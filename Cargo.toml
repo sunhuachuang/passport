@@ -1,0 +1,20 @@
+[package]
+name = "assassin"
+version = "0.0.1"
+authors = ["Contact <contact@cypherlink.io>"]
+edition = "2018"
+readme = "README.md"
+description = "Personal distributed assistant."
+repository = "https://github.com/cypherlink/assassin"
+keywords = ["distributed", "blockchain", "infrastructure", "assistant"]
+license = "MIT/Apache-2.0"
+
+[dependencies]
+serde = "1"
+serde_derive = "1"
+serde_json = "1"
+bincode = "1"
+base64 = "0.11"
+
+tdn = { path = "../TDN" } # Dev
+tdn_permission = { path = "../TDN-Permission" } # Dev
