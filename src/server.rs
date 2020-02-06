@@ -81,9 +81,9 @@ pub async fn start() -> Result<()> {
                         let params = Event::from_upper(&bytes);
                         // TODO send to gid to show
                     }
-                    LayerMessage::LowerJoinResult(gid, uid, is_ok) => {
+                    LayerMessage::LowerJoinResult(_gid, remote_gid, uid, is_ok) => {
                         if is_ok {
-                            let param = global.write().await.apps.fixed_tmp(&gid);
+                            let param = global.write().await.apps.fixed_tmp(&remote_gid);
                             if param.is_none() {
                                 continue;
                             }
@@ -91,13 +91,17 @@ pub async fn start() -> Result<()> {
                             for peer_addr in global.read().await.group.peers() {
                                 send.send(Message::Group(GroupMessage::Event(
                                     *peer_addr,
-                                    Event::build_app_register(gid, *peer_addr, param.clone())
-                                        .to_bytes(),
+                                    Event::build_app_register(
+                                        remote_gid,
+                                        *peer_addr,
+                                        param.clone(),
+                                    )
+                                    .to_bytes(),
                                 )))
                                 .await;
                             }
                         } else {
-                            global.write().await.apps.remove_tmp(&gid);
+                            global.write().await.apps.remove_tmp(&remote_gid);
                         }
                     }
                     LayerMessage::Lower(..) => {} // Not support lower

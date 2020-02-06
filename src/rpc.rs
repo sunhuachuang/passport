@@ -89,11 +89,12 @@ pub fn new_rpc_handler(s: State) -> RpcHandler<State> {
                     return Err(RpcError::InvalidRequest);
                 }
 
-                let gid = gid.unwrap();
+                let remote_gid = gid.unwrap();
 
                 let addr = "127.0.0.1:7000".parse().unwrap();
                 let join_data = vec![];
                 let app_param = AppParam::default();
+                let self_gid = state.0.read().await.group.id().clone();
 
                 state
                     .0
@@ -101,11 +102,11 @@ pub fn new_rpc_handler(s: State) -> RpcHandler<State> {
                     .await
                     .sender
                     .send(Message::Layer(LayerMessage::LowerJoin(
-                        gid, 0, addr, join_data,
+                        self_gid, remote_gid, 0, addr, join_data,
                     )))
                     .await;
 
-                state.0.write().await.apps.add_tmp(gid, app_param);
+                state.0.write().await.apps.add_tmp(remote_gid, app_param);
 
                 Ok(RpcParam::String("App Register Sucess".to_owned()))
             })
