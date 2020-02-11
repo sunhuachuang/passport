@@ -13,6 +13,7 @@ use crate::event::Event;
 use crate::message::{EncodeMode, Message as EventMessage};
 use crate::peer::Peer;
 use crate::rpc::{new_rpc_handler, State};
+use crate::user_id::{MeId, UserHandshake, UserId};
 
 pub struct Global {
     pub apps: AppList,
@@ -39,7 +40,11 @@ pub async fn start() -> Result<()> {
     let group = CAPermissionedGroup::<Peer>::new(config.group_id, vec![1], vec![1, 2, 3], vec![3]);
     config.p2p_join_data = group.join_bytes();
 
-    let send = start_with_config(out_send, config).await.unwrap();
+    let (peer_id, send) = start_with_config(out_send, config).await.unwrap();
+    println!("Debug: peer id: {}", peer_id.short_show());
+    let me_id = MeId::generate("TODOmyname".to_owned(), peer_id, &[1, 2, 3, 4, 5, 6, 7, 8])
+        .expect("self user id error!");
+    println!("My User: {:?}", me_id);
 
     // TODO RWLock
     let global = Arc::new(RwLock::new(Global::new(send.clone(), group)));

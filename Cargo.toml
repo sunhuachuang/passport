@@ -15,6 +15,9 @@ serde_derive = "1"
 serde_json = "1"
 bincode = "1"
 base64 = "0.11"
+bs58 = "0.3"
+sha3 = "0.8"
+ed25519-dalek = { version="1.0.0-pre.3", features=["serde"] }
 
 tdn = { path = "../TDN" } # Dev
 tdn_permission = { path = "../TDN-Permission" } # Dev
