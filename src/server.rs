@@ -1,129 +1,88 @@
-use std::collections::HashMap;
-use tdn::async_std::{
-    io::Result,
-    sync::{Arc, RwLock, Sender},
-};
+use std::path::PathBuf;
+use tdn::async_std::{io::Result, sync::Sender};
 use tdn::prelude::*;
-use tdn::storage::write_local_file;
-use tdn::{new_channel, start_with_config};
-use tdn_permission::CAPermissionedGroup;
 
-use crate::app::{App, AppList, AppParam};
-use crate::event::Event;
-use crate::message::{EncodeMode, Message as EventMessage};
-use crate::peer::Peer;
-use crate::rpc::{new_rpc_handler, State};
-use crate::user_id::{MeId, UserHandshake, UserId};
+use crate::error::new_io_error;
+use crate::event::{Event, Message as EventMessage};
+use crate::group::JoinType;
+use crate::rpc::{new_global_handler, State};
+use crate::rpc_common::RpcInfo;
+use crate::storage::LocalStorage;
 
-pub struct Global {
-    pub apps: AppList,
-    pub group: CAPermissionedGroup<Peer>,
-    pub storage: u32,
-    pub sender: Sender<Message>,
-}
+pub async fn start(db_path: String) -> Result<()> {
+    println!("Rust DEBUG db path: {}", db_path);
+    let db_path = PathBuf::from(db_path);
+    let mut config = Config::load_with_path(db_path.clone()).await;
+    config.db_path = Some(db_path.clone());
 
-impl Global {
-    fn new(sender: Sender<Message>, group: CAPermissionedGroup<Peer>) -> Global {
-        Global {
-            sender,
-            group,
-            apps: AppList::default(),
-            storage: 1,
-        }
+    let storage = LocalStorage::init(db_path)?;
+
+    // use self sign to bootstrap peer.
+    config.p2p_join_data = JoinType::default();
+    if config.rpc_ws.is_none() {
+        // set default ws addr.
+        config.rpc_ws = Some("127.0.0.1:8080".parse().unwrap());
     }
-}
 
-pub async fn start() -> Result<()> {
-    let (out_send, out_recv) = new_channel();
+    let (peer_id, send, out_recv) = start_with_config(config).await.unwrap();
+    println!("Debug: peer id: {}", peer_id.to_hex());
 
-    let mut config = Config::load();
-    let group = CAPermissionedGroup::<Peer>::new(config.group_id, vec![1], vec![1, 2, 3], vec![3]);
-    config.p2p_join_data = group.join_bytes();
-
-    let (peer_id, send) = start_with_config(out_send, config).await.unwrap();
-    println!("Debug: peer id: {}", peer_id.short_show());
-    let me_id = MeId::generate("TODOmyname".to_owned(), peer_id, &[1, 2, 3, 4, 5, 6, 7, 8])
-        .expect("self user id error!");
-    println!("My User: {:?}", me_id);
-
-    // TODO RWLock
-    let global = Arc::new(RwLock::new(Global::new(send.clone(), group)));
-
-    let rpc_handler = new_rpc_handler(State(global.clone()));
+    let (global, rpc_handler) = new_global_handler(storage, send.clone(), peer_id);
 
     while let Some(message) = out_recv.recv().await {
         match message {
-            Message::Group(g_msg) => match g_msg {
-                GroupMessage::PeerJoin(peer_addr, addr, data) => {
-                    global
-                        .write()
-                        .await
-                        .group
-                        .join(peer_addr, addr, data, send.clone())
-                        .await;
+            ReceiveMessage::Group(g_msg) => match g_msg {
+                GroupReceiveMessage::PeerJoin(addr, ..) => {
+                    send.send(SendMessage::Group(GroupSendMessage::PeerJoinResult(
+                        addr,
+                        true,
+                        false,
+                        vec![],
+                    )))
+                    .await;
                 }
-                GroupMessage::PeerJoinResult(peer_addr, is_ok, result) => {
-                    global
-                        .write()
-                        .await
-                        .group
-                        .join_result(peer_addr, is_ok, result);
+                GroupReceiveMessage::PeerJoinResult(..) => {
+                    // Nothing to db.
                 }
-                GroupMessage::PeerLeave(peer_addr) => {
-                    global.write().await.group.leave(&peer_addr);
+                GroupReceiveMessage::PeerLeave(addr) => {
+                    global.write().await.peer_leave(addr);
                 }
-                GroupMessage::Event(peer_addr, bytes) => {
-                    let event_result = Event::from_bytes(&bytes);
-                    if event_result.is_err() {
-                        continue;
-                    };
-                    handle_event(event_result.unwrap(), global.clone()).await;
-                }
-            },
-            Message::Layer(l_msg) => {
-                match l_msg {
-                    LayerMessage::Upper(gid, bytes) => {
-                        let params = Event::from_upper(&bytes);
-                        // TODO send to gid to show
-                    }
-                    LayerMessage::LowerJoinResult(_gid, remote_gid, uid, is_ok) => {
-                        if is_ok {
-                            let param = global.write().await.apps.fixed_tmp(&remote_gid);
-                            if param.is_none() {
-                                continue;
-                            }
-                            let param = param.unwrap();
-                            for peer_addr in global.read().await.group.peers() {
-                                send.send(Message::Group(GroupMessage::Event(
-                                    *peer_addr,
-                                    Event::build_app_register(
-                                        remote_gid,
-                                        *peer_addr,
-                                        param.clone(),
-                                    )
-                                    .to_bytes(),
-                                )))
-                                .await;
-                            }
-                        } else {
-                            global.write().await.apps.remove_tmp(&remote_gid);
+                GroupReceiveMessage::Event(peer_addr, bytes) => {
+                    if let Ok(event) = Event::from_bytes(&bytes) {
+                        if let Ok(true) = handle_event(&peer_addr, &event, &send, &global).await {
+                            // TODO save event.
                         }
                     }
-                    LayerMessage::Lower(..) => {} // Not support lower
-                    LayerMessage::LowerJoin(..) => {} // Not support lower
-                    LayerMessage::UpperJoin(..) => {} //TODO
-                    LayerMessage::UpperJoinResult(..) => {} //TODO
-                    LayerMessage::UpperLeave(..) => {} //TODO
-                    LayerMessage::UpperLeaveResult(..) => {} //TODO
+                }
+            },
+            ReceiveMessage::Rpc(uid, mut params, is_ws) => {
+                println!("uid: {}, rpc comming.", uid);
+                if global.read().await.rpcs.contains_key(&uid) {
+                    let sender = send.clone();
+                    if let Some(user_rpc_handler) = global.read().await.rpcs.get(&uid) {
+                        sender
+                            .send(SendMessage::Rpc(
+                                uid,
+                                user_rpc_handler.handle(params).await,
+                                is_ws,
+                            ))
+                            .await;
+                    }
+                } else {
+                    if let RpcParam::Array(mut rawparams) = params["params"].take() {
+                        rawparams.push(RpcParam::Number(uid.into()));
+                        params["params"] = RpcParam::Array(rawparams);
+                    }
+                    send.send(SendMessage::Rpc(
+                        uid,
+                        rpc_handler.handle(params).await,
+                        is_ws,
+                    ))
+                    .await;
                 }
             }
-            Message::Rpc(uid, params, is_ws) => {
-                if is_ws {
-                    // TODO websocket
-                } else {
-                    send.send(Message::Rpc(uid, rpc_handler.handle(params).await, false))
-                        .await;
-                }
+            ReceiveMessage::Layer(_l_msg) => {
+                // TODO layers
             }
         }
     }
@@ -131,26 +90,128 @@ pub async fn start() -> Result<()> {
     Ok(())
 }
 
-async fn handle_event(event: Event, global: Arc<RwLock<Global>>) -> Result<()> {
-    match event.message() {
-        EventMessage::SyncFile(_peer_addr, file_name, file_mode, file_content) => {
-            let bytes = match file_mode {
-                EncodeMode::Binary => file_content,
-                EncodeMode::Base64 => {
-                    let string = String::from_utf8(file_content).unwrap_or("".to_owned());
-                    let v: Vec<&str> = string.split(',').collect();
-                    if v.len() < 2 {
-                        return Ok(());
-                    }
-
-                    base64::decode(v[1]).unwrap_or(vec![])
-                }
-            };
-
-            write_local_file(&file_name, &bytes).await?;
-        }
-        _ => {}
+async fn handle_event(
+    peer_addr: &PeerAddr,
+    event: &Event,
+    send: &Sender<SendMessage>,
+    global: &State,
+) -> Result<bool> {
+    println!("DEBUG-Yu: Handle event from: {}", peer_addr.short_show());
+    if global.read().await.users.contains_key(&event.from) {
+        println!("DEBUG-Yu: Send to myself!!!!!!");
+        return Err(new_io_error("it is me!"));
     }
 
-    Ok(())
+    if !global.read().await.users.contains_key(&event.to) {
+        println!("DEBUG-Yu: Sended to user not exsit or outline!!!!!!");
+        // TODO if exsit this user, save to cache.
+        return Err(new_io_error("it is not send to me!"));
+    }
+
+    let uid: u64 = global
+        .read()
+        .await
+        .users
+        .get(&event.to)
+        .map(|(uid, _)| uid.clone())
+        .unwrap_or(0);
+
+    match event.msg {
+        EventMessage::ApplyFriend(ref from_peer, ref from_user, ref remark) => {
+            if !event.verify(&from_peer) {
+                return Err(new_io_error("data verify failure!"));
+            }
+            println!("DEBUG-Yu: got friend request");
+
+            send.send(SendMessage::Rpc(
+                uid,
+                RpcInfo::ApplyFriend(from_user.clone(), *peer_addr, remark.clone()).json(),
+                true,
+            ))
+            .await;
+
+            if let Some((_, peers)) = global.write().await.users.get_mut(&event.to) {
+                peers
+                    .write()
+                    .await
+                    .peers
+                    .friend_apply(event.from.clone(), from_peer.clone());
+            }
+
+            return Ok(true);
+        }
+        EventMessage::ReplyFriendSuccess(ref from_peer, ref from_user) => {
+            if !event.verify(&from_peer) {
+                return Err(new_io_error("data verify failure!"));
+            }
+            println!("DEBUG-Yu: got friend response success");
+            let mut my_application = false;
+            if let Some((_, peers)) = global.write().await.users.get_mut(&event.to) {
+                my_application = peers
+                    .write()
+                    .await
+                    .peers
+                    .friend_reply(event.from.clone(), Some(from_peer.clone()));
+            }
+
+            if my_application {
+                send.send(SendMessage::Rpc(
+                    uid,
+                    RpcInfo::ReplyFriend(Some(from_user.clone()), from_user.id.clone(), *peer_addr)
+                        .json(),
+                    true,
+                ))
+                .await;
+                return Ok(true);
+            } else {
+                return Ok(false);
+            }
+        }
+        EventMessage::ReplyFriendFailure => {
+            println!("DEBUG-Yu: got friend response failure");
+            let mut my_application = false;
+            if let Some((_, peers)) = global.write().await.users.get_mut(&event.to) {
+                my_application = peers
+                    .write()
+                    .await
+                    .peers
+                    .friend_reply(event.from.clone(), None);
+            }
+
+            if my_application {
+                send.send(SendMessage::Rpc(
+                    uid,
+                    RpcInfo::ReplyFriend(None, event.from.clone(), *peer_addr).json(),
+                    true,
+                ))
+                .await;
+                return Ok(true);
+            } else {
+                return Ok(false);
+            }
+        }
+        EventMessage::Data(ref from, ref _to, ref data_type, ref data_value, ref data_time) => {
+            println!("DEBUG-Yu: got friend message");
+
+            send.send(SendMessage::Rpc(
+                uid,
+                RpcInfo::Message(
+                    from.clone(),
+                    data_type.clone(),
+                    data_value.clone(),
+                    data_time.clone(),
+                )
+                .json(),
+                true,
+            ))
+            .await;
+
+            return Ok(true);
+        }
+        _ => {
+            println!("DEBUG-Yu: nothing!!!");
+        }
+    }
+
+    Ok(false)
 }

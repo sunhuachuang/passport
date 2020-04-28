@@ -1,90 +1,113 @@
+use ed25519_dalek::{Keypair, PublicKey, Signature};
 use serde_derive::{Deserialize, Serialize};
-use tdn::prelude::{GroupId, PeerAddr};
+use tdn::primitive::PeerAddr;
 
-use crate::app::AppParam;
-use crate::message::{EncodeMode, Message};
+use crate::group::{Friend, GroupId, Peer, UserId};
 
-#[derive(Default, Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Event {
-    message: Message,
+    pub from: UserId,
+    pub to: UserId,
+    pub msg: Message,
+    sign: Signature,
 }
 
 impl Event {
-    fn build(message: Message) -> Event {
-        Event { message }
+    pub fn as_bytes(&self) -> Vec<u8> {
+        bincode::serialize(&self).unwrap_or(vec![])
     }
 
-    pub fn build_sync(peer_addr: PeerAddr, value: impl ToString) -> Event {
-        Event::build(Message::Sync(peer_addr, value.to_string()))
+    pub fn from_bytes(bytes: &Vec<u8>) -> Result<Event, bincode::Error> {
+        bincode::deserialize::<Event>(bytes)
     }
 
-    pub fn build_sync_file(
-        peer_addr: PeerAddr,
-        file_name: impl ToString,
-        file_mode: EncodeMode,
-        file_bytes: Vec<u8>,
+    pub fn signed(from: UserId, to: UserId, msg: Message, keypair: &Keypair) -> Event {
+        let sign = Peer::sign(&bincode::serialize(&msg).unwrap_or(vec![]), keypair);
+
+        Event {
+            from,
+            to,
+            msg,
+            sign,
+        }
+    }
+
+    pub fn verify(&self, user: &Peer) -> bool {
+        let data = bincode::serialize(&self.msg).unwrap_or(vec![]);
+        user.verify(&data, &self.sign)
+    }
+
+    pub fn new_by_apply_friend(
+        to: UserId,
+        my: Peer,
+        friend: Friend,
+        remark: String,
+        keypair: &Keypair,
     ) -> Event {
-        Event::build(Message::SyncFile(
-            peer_addr,
-            file_name.to_string(),
-            file_mode,
-            file_bytes,
-        ))
+        println!("DEBUG: New request event: from: {}, to: {}", friend.id, to);
+        let from = friend.id.clone();
+        let msg = Message::ApplyFriend(my, friend, remark);
+        Self::signed(from, to, msg, keypair)
     }
 
-    pub fn build_store(value: Vec<u8>) -> Event {
-        Event::build(Message::Store(value))
+    pub fn new_by_reply_friend_success(
+        to: UserId,
+        my: Peer,
+        friend: Friend,
+        keypair: &Keypair,
+    ) -> Event {
+        let from = friend.id.clone();
+        let msg = Message::ReplyFriendSuccess(my, friend);
+        Self::signed(from, to, msg, keypair)
     }
 
-    pub fn build_app_register(gid: GroupId, peer_addr: PeerAddr, app_param: AppParam) -> Event {
-        Event::build(Message::AppRegister(gid, peer_addr, app_param))
+    pub fn new_by_reply_friend_failure(from: UserId, to: UserId, keypair: &Keypair) -> Event {
+        Self::signed(from, to, Message::ReplyFriendFailure, keypair)
     }
 
-    pub fn build_app_delete(gid: GroupId) -> Event {
-        Event::build(Message::AppDelete(gid))
+    pub fn new_by_message(
+        from: UserId,
+        to: UserId,
+        data_type: u32,
+        data_value: String,
+        data_time: String,
+        keypair: &Keypair,
+    ) -> Event {
+        Self::signed(
+            from.clone(),
+            to.clone(),
+            Message::Data(from, to, data_type, data_value, data_time),
+            keypair,
+        )
     }
+}
 
-    pub fn build_app(gid: GroupId, param: AppParam) -> Event {
-        Event::build(Message::App(gid, param))
-    }
-
-    pub fn message(self) -> Message {
-        self.message
-    }
-
-    pub fn is_app(&self) -> bool {
-        match self.message {
-            Message::App { .. } | Message::AppRegister { .. } | Message::AppDelete { .. } => true,
-            _ => false,
-        }
-    }
-
-    pub fn from_bytes(bytes: &Vec<u8>) -> Result<Self, ()> {
-        bincode::deserialize(bytes).map_err(|_e| ())
-    }
-
-    pub fn to_bytes(&self) -> Vec<u8> {
-        bincode::serialize(self).unwrap_or(vec![])
-    }
-
-    pub fn from_upper(bytes: &Vec<u8>) -> Vec<AppParam> {
-        bincode::deserialize(bytes).unwrap_or(vec![])
-    }
-
-    pub fn to_upper(&self) -> Vec<u8> {
-        match &self.message {
-            Message::App(_gid, params) => bincode::serialize(&vec![&params]).unwrap_or(vec![]),
-            _ => vec![],
-        }
-    }
-
-    /// no lower layer
-    pub fn from_lower(_bytes: &Vec<u8>) -> Result<Self, ()> {
-        Err(())
-    }
-
-    /// no lower layer
-    pub fn to_lower(&self) -> Vec<u8> {
-        vec![]
-    }
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub enum Message {
+    /// New a user: user_id, name, bio, avator, pk.
+    UserNew(UserId, String, String, String, String, PublicKey),
+    /// Edit user info: user_id, name, remark, bio, avator
+    UserEdit(UserId, String, String, String, String, String),
+    /// Deprecated use account. others will close it.
+    UserReject(UserId),
+    /// Make friend with other: from_user, from_user_info, remark.
+    ApplyFriend(Peer, Friend, String),
+    /// Make friend sucess: my_make_friend_user
+    ReplyFriendSuccess(Peer, Friend),
+    /// Make friend failure.
+    ReplyFriendFailure,
+    /// Close friend: one person, other person.
+    FriendReject(UserId, UserId),
+    /// Tell all friends I online: user_id, peer_addr.
+    FriendOnline(UserId, PeerAddr),
+    /// Tell all friends I offline.
+    FriendOffline(UserId),
+    /// New a Group: id, owner, name, bio, avator
+    GroupNew(GroupId, UserId, String, String, String),
+    /// Invate person to this Group: id, owner, name, bio, avator, sign.
+    GroupInvate(GroupId, UserId, String, String, String, Signature),
+    /// Reject someone from a group: id, rejected_user_id.
+    GroupReject(GroupId, UserId),
+    /// Message Data: from, to, type, value, time.
+    Data(String, String, u32, String, String),
 }

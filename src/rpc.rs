@@ -1,124 +1,135 @@
-use std::future::Future;
-use tdn::async_std::sync::{Arc, RwLock};
-use tdn::prelude::*;
+use std::collections::HashMap;
+use std::net::SocketAddr;
+use tdn::async_std::sync::{Arc, RwLock, Sender};
+use tdn::prelude::{GroupSendMessage, PeerAddr, RpcHandler, RpcParam, SendMessage};
 
-use crate::app::AppParam;
-use crate::event::Event;
-use crate::message::EncodeMode;
-use crate::server::Global;
+use crate::group::{User, UserId};
+use crate::rpc_common::{failure_response, response, success_response};
+use crate::rpc_user::{new_user_handler, UserState};
+use crate::storage::LocalStorage;
 
-pub struct State(pub Arc<RwLock<Global>>);
+pub struct Global {
+    pub storage: LocalStorage,
+    pub send: Sender<SendMessage>,
+    pub addr: PeerAddr,
+    pub users: HashMap<UserId, (u64, UserState)>,
+    pub rpcs: HashMap<u64, RpcHandler<UserState>>,
+}
 
-pub fn new_rpc_handler(s: State) -> RpcHandler<State> {
+impl Global {
+    fn notify(&self) {}
+
+    pub fn peer_leave(&self, addr: PeerAddr) {}
+}
+
+pub type State = Arc<RwLock<Global>>;
+
+pub fn new_global_handler(
+    storage: LocalStorage,
+    send: Sender<SendMessage>,
+    addr: PeerAddr,
+) -> (State, RpcHandler<State>) {
+    let global = Arc::new(RwLock::new(Global {
+        storage,
+        send,
+        addr,
+        users: HashMap::new(),
+        rpcs: HashMap::new(),
+    }));
+    let rpc_handler = new_rpc_handler(global.clone());
+    (global, rpc_handler)
+}
+
+fn new_rpc_handler(s: State) -> RpcHandler<State> {
     let mut rpc_handler = RpcHandler::new(s);
+
+    // server ping
     rpc_handler.add_method("echo", |params: Vec<RpcParam>, _state: Arc<State>| {
-        Box::pin(async {
-            Ok(RpcParam::Array(params))
-            //Err(RpcError::InvalidRequest)
-        })
+        Box::pin(async { Ok(response("echo", params)) })
     });
 
-    rpc_handler.add_method("sync-file", |params, state| {
+    rpc_handler.add_method("new-user", |params: Vec<RpcParam>, state: Arc<State>| {
         Box::pin(async move {
-            let peer_name = params[0].as_str().unwrap();
-            let file_name = params[1].as_str().unwrap();
-            let file_bytes = params[2].as_str().unwrap();
-            println!("{}", file_bytes);
+            let seed = params[0].as_str().unwrap().to_owned();
+            let password = params[1].as_str().unwrap().to_owned();
+            let name = params[2].as_str().unwrap().to_owned();
+            let avator = params[3].as_str().unwrap().to_owned();
+            let bio = params[4].as_str().unwrap().to_owned();
+            let uid = params[5].as_u64().unwrap();
 
-            let peer_addr = state
-                .0
-                .read()
-                .await
-                .group
-                .get_peer_addr(&peer_name.to_string())
-                .map(|peer| peer.clone());
+            println!("DEBUG-Yu: New User: {}, avator: {}", name, avator.len());
 
-            if peer_addr.is_none() {
-                return Err(RpcError::InvalidRequest);
+            let addr = state.read().await.addr.clone();
+            let send = state.read().await.send.clone();
+
+            if let Ok(user) = User::init(name, avator, bio, seed) {
+                let user_id = user.id.clone();
+                let peer_list_result = state.read().await.storage.add_user(addr, password, user);
+                if let Ok(peer_list) = peer_list_result {
+                    let (s, handler) = new_user_handler(send, peer_list);
+                    state.write().await.users.insert(user_id.clone(), (uid, s));
+                    state.write().await.rpcs.insert(uid, handler);
+
+                    return Ok(response(
+                        "new-user",
+                        vec![RpcParam::String(user_id), RpcParam::String(addr.to_hex())],
+                    ));
+                }
             }
-            let peer_addr = peer_addr.unwrap();
-            let event = Event::build_sync_file(
-                peer_addr,
-                file_name,
-                EncodeMode::Base64,
-                file_bytes.as_bytes().to_vec(),
-            );
 
-            state
-                .0
-                .read()
-                .await
-                .sender
-                .send(Message::Group(GroupMessage::Event(
-                    peer_addr,
-                    event.to_bytes(),
-                )))
-                .await;
-            Ok(RpcParam::String("Sync File Sucess".to_owned()))
+            Ok(failure_response("new-user", "params invalid."))
         })
     });
 
-    rpc_handler.add_method("sync", |params, state| {
-        Box::pin(async move { Ok(RpcParam::String("TODO".to_owned())) })
-    });
+    // user online.
+    rpc_handler.add_method("hello", |params: Vec<RpcParam>, state: Arc<State>| {
+        Box::pin(async move {
+            let user_id = params[0].as_str().unwrap().to_owned();
+            let password = params[1].as_str().unwrap().to_owned();
+            let uid = params[2].as_u64().unwrap();
 
-    rpc_handler.add_method("store", |params, state| {
-        Box::pin(async move { Ok(RpcParam::String("TODO".to_owned())) })
-    });
+            println!("DEBUG-Yu: Say Hello: {}", user_id);
 
-    rpc_handler.add_method(
-        "app-register",
-        |params: Vec<RpcParam>, state: Arc<State>| {
-            Box::pin(async move {
-                if params.len() != 4 {
-                    return Err(RpcError::InvalidRequest);
-                }
+            let addr = state.read().await.addr.clone();
+            let send = state.read().await.send.clone();
 
-                let gid = params[0]
-                    .as_str()
-                    .map(|gids| {
-                        if gids.len() > 2 && &gids[0..2] == "0x" {
-                            GroupId::from_hex(gids[2..].to_owned()).ok()
-                        } else {
-                            Some(GroupId::from_symbol(gids))
-                        }
-                    })
-                    .flatten();
-
-                if gid.is_none() {
-                    return Err(RpcError::InvalidRequest);
-                }
-
-                let remote_gid = gid.unwrap();
-
-                let addr = "127.0.0.1:7000".parse().unwrap();
-                let join_data = vec![];
-                let app_param = AppParam::default();
-                let self_gid = state.0.read().await.group.id().clone();
-
-                state
-                    .0
+            if state.read().await.users.get(&user_id).is_none() {
+                let peer_list_result = state
                     .read()
                     .await
-                    .sender
-                    .send(Message::Layer(LayerMessage::LowerJoin(
-                        self_gid, remote_gid, 0, addr, join_data,
-                    )))
-                    .await;
+                    .storage
+                    .load_user(addr, password, &user_id);
 
-                state.0.write().await.apps.add_tmp(remote_gid, app_param);
+                if let Ok(peer_list) = peer_list_result {
+                    let (s, handler) = new_user_handler(send, peer_list);
+                    state.write().await.users.insert(user_id.clone(), (uid, s));
+                    state.write().await.rpcs.insert(uid, handler);
+                }
+            }
 
-                Ok(RpcParam::String("App Register Sucess".to_owned()))
-            })
-        },
-    );
-
-    rpc_handler.add_method("app", |params, state| {
-        Box::pin(async move { Ok(RpcParam::String("TODO".to_owned())) })
+            Ok(response(
+                "hello",
+                vec![RpcParam::String(user_id), RpcParam::String(addr.to_hex())],
+            ))
+        })
     });
 
-    rpc_handler.add_method("app-delete", |params: Vec<RpcParam>, _state: Arc<State>| {
-        Box::pin(async { Ok(RpcParam::String("App Delete Sucess".to_owned())) })
+    // bootstrap
+    rpc_handler.add_method("bootstrap", |params: Vec<RpcParam>, state: Arc<State>| {
+        Box::pin(async move {
+            let socket = params[0].as_str().unwrap();
+            if let Ok(addr) = socket.parse::<SocketAddr>() {
+                println!("DEBUG-Yu: start bootstrap to: {:?}", addr);
+                state
+                    .read()
+                    .await
+                    .send
+                    .send(SendMessage::Group(GroupSendMessage::Connect(addr, None)))
+                    .await;
+            }
+
+            return Ok(success_response("bootstrap"));
+        })
     });
 
     rpc_handler
