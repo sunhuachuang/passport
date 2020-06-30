@@ -1,14 +1,16 @@
+#[macro_use]
+extern crate log;
+
 use std::ffi::CString;
 use std::os::raw::c_char;
 use tdn::async_std::task;
 
+mod apps;
 mod error;
-mod event;
 mod group;
+mod layer;
 mod primitives;
 mod rpc;
-mod rpc_common;
-mod rpc_user;
 mod server;
 mod storage;
 

@@ -1,39 +1,58 @@
 use std::net::SocketAddr;
 
 use tdn::async_std::io::Result;
+use tdn::async_std::sync::{Arc, RwLock};
 use tdn::prelude::{GroupId, LayerReceiveMessage};
 
-struct LayerBus;
+use crate::storage::LocalStorage;
+
+pub struct LayerBus(Arc<RwLock<LocalStorage>>);
 
 impl LayerBus {
-    pub async fn handle(ltype: LayerReceiveMessage) -> Result<()> {
-        match ltype {
-            // TODO
-        }
+    pub fn new(ls: Arc<RwLock<LocalStorage>>) -> Self {
+        Self(ls)
     }
 
-    pub async fn upper(gid: GroupId, bytes: Vec<u8>) -> Result<()> {}
+    pub async fn handle(&mut self, _ltype: LayerReceiveMessage) -> Result<()> {
+        //match ltype {
+        // TODO
+        //}
 
-    pub async fn lower(gid: GroupId, bytes: Vec<u8>) -> Result<()> {}
-
-    pub async fn upper_join(gid: GroupId) -> Result<()> {}
-
-    pub async fn lower_join(
-        req_gid: GroupId,
-        remote_gid: GroupId,
-        uuid: u32,
-        addr: SocketAddr,
-        bytes: Vec<u8>,
-    ) -> Result<()> {
+        Ok(())
     }
 
-    pub async fn upper_join_result(remote_gid: GroupId, is_ok: bool) -> Result<()> {}
+    async fn _upper(_gid: GroupId, _bytes: Vec<u8>) -> Result<()> {
+        Ok(())
+    }
 
-    pub async fn lower_join_result(
-        req_gid: GroupId,
-        remote_gid: GroupId,
-        uuid: u32,
-        is_ok: bool,
+    async fn _lower(_gid: GroupId, _bytes: Vec<u8>) -> Result<()> {
+        Ok(())
+    }
+
+    async fn _upper_join(_gid: GroupId) -> Result<()> {
+        Ok(())
+    }
+
+    async fn _lower_join(
+        _req_gid: GroupId,
+        _remote_gid: GroupId,
+        _uuid: u32,
+        _addr: SocketAddr,
+        _bytes: Vec<u8>,
     ) -> Result<()> {
+        Ok(())
+    }
+
+    async fn _upper_join_result(_remote_gid: GroupId, _is_ok: bool) -> Result<()> {
+        Ok(())
+    }
+
+    async fn _lower_join_result(
+        _req_gid: GroupId,
+        _remote_gid: GroupId,
+        _uuid: u32,
+        _is_ok: bool,
+    ) -> Result<()> {
+        Ok(())
     }
 }

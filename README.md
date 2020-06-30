@@ -13,6 +13,18 @@ Personal distributed data assistant build on TDN. And How to use.
 
 ![Helper With Others](./assets/Helper-others.jpg)
 
+## rpc with server
+```
+{
+    "jsonrpc": "2.0",
+    "id": 0,
+    "app": "system"
+    "method": "start",
+    "params": ["s", 1]
+}
+```
+
+
 ## License
 
 This project is licensed under either of

@@ -1,12 +1,14 @@
+#[macro_use]
+extern crate log;
+
 use tdn::async_std::{io::Result, task};
 
+mod apps;
 mod error;
-mod event;
 mod group;
+mod layer;
 mod primitives;
 mod rpc;
-mod rpc_common;
-mod rpc_user;
 mod server;
 mod storage;
 

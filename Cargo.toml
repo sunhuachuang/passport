@@ -9,11 +9,18 @@ repository = "https://github.com/cypherlink/assassin"
 keywords = ["distributed", "blockchain", "infrastructure", "assistant"]
 license = "MIT/Apache-2.0"
 
+[profile.release]
+lto = true
+opt-level = 's'
+codegen-units = 1
+
 [lib]
 name = "assassin"
 crate-type = ["dylib", "staticlib"]
 
 [dependencies]
+log = "0.4"
+simplelog = "0.7"
 serde = "1"
 serde_derive = "1"
 serde_json = "1"
@@ -25,4 +32,4 @@ blake2 = "0.8"
 ed25519-dalek = { git = "https://github.com/dalek-cryptography/ed25519-dalek", branch = "develop", features=["serde"] }
 rand = "0.7"
 
-tdn = { path = "../TDN" } # Dev
+tdn = { path = "../../TDN" } # Dev

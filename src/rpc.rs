@@ -1,136 +1,173 @@
 use std::collections::HashMap;
 use std::net::SocketAddr;
-use tdn::async_std::sync::{Arc, RwLock, Sender};
-use tdn::prelude::{GroupSendMessage, PeerAddr, RpcHandler, RpcParam, SendMessage};
+use tdn::async_std::{
+    io::Result,
+    sync::{Arc, RwLock, Sender},
+};
+use tdn::prelude::{GroupSendMessage, PeerAddr, RpcError, RpcHandler, RpcParam, SendMessage};
+use tdn::primitive::json;
 
-use crate::group::{User, UserId};
-use crate::rpc_common::{failure_response, response, success_response};
-use crate::rpc_user::{new_user_handler, UserState};
+use crate::apps::{AppRpc, AppSymbol};
 use crate::storage::LocalStorage;
 
-pub struct Global {
-    pub storage: LocalStorage,
-    pub send: Sender<SendMessage>,
-    pub addr: PeerAddr,
-    pub users: HashMap<UserId, (u64, UserState)>,
-    pub rpcs: HashMap<u64, RpcHandler<UserState>>,
+pub trait RpcState {}
+
+type Handlers = Arc<RwLock<HashMap<AppSymbol, AppRpc>>>;
+
+/// RPC Handler Bus.
+/// jsonrpc call like this:
+/// ```
+/// {
+///    "jsonrpc": "2.0",
+///    "id": 0,
+///    "app": "system", // apps: did / yu / sync...
+///    "method": "echo",
+///    "params": []
+/// }
+/// ```
+pub struct RpcBus {
+    system: RpcHandler<SystemState>,
+    rpcs: Handlers,
 }
 
-impl Global {
-    fn notify(&self) {}
+impl RpcBus {
+    pub fn new(ls: Arc<RwLock<LocalStorage>>, send: Sender<SendMessage>, addr: PeerAddr) -> Self {
+        let handlers = Arc::new(RwLock::new(HashMap::new()));
+        Self {
+            system: system_rpc_handler(SystemState((handlers.clone(), send, ls, addr))),
+            rpcs: handlers,
+        }
+    }
 
-    pub fn peer_leave(&self, addr: PeerAddr) {}
+    pub async fn handle(&mut self, params: RpcParam) -> Result<RpcParam> {
+        if let Some(appname) = params.get("app").map(|s| s.as_str()).flatten() {
+            let res_appname = appname.clone().into();
+            let mut res = if appname == "system" {
+                self.system.handle(params).await
+            } else {
+                let app_res = AppSymbol::from_str(appname);
+                if app_res.is_err() {
+                    failure_response("App not exsit!")
+                } else {
+                    if let Some(handler) = self.rpcs.write().await.get(&app_res.unwrap()) {
+                        handler.handle(params).await
+                    } else {
+                        failure_response("App not started!")
+                    }
+                }
+            };
+
+            res["app"] = res_appname;
+            return Ok(res);
+        }
+
+        Ok(failure_response("No app params in jsonrpc call!"))
+    }
 }
 
-pub type State = Arc<RwLock<Global>>;
+struct SystemState(
+    (
+        Handlers,
+        Sender<SendMessage>,
+        Arc<RwLock<LocalStorage>>,
+        PeerAddr,
+    ),
+);
 
-pub fn new_global_handler(
-    storage: LocalStorage,
-    send: Sender<SendMessage>,
-    addr: PeerAddr,
-) -> (State, RpcHandler<State>) {
-    let global = Arc::new(RwLock::new(Global {
-        storage,
-        send,
-        addr,
-        users: HashMap::new(),
-        rpcs: HashMap::new(),
-    }));
-    let rpc_handler = new_rpc_handler(global.clone());
-    (global, rpc_handler)
-}
-
-fn new_rpc_handler(s: State) -> RpcHandler<State> {
+fn system_rpc_handler(s: SystemState) -> RpcHandler<SystemState> {
     let mut rpc_handler = RpcHandler::new(s);
 
-    // server ping
-    rpc_handler.add_method("echo", |params: Vec<RpcParam>, _state: Arc<State>| {
-        Box::pin(async { Ok(response("echo", params)) })
-    });
-
-    rpc_handler.add_method("new-user", |params: Vec<RpcParam>, state: Arc<State>| {
-        Box::pin(async move {
-            let seed = params[0].as_str().unwrap().to_owned();
-            let password = params[1].as_str().unwrap().to_owned();
-            let name = params[2].as_str().unwrap().to_owned();
-            let avator = params[3].as_str().unwrap().to_owned();
-            let bio = params[4].as_str().unwrap().to_owned();
-            let uid = params[5].as_u64().unwrap();
-
-            println!("DEBUG-Yu: New User: {}, avator: {}", name, avator.len());
-
-            let addr = state.read().await.addr.clone();
-            let send = state.read().await.send.clone();
-
-            if let Ok(user) = User::init(name, avator, bio, seed) {
-                let user_id = user.id.clone();
-                let peer_list_result = state.read().await.storage.add_user(addr, password, user);
-                if let Ok(peer_list) = peer_list_result {
-                    let (s, handler) = new_user_handler(send, peer_list);
-                    state.write().await.users.insert(user_id.clone(), (uid, s));
-                    state.write().await.rpcs.insert(uid, handler);
-
-                    return Ok(response(
-                        "new-user",
-                        vec![RpcParam::String(user_id), RpcParam::String(addr.to_hex())],
-                    ));
-                }
-            }
-
-            Ok(failure_response("new-user", "params invalid."))
-        })
-    });
-
-    // user online.
-    rpc_handler.add_method("hello", |params: Vec<RpcParam>, state: Arc<State>| {
-        Box::pin(async move {
-            let user_id = params[0].as_str().unwrap().to_owned();
-            let password = params[1].as_str().unwrap().to_owned();
-            let uid = params[2].as_u64().unwrap();
-
-            println!("DEBUG-Yu: Say Hello: {}", user_id);
-
-            let addr = state.read().await.addr.clone();
-            let send = state.read().await.send.clone();
-
-            if state.read().await.users.get(&user_id).is_none() {
-                let peer_list_result = state
-                    .read()
-                    .await
-                    .storage
-                    .load_user(addr, password, &user_id);
-
-                if let Ok(peer_list) = peer_list_result {
-                    let (s, handler) = new_user_handler(send, peer_list);
-                    state.write().await.users.insert(user_id.clone(), (uid, s));
-                    state.write().await.rpcs.insert(uid, handler);
-                }
-            }
-
-            Ok(response(
-                "hello",
-                vec![RpcParam::String(user_id), RpcParam::String(addr.to_hex())],
-            ))
-        })
-    });
+    rpc_handler.add_method("echo", |params, _| Box::pin(async { Ok(params.into()) }));
 
     // bootstrap
-    rpc_handler.add_method("bootstrap", |params: Vec<RpcParam>, state: Arc<State>| {
+    rpc_handler.add_method(
+        "bootstrap",
+        |params: Vec<RpcParam>, state: Arc<SystemState>| {
+            Box::pin(async move {
+                let socket = params[0].as_str().unwrap();
+                info!("add bootstrap to: {}", socket);
+                if let Ok(addr) = socket.parse::<SocketAddr>() {
+                    (state.0)
+                        .1
+                        .send(SendMessage::Group(GroupSendMessage::Connect(addr, None)))
+                        .await;
+
+                    Ok(Default::default())
+                } else {
+                    Err(RpcError::Custom("socket address not valid"))
+                }
+            })
+        },
+    );
+
+    rpc_handler.add_method(
+        "peer_info",
+        |_params: Vec<RpcParam>, _state: Arc<SystemState>| {
+            Box::pin(async move { Ok(Default::default()) })
+        },
+    );
+
+    // start app
+    rpc_handler.add_method("start", |params: Vec<RpcParam>, state: Arc<SystemState>| {
         Box::pin(async move {
-            let socket = params[0].as_str().unwrap();
-            if let Ok(addr) = socket.parse::<SocketAddr>() {
-                println!("DEBUG-Yu: start bootstrap to: {:?}", addr);
-                state
-                    .read()
-                    .await
-                    .send
-                    .send(SendMessage::Group(GroupSendMessage::Connect(addr, None)))
-                    .await;
+            if params.len() == 0 {
+                return Err(RpcError::Custom("Invalid Params!"));
             }
 
-            return Ok(success_response("bootstrap"));
+            if let Some(app) = params[0].as_str() {
+                info!("start app: {}", app);
+                let app_res = AppSymbol::from_str(app);
+
+                if app_res.is_err() {
+                    info!("app not exsit");
+                    return Err(RpcError::Custom("app not exsit!"));
+                }
+                let app = app_res.unwrap();
+
+                if (state.0).0.read().await.contains_key(&app) {
+                    return Ok(Default::default());
+                }
+
+                let handler = app.start((state.0).3);
+                (state.0).0.write().await.insert(app, handler);
+
+                return Ok(Default::default());
+            }
+
+            return Err(RpcError::Custom("Invalid Params!"));
+        })
+    });
+
+    // restart running app
+    rpc_handler.add_method(
+        "restart",
+        |params: Vec<RpcParam>, _state: Arc<SystemState>| {
+            Box::pin(async move {
+                let app = params[0].as_str().unwrap();
+                info!("restart app: {}", app);
+                Ok(Default::default())
+            })
+        },
+    );
+
+    // stop running app
+    rpc_handler.add_method("stop", |params: Vec<RpcParam>, _state: Arc<SystemState>| {
+        Box::pin(async move {
+            let app = params[0].as_str().unwrap();
+            info!("stop app: {}", app);
+            Ok(Default::default())
         })
     });
 
     rpc_handler
+}
+
+fn failure_response(reason: &str) -> RpcParam {
+    json!({
+        "jsonrpc": "2.0",
+        "error": {
+            "code": -32600,
+            "message": reason,
+        }
+    })
 }

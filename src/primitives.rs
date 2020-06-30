@@ -4,6 +4,8 @@ use crate::error::Error;
 
 pub const DEFAULT_WS_ADDR: &'static str = "127.0.0.1:8080";
 
+pub const DEFAULT_LOG_FILE: &'static str = "assassin.log";
+
 /// db save secret key.
 pub fn db_sk_key() -> Vec<u8> {
     vec![1]
