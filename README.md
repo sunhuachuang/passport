@@ -1,7 +1,7 @@
 # Assassin
 Personal distributed data assistant build on TDN. And How to use.
 
-1. Assassin, a permissioned DApp. (DOING)
+1. Assassin, a permissioned DApp.
 2. Example for SMS(chat) DEMO, a permissionless DApp. (TODO)
 
 ## Experience in browser.
@@ -9,9 +9,9 @@ Personal distributed data assistant build on TDN. And How to use.
 - open `127.0.0.1:8000` in brower. html in assets/index.html
 
 ## How ?
-![Helper Mode](./assets/Helper.jpg)
+![Assassin Mode](./assets/assassin.jpg)
 
-![Helper With Others](./assets/Helper-others.jpg)
+![Assassin With Others](./assets/assassin-others.jpg)
 
 ## rpc with server
 ```
