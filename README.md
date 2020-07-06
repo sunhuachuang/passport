@@ -1,28 +1,20 @@
 # Assassin
-Personal distributed data assistant build on TDN. And How to use.
+Distributed data assistant.
 
-1. Assassin, a permissioned DApp.
-2. Example for SMS(chat) DEMO, a permissionless DApp. (TODO)
+## Structure
+- [core](./core) Backend services built on TDN.
+- [app](./app) Frontend user interface built on Flutter.
 
-## Experience in browser.
-- run `cargo run`, and it will start use `config.toml`.
-- open `127.0.0.1:8000` in brower. html in assets/index.html
+
+## Built-in Dapps
+1. **Yu**: distributed, security and privacy IM.
+2. **Sync**: Safely transfer files between devices.
+
 
 ## How ?
-![Assassin Mode](./assets/assassin.jpg)
+![Assassin Mode](./raw/master/assets/assassin.jpg)
 
-![Assassin With Others](./assets/assassin-others.jpg)
-
-## rpc with server
-```
-{
-    "jsonrpc": "2.0",
-    "id": 0,
-    "app": "system"
-    "method": "start",
-    "params": ["s", 1]
-}
-```
+![Assassin With Others](./raw/master/assets/assassin-others.jpg)
 
 
 ## License
