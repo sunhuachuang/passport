@@ -12,9 +12,9 @@ Distributed data assistant.
 
 
 ## How ?
-![Assassin Mode](./raw/master/assets/assassin.jpg)
+![Assassin Mode](assets/assassin.jpg)
 
-![Assassin With Others](./raw/master/assets/assassin-others.jpg)
+![Assassin With Others](assets/assassin-others.jpg)
 
 
 ## License
