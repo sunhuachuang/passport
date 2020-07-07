@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:provider/provider.dart';
 
 import 'package:assassin/l10n/gallery_localizations.dart';
 import 'package:assassin/widgets/adaptive.dart';
@@ -9,6 +10,23 @@ import './common/styles.dart';
 import './models/message.dart';
 import './models/user_model.dart';
 import './widgets/avatar.dart';
+
+class ActiveUser extends ChangeNotifier {
+  User user = User(
+    id: 1,
+    name: 'Peter lastony',
+    imgUrl: 'https://i.pravatar.cc/300?img=1',
+    isOnline: true);
+
+  ActiveUser([User user]) {
+    this.user = user;
+  }
+
+  update(User user) {
+    this.user = user;
+    notifyListeners();
+  }
+}
 
 class HomePage extends StatelessWidget {
   const HomePage();
@@ -21,24 +39,22 @@ class HomePage extends StatelessWidget {
       return Scaffold(
         body: Container(
           color: background,
-          child: Row(
-            children: [
-              Container(
-                width: 350,
-                child: ListFriends(),
-              ),
-              SizedBox(width: 20.0),
-              Expanded(
-                child: ChatDetail(
-                  sender: User(
-                    id: 1,
-                    name: 'Peter lastony',
-                    imgUrl: 'https://i.pravatar.cc/300?img=1',
-                    isOnline: true)
-                ),
-              ),
-          ]),
-      ));
+          child: ListenableProvider<ActiveUser>(
+            create: (_) => ActiveUser(),
+            child: Builder(builder: (context) {
+                return Row(
+                  children: [
+                    Container(
+                      width: 350,
+                      child: ListFriends(),
+                    ),
+                    SizedBox(width: 20.0),
+                    Expanded(
+                      child: ChatDetail()
+                    ),
+                ]);
+            }),
+      )));
     } else {
       return Scaffold(
         body: Container(
@@ -89,14 +105,18 @@ class _ListFriendsState extends State<ListFriends> {
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => ChatScreen(
-              sender: message.sender,
+        if (isDisplayDesktop(context)) {
+          Provider.of<ActiveUser>(context, listen: false).update(message.sender);
+        } else {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => ChatScreen(
+                sender: message.sender,
+              ),
             ),
-          ),
-        );
+          );
+        }
       },
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 6.0),

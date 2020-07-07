@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import './common/styles.dart';
 import './models/message.dart';
@@ -6,32 +7,35 @@ import './models/user_model.dart';
 import './widgets/avatar.dart';
 import './widgets/button_icon.dart';
 
+import 'home.dart';
+
 class ChatScreen extends StatelessWidget {
   final User sender;
   const ChatScreen({Key key, this.sender}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
-        color: background,
-        child: ChatDetail(sender: sender),
-    ));
+    return ListenableProvider<ActiveUser>(
+      create: (_) => ActiveUser(sender),
+      child: Builder(builder: (context) {
+          return Scaffold(
+            body: Container(
+              color: background,
+              child: ChatDetail(),
+          ));
+      })
+    );
   }
 }
 
 class ChatDetail extends StatefulWidget {
-  final User sender;
-  const ChatDetail({Key key, this.sender}) : super(key: key);
+  ChatDetail({Key key}) : super(key: key);
 
   @override
-  _ChatDetailState createState() => _ChatDetailState(sender: sender);
+  _ChatDetailState createState() => _ChatDetailState();
 }
 
 class _ChatDetailState extends State<ChatDetail> {
-  final User sender;
-  _ChatDetailState({this.sender});
-
   buildChat(Message message, BuildContext context) {
     final bool isCurrentUser = message.sender.id == currentUser.id;
     return Padding(
@@ -68,6 +72,7 @@ class _ChatDetailState extends State<ChatDetail> {
 
   @override
   Widget build(BuildContext context) {
+    final sender = context.watch<ActiveUser>().user;
     return Column(
       children: [
         Container(
