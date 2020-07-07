@@ -4,8 +4,10 @@ import 'package:flutter/material.dart';
 import 'main.dart';
 import 'pages/home.dart';
 import 'pages/app_info.dart';
+import 'pages/network_device.dart';
 
 import 'apps/starter/app.dart';
+import 'apps/yu/app.dart';
 
 typedef PathWidgetBuilder = Widget Function(BuildContext, String);
 
@@ -42,6 +44,10 @@ class RouteConfiguration {
     Path(
       r'^' + StarterApp.defaultRoute,
       (context, match) => const AppWrapper(study: StarterApp()),
+    ),
+    Path(
+      r'^' + YuApp.defaultRoute,
+      (context, match) => const AppWrapper(study: YuApp()),
     ),
     Path(
       r'^/',

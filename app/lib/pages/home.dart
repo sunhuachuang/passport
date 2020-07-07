@@ -79,7 +79,7 @@ class HomePage extends StatelessWidget {
               padding: const EdgeInsets.symmetric(
                 horizontal: _horizontalDesktopPadding,
               ),
-              child: _GalleryHeader(),
+              child: _AppHeader(),
             ),
             Container(
               height: carouselHeight,
@@ -89,7 +89,7 @@ class HomePage extends StatelessWidget {
               padding: const EdgeInsets.symmetric(
                 horizontal: _horizontalDesktopPadding,
               ),
-              child: _CategoriesHeader(),
+              child: _ProfileHeader(),
             ),
             Container(
               height: 585,
@@ -165,7 +165,7 @@ class HomePage extends StatelessWidget {
   }
 }
 
-class _GalleryHeader extends StatelessWidget {
+class _AppHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Header(
@@ -175,7 +175,7 @@ class _GalleryHeader extends StatelessWidget {
   }
 }
 
-class _CategoriesHeader extends StatelessWidget {
+class _ProfileHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Header(
@@ -277,7 +277,7 @@ class _AnimatedHomePageState extends State<_AnimatedHomePage>
             Container(
               margin:
                   const EdgeInsets.symmetric(horizontal: _horizontalPadding),
-              child: _GalleryHeader(),
+              child: _AppHeader(),
             ),
             _Carousel(
               children: widget.carouselCards,
@@ -286,7 +286,7 @@ class _AnimatedHomePageState extends State<_AnimatedHomePage>
             Container(
               margin:
                   const EdgeInsets.symmetric(horizontal: _horizontalPadding),
-              child: _CategoriesHeader(),
+              child: _ProfileHeader(),
             ),
             _AnimatedProfileItem(
               startDelayFraction: 0.00,

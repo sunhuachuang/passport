@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../l10n/gallery_localizations.dart';
 
 import '../apps/starter/app.dart';
+import '../apps/yu/app.dart';
 
 class AppModel {
   const AppModel({
@@ -60,7 +61,7 @@ List<AppModel> apps(GalleryLocalizations localizations) {
       assetColor: const Color(0xFFFEDBD0),
       assetDarkColor: const Color(0xFF543B3C),
       textColor: Colors.red[900],
-      route: StarterApp.defaultRoute,
+      route: YuApp.defaultRoute,
     ),
     AppModel(
       title: localizations.docsTitle,

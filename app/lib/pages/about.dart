@@ -9,6 +9,8 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../l10n/gallery_localizations.dart';
 
+import 'network_device.dart';
+
 void showAboutDialog({
   @required BuildContext context,
 }) {
