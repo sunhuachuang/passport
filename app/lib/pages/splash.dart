@@ -7,7 +7,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 
 import '../constants.dart';
-import '../layout/adaptive.dart';
+import '../widgets/adaptive.dart';
 
 import 'home.dart';
 

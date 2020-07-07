@@ -10,15 +10,15 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/semantics.dart';
 
 import '../constants.dart';
-import '../data/demos.dart';
-import '../data/gallery_options.dart';
 import '../l10n/gallery_localizations.dart';
-import '../layout/adaptive.dart';
-import '../layout/image_placeholder.dart';
+import '../widgets/adaptive.dart';
+import '../widgets/image_placeholder.dart';
+import '../widgets/profile_list_item.dart';
 
-import '../apps/starter/app.dart';
+import '../models/profile.dart';
+import '../models/app.dart';
+import '../models/gallery_options.dart';
 
-import 'category_list_item.dart';
 import 'settings.dart';
 import 'splash.dart';
 
@@ -36,109 +36,34 @@ class HomePage extends StatelessWidget {
     var carouselHeight = _carouselHeight(.7, context);
     final isDesktop = isDisplayDesktop(context);
     final localizations = GalleryLocalizations.of(context);
-    final studyDemos = studies(localizations);
-    final carouselCards = <Widget>[
-      _CarouselCard(
-        demo: studyDemos['starterApp'],
-        asset: const AssetImage(
-          'assets/studies/starter_card.png',
-          package: 'flutter_gallery_assets',
-        ),
-        assetColor: const Color(0xFFFEDBD0),
-        assetDark: const AssetImage(
-          'assets/studies/starter_card_dark.png',
-          package: 'flutter_gallery_assets',
-        ),
-        assetDarkColor: const Color(0xFF543B3C),
-        textColor: Colors.brown[900],
-        studyRoute: StarterApp.defaultRoute,
-      ),
-      _CarouselCard(
-        demo: studyDemos['starterApp'],
-        textColor: Colors.red,
-        asset: const AssetImage(
-          'assets/studies/starter_card.png',
-          package: 'flutter_gallery_assets',
-        ),
-        assetColor: const Color(0xFFD1F2E6),
-        assetDark: const AssetImage(
-          'assets/studies/starter_card_dark.png',
-          package: 'flutter_gallery_assets',
-        ),
-        assetDarkColor: const Color(0xFF253538),
-        studyRoute: StarterApp.defaultRoute,
-      ),
-      _CarouselCard(
-        demo: studyDemos['starterApp'],
-        asset: const AssetImage(
-          'assets/studies/starter_card.png',
-          package: 'flutter_gallery_assets',
-        ),
-        assetColor: const Color(0xFFFBF6F8),
-        assetDark: const AssetImage(
-          'assets/studies/starter_card_dark.png',
-          package: 'flutter_gallery_assets',
-        ),
-        assetDarkColor: const Color(0xFF591946),
-        textColor: Colors.purple[700],
-        studyRoute: StarterApp.defaultRoute,
-      ),
-      _CarouselCard(
-        demo: studyDemos['starterApp'],
-        asset: const AssetImage(
-          'assets/studies/starter_card.png',
-          package: 'flutter_gallery_assets',
-        ),
-        assetColor: Colors.white,
-        assetDark: const AssetImage(
-          'assets/studies/starter_card_dark.png',
-          package: 'flutter_gallery_assets',
-        ),
-        assetDarkColor: const Color(0xFF1F1F1F),
-        studyRoute: StarterApp.defaultRoute,
-      ),
-      _CarouselCard(
-        demo: studyDemos['starterApp'],
-        asset: const AssetImage(
-          'assets/studies/starter_card.png',
-          package: 'flutter_gallery_assets',
-        ),
-        assetColor: const Color(0xFFFAF6FE),
-        assetDark: const AssetImage(
-          'assets/studies/starter_card_dark.png',
-          package: 'flutter_gallery_assets',
-        ),
-        assetDarkColor: const Color(0xFF3F3D45),
-        textColor: Colors.black,
-        studyRoute: StarterApp.defaultRoute,
-      ),
-    ];
+    final apps = actived_apps(localizations);
+    final carouselCards = apps.map((app) => _CarouselCard(app: app)).toList();
 
     if (isDesktop) {
-      final desktopCategoryItems = <_DesktopCategoryItem>[
-        _DesktopCategoryItem(
-          category: GalleryDemoCategory.material,
+      final desktopProfileItems = <_DesktopProfileItem>[
+        _DesktopProfileItem(
+          category: PrifleCategory.apps,
           asset: const AssetImage(
             'assets/icons/material/material.png',
             package: 'flutter_gallery_assets',
           ),
-          demos: materialDemos(localizations),
+          items: profileApps(localizations),
         ),
-        _DesktopCategoryItem(
-          category: GalleryDemoCategory.cupertino,
+        _DesktopProfileItem(
+          category: PrifleCategory.network,
           asset: const AssetImage(
             'assets/icons/cupertino/cupertino.png',
             package: 'flutter_gallery_assets',
           ),
-          demos: cupertinoDemos(localizations),
+          items: profileNetwork(localizations),
         ),
-        _DesktopCategoryItem(
-          category: GalleryDemoCategory.other,
+        _DesktopProfileItem(
+          category: PrifleCategory.accounts,
           asset: const AssetImage(
             'assets/icons/reference/reference.png',
             package: 'flutter_gallery_assets',
           ),
-          demos: otherDemos(localizations),
+          items: profileAccounts(localizations),
         ),
       ];
 
@@ -174,7 +99,7 @@ class HomePage extends StatelessWidget {
               child: Row(
                 mainAxisSize: MainAxisSize.max,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: spaceBetween(28, desktopCategoryItems),
+                children: spaceBetween(28, desktopProfileItems),
               ),
             ),
             Padding(
@@ -363,42 +288,42 @@ class _AnimatedHomePageState extends State<_AnimatedHomePage>
                   const EdgeInsets.symmetric(horizontal: _horizontalPadding),
               child: _CategoriesHeader(),
             ),
-            _AnimatedCategoryItem(
+            _AnimatedProfileItem(
               startDelayFraction: 0.00,
               controller: _animationController,
               child: CategoryListItem(
-                key: const PageStorageKey<GalleryDemoCategory>(
-                  GalleryDemoCategory.material,
+                key: const PageStorageKey<PrifleCategory>(
+                  PrifleCategory.apps,
                 ),
-                category: GalleryDemoCategory.material,
+                category: PrifleCategory.apps,
                 imageString: 'assets/icons/material/material.png',
-                demos: materialDemos(localizations),
+                items: profileApps(localizations),
                 initiallyExpanded: isTestMode,
               ),
             ),
-            _AnimatedCategoryItem(
+            _AnimatedProfileItem(
               startDelayFraction: 0.05,
               controller: _animationController,
               child: CategoryListItem(
-                key: const PageStorageKey<GalleryDemoCategory>(
-                  GalleryDemoCategory.cupertino,
+                key: const PageStorageKey<PrifleCategory>(
+                  PrifleCategory.network,
                 ),
-                category: GalleryDemoCategory.cupertino,
+                category: PrifleCategory.network,
                 imageString: 'assets/icons/cupertino/cupertino.png',
-                demos: cupertinoDemos(localizations),
+                items: profileNetwork(localizations),
                 initiallyExpanded: isTestMode,
               ),
             ),
-            _AnimatedCategoryItem(
+            _AnimatedProfileItem(
               startDelayFraction: 0.10,
               controller: _animationController,
               child: CategoryListItem(
-                key: const PageStorageKey<GalleryDemoCategory>(
-                  GalleryDemoCategory.other,
+                key: const PageStorageKey<PrifleCategory>(
+                  PrifleCategory.accounts,
                 ),
-                category: GalleryDemoCategory.other,
+                category: PrifleCategory.accounts,
                 imageString: 'assets/icons/reference/reference.png',
-                demos: otherDemos(localizations),
+                items: profileAccounts(localizations),
                 initiallyExpanded: isTestMode,
               ),
             ),
@@ -426,16 +351,16 @@ class _AnimatedHomePageState extends State<_AnimatedHomePage>
   }
 }
 
-class _DesktopCategoryItem extends StatelessWidget {
-  const _DesktopCategoryItem({
+class _DesktopProfileItem extends StatelessWidget {
+  const _DesktopProfileItem({
     this.category,
     this.asset,
-    this.demos,
+    this.items,
   });
 
-  final GalleryDemoCategory category;
+  final PrifleCategory category;
   final ImageProvider asset;
-  final List<GalleryDemo> demos;
+  final List<ProfileModel> items;
 
   @override
   Widget build(BuildContext context) {
@@ -464,8 +389,8 @@ class _DesktopCategoryItem extends StatelessWidget {
                   // Makes integration tests possible.
                   key: ValueKey('${category.name}DemoList'),
                   itemBuilder: (context, index) =>
-                      CategoryDemoItem(demo: demos[index]),
-                  itemCount: demos.length,
+                      CategoryDemoItem(item: items[index]),
+                  itemCount: items.length,
                 ),
               ),
             ],
@@ -481,7 +406,7 @@ class _DesktopCategoryHeader extends StatelessWidget {
     this.category,
     this.asset,
   });
-  final GalleryDemoCategory category;
+  final PrifleCategory category;
   final ImageProvider asset;
 
   @override
@@ -528,11 +453,11 @@ class _DesktopCategoryHeader extends StatelessWidget {
   }
 }
 
-/// Animates the category item to stagger in. The [_AnimatedCategoryItem.startDelayFraction]
+/// Animates the category item to stagger in. The [_AnimatedProfileItem.startDelayFraction]
 /// gives a delay in the unit of a fraction of the whole animation duration,
 /// which is defined in [_AnimatedHomePageState].
-class _AnimatedCategoryItem extends StatelessWidget {
-  _AnimatedCategoryItem({
+class _AnimatedProfileItem extends StatelessWidget {
+  _AnimatedProfileItem({
     Key key,
     double startDelayFraction,
     @required this.controller,
@@ -967,34 +892,22 @@ class _DesktopPageButton extends StatelessWidget {
 class _CarouselCard extends StatelessWidget {
   const _CarouselCard({
     Key key,
-    this.demo,
-    this.asset,
-    this.assetDark,
-    this.assetColor,
-    this.assetDarkColor,
-    this.textColor,
-    this.studyRoute,
+    this.app,
   }) : super(key: key);
 
-  final GalleryDemo demo;
-  final ImageProvider asset;
-  final ImageProvider assetDark;
-  final Color assetColor;
-  final Color assetDarkColor;
-  final Color textColor;
-  final String studyRoute;
+  final AppModel app;
 
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
     final isDark = Theme.of(context).colorScheme.brightness == Brightness.dark;
-    final asset = isDark ? assetDark : this.asset;
-    final assetColor = isDark ? assetDarkColor : this.assetColor;
-    final textColor = isDark ? Colors.white.withOpacity(0.87) : this.textColor;
+    final asset = isDark ? app.assetDark : app.asset;
+    final assetColor = isDark ? app.assetDarkColor : app.assetColor;
+    final textColor = isDark ? Colors.white.withOpacity(0.87) : app.textColor;
 
     return Container(
       // Makes integration tests possible.
-      key: ValueKey(demo.describe),
+      key: ValueKey(app.describe),
       margin:
           EdgeInsets.all(isDisplayDesktop(context) ? 0 : _carouselItemMargin),
       child: Material(
@@ -1003,7 +916,7 @@ class _CarouselCard extends StatelessWidget {
         clipBehavior: Clip.antiAlias,
         child: InkWell(
           onTap: () {
-            Navigator.of(context).pushNamed(studyRoute);
+            Navigator.of(context).pushNamed(app.route);
           },
           child: Stack(
             fit: StackFit.expand,
@@ -1026,13 +939,13 @@ class _CarouselCard extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     Text(
-                      demo.title,
+                      app.title,
                       style: textTheme.caption.apply(color: textColor),
                       maxLines: 3,
                       overflow: TextOverflow.visible,
                     ),
                     Text(
-                      demo.subtitle,
+                      app.subtitle,
                       style: textTheme.overline.apply(color: textColor),
                       maxLines: 5,
                       overflow: TextOverflow.visible,
@@ -1054,10 +967,10 @@ double _carouselHeight(double scaleFactor, BuildContext context) => math.max(
         scaleFactor,
     _carouselHeightMin);
 
-/// Wrap the studies with this to display a back button and allow the user to
+/// Wrap the apps with this to display a back button and allow the user to
 /// exit them at any time.
-class StudyWrapper extends StatefulWidget {
-  const StudyWrapper({
+class AppWrapper extends StatefulWidget {
+  const AppWrapper({
     Key key,
     this.study,
   }) : super(key: key);
@@ -1065,10 +978,10 @@ class StudyWrapper extends StatefulWidget {
   final Widget study;
 
   @override
-  _StudyWrapperState createState() => _StudyWrapperState();
+  _AppWrapperState createState() => _AppWrapperState();
 }
 
-class _StudyWrapperState extends State<StudyWrapper> {
+class _AppWrapperState extends State<AppWrapper> {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;

@@ -11,9 +11,9 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 
 import '../constants.dart';
-import '../data/gallery_options.dart';
+import '../models/gallery_options.dart';
 import '../l10n/gallery_localizations.dart';
-import '../layout/adaptive.dart';
+import '../widgets/adaptive.dart';
 
 import 'home.dart';
 import 'settings.dart';

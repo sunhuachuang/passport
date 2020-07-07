@@ -10,8 +10,8 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'routes.dart';
 import 'constants.dart';
-import 'data/gallery_options.dart';
 import 'l10n/gallery_localizations.dart';
+import 'models/gallery_options.dart';
 import 'pages/backdrop.dart';
 import 'pages/splash.dart';
 import 'themes/gallery_theme_data.dart';

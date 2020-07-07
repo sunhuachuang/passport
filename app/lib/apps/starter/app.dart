@@ -4,7 +4,7 @@
 
 import 'package:flutter/material.dart';
 
-import 'package:assassin/data/gallery_options.dart';
+import 'package:assassin/models/gallery_options.dart';
 import 'package:assassin/l10n/gallery_localizations.dart';
 
 import 'home.dart';

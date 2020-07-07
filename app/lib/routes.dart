@@ -2,8 +2,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'main.dart';
-import 'pages/demo.dart';
 import 'pages/home.dart';
+import 'pages/app_info.dart';
 
 import 'apps/starter/app.dart';
 
@@ -36,12 +36,12 @@ class RouteConfiguration {
   /// take priority.
   static List<Path> paths = [
     Path(
-      r'^' + DemoPage.baseRoute + r'/([\w-]+)$',
-      (context, match) => DemoPage(slug: match),
+      r'^' + AppInfoPage.baseRoute + r'/([\w-]+)$',
+      (context, match) => AppInfoPage(slug: match),
     ),
     Path(
       r'^' + StarterApp.defaultRoute,
-      (context, match) => const StudyWrapper(study: StarterApp()),
+      (context, match) => const AppWrapper(study: StarterApp()),
     ),
     Path(
       r'^/',

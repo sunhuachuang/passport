@@ -69,12 +69,47 @@ class GalleryLocalizationsEn extends GalleryLocalizations {
   String get settingsFeedback => 'Send feedback';
   @override
   String get settingsAttribution => 'Designed & implemented by CypherLink';
-  // ---- End Settings menu page --------
-
   @override
   String aboutDialogDescription(Object repoLink) {
     return 'To see the source code for this app, please visit the ${repoLink}.';
   }
+  // ---- End Settings menu page --------
+
+  // ---- bulit-in apps -----
+  @override
+  String get yuTitle => 'Yu';
+  @override
+  String get yuDescription => 'Distributed, security and privacy IM';
+  @override
+  String get docsTitle => 'Docs';
+  @override
+  String get docsDescription => 'Manage and sync file under all devices';
+  @override
+  String get healthTitle => 'Health';
+  @override
+  String get healthDescription => 'Management of personal health data';
+  @override
+  String get remindersTitle => 'Reminders';
+  @override
+  String get remindersDescription => 'A things todo list and reminder';
+  @override
+  String get starterAppTitle => 'Starter app';
+  @override
+  String get starterAppDescription => 'A responsive starter layout';
+  // ---- end bulit-in apps--
+
+  // ---- profile -----=
+  @override
+  String get deviceInfo => 'Device Info';
+  @override
+  String get devicesNetwork => 'All Devices';
+  @override
+  String get distributedNetwork => 'Distributed';
+  @override
+  String get p2pNetwork => 'Peer-To-Peer';
+  // ---- end profile--
+
+
 
   @override
   String get signIn => 'SIGN IN';
@@ -126,10 +161,6 @@ class GalleryLocalizationsEn extends GalleryLocalizations {
   @override
   String get bannerDemoLeadingText => 'Leading';
 
-  @override
-  String get starterAppTitle => 'Starter app';
-  @override
-  String get starterAppDescription => 'A responsive starter layout';
   @override
   String get starterAppGenericButton => 'BUTTON';
   @override

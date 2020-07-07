@@ -10,9 +10,9 @@ import 'package:flutter_localized_locales/flutter_localized_locales.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../constants.dart';
-import '../data/gallery_options.dart';
+import '../models/gallery_options.dart';
 import '../l10n/gallery_localizations.dart';
-import '../layout/adaptive.dart';
+import '../widgets/adaptive.dart';
 
 import 'about.dart' as about;
 import 'home.dart';

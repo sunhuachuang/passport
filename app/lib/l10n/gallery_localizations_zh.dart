@@ -69,12 +69,46 @@ class GalleryLocalizationsZh extends GalleryLocalizations {
   String get settingsFeedback => '发送反馈';
   @override
   String get settingsAttribution => '由 CypherLink 团队设计实现';
-  // ---- End Settings menu page ------
-
   @override
   String aboutDialogDescription(Object repoLink) {
     return '要查看此应用的源代码，请访问 ${repoLink}。';
   }
+  // ---- End Settings menu page ------
+
+  // ---- bulit-in apps -----
+  @override
+  String get yuTitle => '语';
+  @override
+  String get yuDescription => '专注安全隐私的分布式即时聊天工具';
+  @override
+  String get docsTitle => '文档';
+  @override
+  String get docsDescription => '管理和同步多设备下的文件';
+  @override
+  String get healthTitle => '健康';
+  @override
+  String get healthDescription => '管理个人的健康数据和分析结果';
+  @override
+  String get remindersTitle => '提醒';
+  @override
+  String get remindersDescription => '管理个人代办事务以及提醒';
+  @override
+  String get starterAppTitle => '入门应用';
+  @override
+  String get starterAppDescription => '自适应入门布局';
+  // ---- end bulit-in apps--
+
+  // ---- profile -----
+  @override
+  String get deviceInfo => '设备信息';
+  @override
+  String get devicesNetwork => '所有设备';
+  @override
+  String get distributedNetwork => '分布式网络';
+  @override
+  String get p2pNetwork => '点对点网络';
+  // ---- end profile--
+
 
   @override
   String get signIn => '登录';
@@ -126,12 +160,6 @@ class GalleryLocalizationsZh extends GalleryLocalizations {
   String get bannerDemoMultipleText => 'Multiple';
   @override
   String get bannerDemoLeadingText => 'Leading';
-
-  @override
-  String get starterAppTitle => '入门应用';
-
-  @override
-  String get starterAppDescription => '自适应入门布局';
 
   @override
   String get starterAppGenericButton => '按钮';

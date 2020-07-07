@@ -6,7 +6,7 @@ import 'dart:collection';
 
 import 'package:flutter/material.dart';
 
-import '../data/gallery_options.dart';
+import '../models/gallery_options.dart';
 import '../l10n/gallery_localizations.dart';
 
 // Common constants between SlowMotionSetting and SettingsListItem.

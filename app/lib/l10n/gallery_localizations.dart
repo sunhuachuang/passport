@@ -135,10 +135,36 @@ abstract class GalleryLocalizations {
   String get settingsAbout;
   String get settingsFeedback;
   String get settingsAttribution;
+  String aboutDialogDescription(Object repoLink);
   // ---- End Settings menu page ------
 
-  // A description about how to view the source code for this app.
-  String aboutDialogDescription(Object repoLink);
+  // ---- bulit-in apps -----
+  String get yuTitle;
+  String get yuDescription;
+  String get docsTitle;
+  String get docsDescription;
+  String get healthTitle;
+  String get healthDescription;
+  String get remindersTitle;
+  String get remindersDescription;
+  String get starterAppTitle;
+  String get starterAppDescription;
+  // ---- end bulit-in apps--
+
+  // ---- profile -----
+  String get deviceInfo;
+  String get devicesNetwork;
+  String get distributedNetwork;
+  String get p2pNetwork;
+  // ---- end profile--
+
+  // ---- Yu -----
+
+  // ---- End Yu--
+
+  // ---- Docs -----
+
+  // ---- End Docs--
 
   String get signIn;
   String get backToGallery;
@@ -165,8 +191,6 @@ abstract class GalleryLocalizations {
   String get bannerDemoMultipleText;
   String get bannerDemoLeadingText;
 
-  String get starterAppTitle;
-  String get starterAppDescription;
   String get starterAppGenericButton;
   String get starterAppTooltipAdd;
   String get starterAppTooltipFavorite;

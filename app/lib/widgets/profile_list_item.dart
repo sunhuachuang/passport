@@ -4,25 +4,23 @@
 
 import 'package:flutter/material.dart';
 
-import '../data/demos.dart';
+import '../models/profile.dart';
 import '../l10n/gallery_localizations.dart';
-import '../layout/adaptive.dart';
-
-import 'demo.dart';
+import '../widgets/adaptive.dart';
 
 class CategoryListItem extends StatefulWidget {
   const CategoryListItem({
     Key key,
     this.category,
     this.imageString,
-    this.demos = const [],
+    this.items = const [],
     this.initiallyExpanded = false,
   })  : assert(initiallyExpanded != null),
         super(key: key);
 
-  final GalleryDemoCategory category;
+  final PrifleCategory category;
   final String imageString;
-  final List<GalleryDemo> demos;
+  final List<ProfileModel> items;
   final bool initiallyExpanded;
 
   @override
@@ -141,7 +139,7 @@ class _CategoryListItemState extends State<CategoryListItem>
           ? null
           : _ExpandedCategoryDemos(
               category: widget.category,
-              demos: widget.demos,
+              items: widget.items,
             ),
     );
   }
@@ -165,7 +163,7 @@ class _CategoryHeader extends StatelessWidget {
   final double height;
   final BorderRadiusGeometry borderRadius;
   final String imageString;
-  final GalleryDemoCategory category;
+  final PrifleCategory category;
   final double chevronOpacity;
   final GestureTapCallback onTap;
 
@@ -243,11 +241,11 @@ class _ExpandedCategoryDemos extends StatelessWidget {
   const _ExpandedCategoryDemos({
     Key key,
     this.category,
-    this.demos,
+    this.items,
   }) : super(key: key);
 
-  final GalleryDemoCategory category;
-  final List<GalleryDemo> demos;
+  final PrifleCategory category;
+  final List<ProfileModel> items;
 
   @override
   Widget build(BuildContext context) {
@@ -255,9 +253,9 @@ class _ExpandedCategoryDemos extends StatelessWidget {
       // Makes integration tests possible.
       key: ValueKey('${category.name}DemoList'),
       children: [
-        for (final demo in demos)
+        for (final item in items)
           CategoryDemoItem(
-            demo: demo,
+            item: item,
           ),
         const SizedBox(height: 12), // Extra space below.
       ],
@@ -266,9 +264,9 @@ class _ExpandedCategoryDemos extends StatelessWidget {
 }
 
 class CategoryDemoItem extends StatelessWidget {
-  const CategoryDemoItem({Key key, this.demo}) : super(key: key);
+  const CategoryDemoItem({Key key, this.item}) : super(key: key);
 
-  final GalleryDemo demo;
+  final ProfileModel item;
 
   @override
   Widget build(BuildContext context) {
@@ -276,14 +274,12 @@ class CategoryDemoItem extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     return Material(
       // Makes integration tests possible.
-      key: ValueKey(demo.describe),
+      key: ValueKey(item.describe),
       color: Theme.of(context).colorScheme.surface,
       child: MergeSemantics(
         child: InkWell(
           onTap: () {
-            Navigator.of(context).pushNamed(
-              '${DemoPage.baseRoute}/${demo.slug}',
-            );
+            Navigator.of(context).pushNamed(item.route);
           },
           child: Padding(
             padding: EdgeInsetsDirectional.only(
@@ -295,7 +291,7 @@ class CategoryDemoItem extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Icon(
-                  demo.icon,
+                  item.icon,
                   color: colorScheme.primary,
                 ),
                 const SizedBox(width: 40),
@@ -304,12 +300,13 @@ class CategoryDemoItem extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        demo.title,
+                        item.title,
                         style: textTheme.subtitle1
                             .apply(color: colorScheme.onSurface),
                       ),
+                      if (item.subtitle != null)
                       Text(
-                        demo.subtitle,
+                        item.subtitle,
                         style: textTheme.overline.apply(
                           color: colorScheme.onSurface.withOpacity(0.5),
                         ),
