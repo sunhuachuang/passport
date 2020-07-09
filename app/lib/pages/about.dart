@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:package_info/package_info.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../l10n/gallery_localizations.dart';
+import '../l10n/localizations.dart';
 
 import 'network_device.dart';
 
@@ -40,7 +40,7 @@ class _AboutDialog extends StatelessWidget {
     final addr = 'cypherlink.io';
     final legalese = '© 2020 The CypherLink team';
     final seeSource =
-    GalleryLocalizations.of(context).aboutDialogDescription(addr);
+    AsLocalizations.of(context).aboutDialogDescription(addr);
 
     return AlertDialog(
       backgroundColor: colorScheme.background,

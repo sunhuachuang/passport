@@ -4,7 +4,7 @@
 
 // Only put constants shared between files here.
 
-// height of the 'Gallery' header
+// height of the 'As' header
 const double galleryHeaderHeight = 64;
 
 // The font size delta for headline4 font.
@@ -19,5 +19,5 @@ const double systemTextScaleFactorOption = -1;
 // The splash page animation duration.
 const splashPageAnimationDurationInMilliseconds = 300;
 
-// The desktop top padding for a page's first header (e.g. Gallery, Settings)
+// The desktop top padding for a page's first header (e.g. As, Settings)
 const firstHeaderDesktopTopPadding = 5.0;

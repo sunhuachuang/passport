@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../l10n/gallery_localizations.dart';
+import '../l10n/localizations.dart';
 
 import '../apps/starter/app.dart';
 import '../apps/yu/app.dart';
@@ -39,12 +39,12 @@ class AppModel {
   String get describe => '${appId}@apps';
 }
 
-List<AppModel> actived_apps(GalleryLocalizations localizations) {
+List<AppModel> actived_apps(AsLocalizations localizations) {
   // TODO load from db
   return apps(localizations);
 }
 
-List<AppModel> apps(GalleryLocalizations localizations) {
+List<AppModel> apps(AsLocalizations localizations) {
   return [
     AppModel(
       title: localizations.yuTitle,

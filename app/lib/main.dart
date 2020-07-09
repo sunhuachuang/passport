@@ -10,19 +10,19 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'routes.dart';
 import 'constants.dart';
-import 'l10n/gallery_localizations.dart';
-import 'models/gallery_options.dart';
+import 'l10n/localizations.dart';
+import 'models/options.dart';
 import 'pages/backdrop.dart';
 import 'pages/splash.dart';
-import 'themes/gallery_theme_data.dart';
+import 'themes/theme_data.dart';
 
 void main() {
   GoogleFonts.config.allowRuntimeFetching = false;
-  runApp(const GalleryApp());
+  runApp(const AsApp());
 }
 
-class GalleryApp extends StatelessWidget {
-  const GalleryApp({
+class AsApp extends StatelessWidget {
+  const AsApp({
     Key key,
     this.initialRoute,
     this.isTestMode = false,
@@ -34,7 +34,7 @@ class GalleryApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ModelBinding(
-      initialModel: GalleryOptions(
+      initialModel: AsOptions(
         themeMode: ThemeMode.system,
         textScaleFactor: systemTextScaleFactorOption,
         customTextDirection: CustomTextDirection.localeBased,
@@ -46,22 +46,22 @@ class GalleryApp extends StatelessWidget {
       child: Builder(
         builder: (context) {
           return MaterialApp(
-            title: 'Flutter Gallery',
+            title: 'Assassin',
             debugShowCheckedModeBanner: false,
-            themeMode: GalleryOptions.of(context).themeMode,
-            theme: GalleryThemeData.lightThemeData.copyWith(
-              platform: GalleryOptions.of(context).platform,
+            themeMode: AsOptions.of(context).themeMode,
+            theme: AsThemeData.lightThemeData.copyWith(
+              platform: AsOptions.of(context).platform,
             ),
-            darkTheme: GalleryThemeData.darkThemeData.copyWith(
-              platform: GalleryOptions.of(context).platform,
+            darkTheme: AsThemeData.darkThemeData.copyWith(
+              platform: AsOptions.of(context).platform,
             ),
             localizationsDelegates: const [
-              ...GalleryLocalizations.localizationsDelegates,
+              ...AsLocalizations.localizationsDelegates,
               LocaleNamesLocalizationsDelegate()
             ],
             initialRoute: initialRoute,
-            supportedLocales: GalleryLocalizations.supportedLocales,
-            locale: GalleryOptions.of(context).locale,
+            supportedLocales: AsLocalizations.supportedLocales,
+            locale: AsOptions.of(context).locale,
             localeResolutionCallback: (locale, supportedLocales) {
               deviceLocale = locale;
               return locale;

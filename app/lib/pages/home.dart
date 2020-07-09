@@ -10,14 +10,13 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/semantics.dart';
 
 import '../constants.dart';
-import '../l10n/gallery_localizations.dart';
+import '../l10n/localizations.dart';
 import '../widgets/adaptive.dart';
 import '../widgets/image_placeholder.dart';
 import '../widgets/profile_list_item.dart';
-
 import '../models/profile.dart';
 import '../models/app.dart';
-import '../models/gallery_options.dart';
+import '../models/options.dart';
 
 import 'settings.dart';
 import 'splash.dart';
@@ -35,7 +34,7 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     var carouselHeight = _carouselHeight(.7, context);
     final isDesktop = isDisplayDesktop(context);
-    final localizations = GalleryLocalizations.of(context);
+    final localizations = AsLocalizations.of(context);
     final apps = actived_apps(localizations);
     final carouselCards = apps.map((app) => _CarouselCard(app: app)).toList();
 
@@ -170,7 +169,7 @@ class _AppHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Header(
       color: Theme.of(context).colorScheme.primaryVariant,
-      text: GalleryLocalizations.of(context).homeHeaderApps,
+      text: AsLocalizations.of(context).homeHeaderApps,
     );
   }
 }
@@ -180,7 +179,7 @@ class _ProfileHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Header(
       color: Theme.of(context).colorScheme.primary,
-      text: GalleryLocalizations.of(context).homeHeaderProfiles,
+      text: AsLocalizations.of(context).homeHeaderProfiles,
     );
   }
 }
@@ -265,8 +264,8 @@ class _AnimatedHomePageState extends State<_AnimatedHomePage>
 
   @override
   Widget build(BuildContext context) {
-    final localizations = GalleryLocalizations.of(context);
-    final isTestMode = GalleryOptions.of(context).isTestMode;
+    final localizations = AsLocalizations.of(context);
+    final isTestMode = AsOptions.of(context).isTestMode;
     return Stack(
       children: [
         ListView(
@@ -437,7 +436,7 @@ class _DesktopCategoryHeader extends StatelessWidget {
               child: Semantics(
                 header: true,
                 child: Text(
-                  category.displayTitle(GalleryLocalizations.of(context)),
+                  category.displayTitle(AsLocalizations.of(context)),
                   style: Theme.of(context).textTheme.headline5.apply(
                         color: colorScheme.onSurface,
                       ),
@@ -963,7 +962,7 @@ class _CarouselCard extends StatelessWidget {
 
 double _carouselHeight(double scaleFactor, BuildContext context) => math.max(
     _carouselHeightMin *
-        GalleryOptions.of(context).textScaleFactor(context) *
+        AsOptions.of(context).textScaleFactor(context) *
         scaleFactor,
     _carouselHeightMin);
 
@@ -999,7 +998,7 @@ class _AppWrapperState extends State<AppWrapper> {
               padding: const EdgeInsets.all(16),
               child: Semantics(
                 sortKey: const OrdinalSortKey(0),
-                label: GalleryLocalizations.of(context).backToGallery,
+                label: AsLocalizations.of(context).backToAssassin,
                 button: true,
                 excludeSemantics: true,
                 child: FloatingActionButton.extended(

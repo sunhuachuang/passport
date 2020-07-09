@@ -4,8 +4,8 @@
 
 import 'package:flutter/material.dart';
 
-import 'package:assassin/models/gallery_options.dart';
-import 'package:assassin/l10n/gallery_localizations.dart';
+import 'package:assassin/models/options.dart';
+import 'package:assassin/l10n/localizations.dart';
 
 import 'home.dart';
 
@@ -19,11 +19,11 @@ class YuApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: GalleryLocalizations.of(context).starterAppTitle,
+      title: AsLocalizations.of(context).starterAppTitle,
       debugShowCheckedModeBanner: false,
-      localizationsDelegates: GalleryLocalizations.localizationsDelegates,
-      supportedLocales: GalleryLocalizations.supportedLocales,
-      locale: GalleryOptions.of(context).locale,
+      localizationsDelegates: AsLocalizations.localizationsDelegates,
+      supportedLocales: AsLocalizations.supportedLocales,
+      locale: AsOptions.of(context).locale,
       initialRoute: YuApp.defaultRoute,
       routes: {
         YuApp.defaultRoute: (context) => const _Home(),
@@ -50,7 +50,7 @@ class YuApp extends StatelessWidget {
           thickness: 1,
           color: Color(0xFFE5E5E5),
         ),
-        platform: GalleryOptions.of(context).platform,
+        platform: AsOptions.of(context).platform,
       ),
     );
   }

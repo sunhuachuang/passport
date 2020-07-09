@@ -5,7 +5,7 @@
 import 'package:flutter/material.dart';
 
 import '../models/profile.dart';
-import '../l10n/gallery_localizations.dart';
+import '../l10n/localizations.dart';
 import '../widgets/adaptive.dart';
 
 class CategoryListItem extends StatefulWidget {
@@ -203,7 +203,7 @@ class _CategoryHeader extends StatelessWidget {
                         padding: const EdgeInsetsDirectional.only(start: 8),
                         child: Text(
                           category.displayTitle(
-                            GalleryLocalizations.of(context),
+                            AsLocalizations.of(context),
                           ),
                           style: Theme.of(context).textTheme.headline5.apply(
                                 color: colorScheme.onSurface,

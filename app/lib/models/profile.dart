@@ -4,11 +4,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart' show describeEnum;
 import 'package:flutter/material.dart';
 
-import '../l10n/gallery_localizations.dart';
+import '../l10n/localizations.dart';
 import '../themes/material_demo_theme_data.dart';
 
-import 'gallery_options.dart';
-import 'icons.dart';
+import 'options.dart';
 
 const _docsBaseUrl = 'https://api.flutter.dev/flutter';
 
@@ -21,7 +20,7 @@ enum PrifleCategory {
 extension ProfileModelExtension on PrifleCategory {
   String get name => describeEnum(this);
 
-  String displayTitle(GalleryLocalizations localizations) {
+  String displayTitle(AsLocalizations localizations) {
     switch (this) {
       case PrifleCategory.apps:
         return localizations.homeProfileApp;
@@ -34,7 +33,7 @@ extension ProfileModelExtension on PrifleCategory {
   }
 }
 
-List<ProfileModel> allProfiles(GalleryLocalizations localizations) =>
+List<ProfileModel> allProfiles(AsLocalizations localizations) =>
     profileApps(localizations) +
     profileNetwork(localizations) +
     profileAccounts(localizations);
@@ -62,7 +61,7 @@ class ProfileModel {
   String get describe => '${title}@${category.name}';
 }
 
-List<ProfileModel> profileApps(GalleryLocalizations localizations) {
+List<ProfileModel> profileApps(AsLocalizations localizations) {
   return [
     ProfileModel(
       title: localizations.yuTitle,
@@ -79,7 +78,7 @@ List<ProfileModel> profileApps(GalleryLocalizations localizations) {
   ];
 }
 
-List<ProfileModel> profileNetwork(GalleryLocalizations localizations) {
+List<ProfileModel> profileNetwork(AsLocalizations localizations) {
   return [
     ProfileModel(
       title: localizations.deviceInfo,
@@ -108,7 +107,7 @@ List<ProfileModel> profileNetwork(GalleryLocalizations localizations) {
   ];
 }
 
-List<ProfileModel> profileAccounts(GalleryLocalizations localizations) {
+List<ProfileModel> profileAccounts(AsLocalizations localizations) {
   return [
     ProfileModel(
       title: 'Sun',
@@ -135,7 +134,7 @@ List<ProfileModel> profileAccounts(GalleryLocalizations localizations) {
 }
 
 Map<String, ProfileModel> slugToDemo(BuildContext context) {
-  final localizations = GalleryLocalizations.of(context);
+  final localizations = AsLocalizations.of(context);
   return LinkedHashMap<String, ProfileModel>.fromIterable(
     allProfiles(localizations),
     key: (dynamic item) => item.route as String,
@@ -151,7 +150,7 @@ class ProfileWrapper extends StatelessWidget {
   Widget build(BuildContext context) {
     return Theme(
       data: MaterialDemoThemeData.themeData.copyWith(
-        platform: GalleryOptions.of(context).platform,
+        platform: AsOptions.of(context).platform,
       ),
       child: ApplyTextOptions(
         child: CupertinoTheme(

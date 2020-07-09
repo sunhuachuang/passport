@@ -6,10 +6,10 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
-import '../models/gallery_options.dart';
+import '../models/options.dart';
 
 double _textScaleFactor(BuildContext context) {
-  return GalleryOptions.of(context).textScaleFactor(context);
+  return AsOptions.of(context).textScaleFactor(context);
 }
 
 // When text is larger, this factor becomes larger, but at half the rate.

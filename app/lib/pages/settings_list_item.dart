@@ -6,8 +6,8 @@ import 'dart:collection';
 
 import 'package:flutter/material.dart';
 
-import '../models/gallery_options.dart';
-import '../l10n/gallery_localizations.dart';
+import '../models/options.dart';
+import '../l10n/localizations.dart';
 
 // Common constants between SlowMotionSetting and SettingsListItem.
 final settingItemBorderRadius = BorderRadius.circular(10);
@@ -25,7 +25,7 @@ class SlowMotionSetting extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-    final options = GalleryOptions.of(context);
+    final options = AsOptions.of(context);
 
     return Semantics(
       container: true,
@@ -46,7 +46,7 @@ class SlowMotionSetting extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        GalleryLocalizations.of(context).settingsSlowMotion,
+                        AsLocalizations.of(context).settingsSlowMotion,
                         style: textTheme.subtitle1.apply(
                           color: colorScheme.onSurface,
                         ),
@@ -60,7 +60,7 @@ class SlowMotionSetting extends StatelessWidget {
                 child: Switch(
                   activeColor: colorScheme.primary,
                   value: options.timeDilation != 1.0,
-                  onChanged: (isOn) => GalleryOptions.update(
+                  onChanged: (isOn) => AsOptions.update(
                     context,
                     options.copyWith(timeDilation: isOn ? 5.0 : 1.0),
                   ),

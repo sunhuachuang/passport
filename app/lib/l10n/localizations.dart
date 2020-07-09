@@ -6,23 +6,23 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/intl.dart' as intl;
 
-import 'gallery_localizations_en.dart' deferred as gallery_localizations_en;
-import 'gallery_localizations_zh.dart' deferred as gallery_localizations_zh;
+import 'localizations_en.dart' deferred as localizations_en;
+import 'localizations_zh.dart' deferred as localizations_zh;
 
 
-/// Callers can lookup localized strings with an instance of GalleryLocalizations returned
-/// by `GalleryLocalizations.of(context)`.
+/// Callers can lookup localized strings with an instance of AsLocalizations returned
+/// by `AsLocalizations.of(context)`.
 ///
-/// Applications need to include `GalleryLocalizations.delegate()` in their app's
+/// Applications need to include `AsLocalizations.delegate()` in their app's
 /// localizationDelegates list, and the locales they support in the app's
 /// supportedLocales list. For example:
 ///
 /// ```
-/// import 'l10n/gallery_localizations.dart';
+/// import 'l10n/localizations.dart';
 ///
 /// return MaterialApp(
-///   localizationsDelegates: GalleryLocalizations.localizationsDelegates,
-///   supportedLocales: GalleryLocalizations.supportedLocales,
+///   localizationsDelegates: AsLocalizations.localizationsDelegates,
+///   supportedLocales: AsLocalizations.supportedLocales,
 ///   home: MyApplicationHome(),
 /// );
 /// ```
@@ -59,23 +59,23 @@ import 'gallery_localizations_zh.dart' deferred as gallery_localizations_zh;
 /// Select and expand the newly-created Localizations item then, for each
 /// locale your application supports, add a new item and select the locale
 /// you wish to add from the pop-up menu in the Value field. This list should
-/// be consistent with the languages listed in the GalleryLocalizations.supportedLocales
+/// be consistent with the languages listed in the AsLocalizations.supportedLocales
 /// property.
-abstract class GalleryLocalizations {
-  GalleryLocalizations(String locale)
+abstract class AsLocalizations {
+  AsLocalizations(String locale)
       : assert(locale != null),
         localeName = intl.Intl.canonicalizedLocale(locale.toString());
 
   // ignore: unused_field
   final String localeName;
 
-  static GalleryLocalizations of(BuildContext context) {
-    return Localizations.of<GalleryLocalizations>(
-        context, GalleryLocalizations);
+  static AsLocalizations of(BuildContext context) {
+    return Localizations.of<AsLocalizations>(
+        context, AsLocalizations);
   }
 
-  static const LocalizationsDelegate<GalleryLocalizations> delegate =
-      _GalleryLocalizationsDelegate();
+  static const LocalizationsDelegate<AsLocalizations> delegate =
+      _AsLocalizationsDelegate();
 
   /// A list of this localizations delegate along with the default localizations
   /// delegates.
@@ -167,7 +167,7 @@ abstract class GalleryLocalizations {
   // ---- End Docs--
 
   String get signIn;
-  String get backToGallery;
+  String get backToAssassin;
   String get dismiss;
 
   String get demoInvalidURL;
@@ -203,13 +203,13 @@ abstract class GalleryLocalizations {
   String starterAppDrawerItem(Object value);
 }
 
-class _GalleryLocalizationsDelegate
-    extends LocalizationsDelegate<GalleryLocalizations> {
-  const _GalleryLocalizationsDelegate();
+class _AsLocalizationsDelegate
+    extends LocalizationsDelegate<AsLocalizations> {
+  const _AsLocalizationsDelegate();
 
   @override
-  Future<GalleryLocalizations> load(Locale locale) {
-    return _lookupGalleryLocalizations(locale);
+  Future<AsLocalizations> load(Locale locale) {
+    return _lookupAsLocalizations(locale);
   }
 
   @override
@@ -219,25 +219,25 @@ class _GalleryLocalizationsDelegate
       ].contains(locale.languageCode);
 
   @override
-  bool shouldReload(_GalleryLocalizationsDelegate old) => false;
+  bool shouldReload(_AsLocalizationsDelegate old) => false;
 }
 
-Future<GalleryLocalizations> _lookupGalleryLocalizations(Locale locale) {
+Future<AsLocalizations> _lookupAsLocalizations(Locale locale) {
   // Lookup logic when language+country codes are specified.
   switch (locale.languageCode) {
     case 'en':
     {
-      return gallery_localizations_en.loadLibrary().then((dynamic _) =>
-        gallery_localizations_en.GalleryLocalizationsEn());
+      return localizations_en.loadLibrary().then((dynamic _) =>
+        localizations_en.AsLocalizationsEn());
       }
     case 'zh':
     {
-      return gallery_localizations_zh.loadLibrary().then((dynamic _) =>
-        gallery_localizations_zh.GalleryLocalizationsZh());
+      return localizations_zh.loadLibrary().then((dynamic _) =>
+        localizations_zh.AsLocalizationsZh());
       }
   }
 
   assert(false,
-      'GalleryLocalizations.delegate failed to load unsupported locale "$locale"');
+      'AsLocalizations.delegate failed to load unsupported locale "$locale"');
   return null;
 }

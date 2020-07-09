@@ -1,7 +1,3 @@
-// Copyright 2019 The Flutter team. All rights reserved.
-// Use of this source code is governed by a BSD-style license that can be
-// found in the LICENSE file.
-
 import 'dart:async';
 import 'dart:io' show Platform;
 
@@ -36,8 +32,8 @@ set deviceLocale(Locale locale) {
   _deviceLocale ??= locale;
 }
 
-class GalleryOptions {
-  const GalleryOptions({
+class AsOptions {
+  const AsOptions({
     this.themeMode,
     double textScaleFactor,
     this.customTextDirection,
@@ -119,7 +115,7 @@ class GalleryOptions {
     return overlayStyle;
   }
 
-  GalleryOptions copyWith({
+  AsOptions copyWith({
     ThemeMode themeMode,
     double textScaleFactor,
     CustomTextDirection customTextDirection,
@@ -128,7 +124,7 @@ class GalleryOptions {
     TargetPlatform platform,
     bool isTestMode,
   }) {
-    return GalleryOptions(
+    return AsOptions(
       themeMode: themeMode ?? this.themeMode,
       textScaleFactor: textScaleFactor ?? _textScaleFactor,
       customTextDirection: customTextDirection ?? this.customTextDirection,
@@ -141,7 +137,7 @@ class GalleryOptions {
 
   @override
   bool operator ==(Object other) =>
-      other is GalleryOptions &&
+      other is AsOptions &&
       themeMode == other.themeMode &&
       _textScaleFactor == other._textScaleFactor &&
       customTextDirection == other.customTextDirection &&
@@ -161,20 +157,20 @@ class GalleryOptions {
         isTestMode,
       );
 
-  static GalleryOptions of(BuildContext context) {
+  static AsOptions of(BuildContext context) {
     final scope =
         context.dependOnInheritedWidgetOfExactType<_ModelBindingScope>();
     return scope.modelBindingState.currentModel;
   }
 
-  static void update(BuildContext context, GalleryOptions newModel) {
+  static void update(BuildContext context, AsOptions newModel) {
     final scope =
         context.dependOnInheritedWidgetOfExactType<_ModelBindingScope>();
     scope.modelBindingState.updateModel(newModel);
   }
 }
 
-// Applies text GalleryOptions to a widget
+// Applies text AsOptions to a widget
 class ApplyTextOptions extends StatelessWidget {
   const ApplyTextOptions({@required this.child});
 
@@ -182,7 +178,7 @@ class ApplyTextOptions extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final options = GalleryOptions.of(context);
+    final options = AsOptions.of(context);
     final textDirection = options.resolvedTextDirection();
     final textScaleFactor = options.textScaleFactor(context);
 
@@ -221,12 +217,12 @@ class _ModelBindingScope extends InheritedWidget {
 class ModelBinding extends StatefulWidget {
   ModelBinding({
     Key key,
-    this.initialModel = const GalleryOptions(),
+    this.initialModel = const AsOptions(),
     this.child,
   })  : assert(initialModel != null),
         super(key: key);
 
-  final GalleryOptions initialModel;
+  final AsOptions initialModel;
   final Widget child;
 
   @override
@@ -234,7 +230,7 @@ class ModelBinding extends StatefulWidget {
 }
 
 class _ModelBindingState extends State<ModelBinding> {
-  GalleryOptions currentModel;
+  AsOptions currentModel;
   Timer _timeDilationTimer;
 
   @override
@@ -250,7 +246,7 @@ class _ModelBindingState extends State<ModelBinding> {
     super.dispose();
   }
 
-  void handleTimeDilation(GalleryOptions newModel) {
+  void handleTimeDilation(AsOptions newModel) {
     if (currentModel.timeDilation != newModel.timeDilation) {
       _timeDilationTimer?.cancel();
       _timeDilationTimer = null;
@@ -267,7 +263,7 @@ class _ModelBindingState extends State<ModelBinding> {
     }
   }
 
-  void updateModel(GalleryOptions newModel) {
+  void updateModel(AsOptions newModel) {
     if (newModel != currentModel) {
       handleTimeDilation(newModel);
       setState(() {

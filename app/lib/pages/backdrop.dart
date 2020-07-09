@@ -11,8 +11,8 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 
 import '../constants.dart';
-import '../models/gallery_options.dart';
-import '../l10n/gallery_localizations.dart';
+import '../models/options.dart';
+import '../l10n/localizations.dart';
 import '../widgets/adaptive.dart';
 
 import 'home.dart';
@@ -187,7 +187,7 @@ class _BackdropState extends State<Backdrop>
     );
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: GalleryOptions.of(context).resolvedSystemUiOverlayStyle(),
+      value: AsOptions.of(context).resolvedSystemUiOverlayStyle(),
       child: Stack(
         children: [
           if (!isDesktop) ...[
@@ -286,8 +286,8 @@ class _SettingsIcon extends AnimatedWidget {
 
   String _settingsSemanticLabel(bool isOpen, BuildContext context) {
     return isOpen
-        ? GalleryLocalizations.of(context).settingsButtonCloseLabel
-        : GalleryLocalizations.of(context).settingsButtonLabel;
+        ? AsLocalizations.of(context).settingsButtonCloseLabel
+        : AsLocalizations.of(context).settingsButtonLabel;
   }
 
   @override
@@ -320,7 +320,7 @@ class _SettingsIcon extends AnimatedWidget {
                 toggleSettings();
                 SemanticsService.announce(
                   _settingsSemanticLabel(isSettingsOpenNotifier.value, context),
-                  GalleryOptions.of(context).resolvedTextDirection(),
+                  AsOptions.of(context).resolvedTextDirection(),
                 );
               },
               child: Padding(

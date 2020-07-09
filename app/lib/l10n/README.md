@@ -17,12 +17,12 @@ In this example, `dartGetterVariableName` should be the Dart method/property
 name that you will be using in your localizations delegate.
 
 After adding the new message in `intl_en.arb`, it can be used in the app by
-regenerating the GalleryLocalizations delegate.
+regenerating the AsLocalizations delegate.
 This allows use of the English message through your localizations delegate in
 the application code immediately without having to wait for the translations
 to be completed.
 
-## Generating GalleryLocalizations
+## Generating AsLocalizations
 
 Note that using grinder is simplest and that, under the hood, it runs the l10n scripts.
 
@@ -30,7 +30,7 @@ Note that using grinder is simplest and that, under the hood, it runs the l10n s
 
 1. Make sure you have [grinder](https://pub.dev/packages/grinder) installed by
 running `flutter pub get`.
-2. Then run `flutter pub run grinder l10n` to generate `GalleryLocalizations`.
+2. Then run `flutter pub run grinder l10n` to generate `AsLocalizations`.
 
 For more details on what `flutter pub run grinder l10n` does, see the next section
 *With l10n scripts*.
@@ -42,7 +42,7 @@ From the root directory, run:
 dart ${YOUR_FLUTTER_PATH}/dev/tools/localization/bin/gen_l10n.dart \
     --template-arb-file=intl_en.arb \
     --output-localization-file=gallery_localizations.dart \
-    --output-class=GalleryLocalizations
+    --output-class=AsLocalizations
 ```
 
 From the root directory, run `dart tool/l10n_cli/main.dart`, which
@@ -64,4 +64,4 @@ flutter format .
 Once the translations are ready:
 
 1. Use the internal tool (`push_l10n`) to push the updated `intl_<locale>.arb` files to this repo. For more information, see `/third_party/dart/flutter_gallery/README.md`
-2. Generate GalleryLocalizations with the updated .arb files by running `flutter pub run grinder l10n`.
+2. Generate AsLocalizations with the updated .arb files by running `flutter pub run grinder l10n`.

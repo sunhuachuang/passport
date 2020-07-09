@@ -1,12 +1,13 @@
 // ignore: unused_import
 import 'package:intl/intl.dart' as intl;
-import 'gallery_localizations.dart';
+
+import 'localizations.dart';
 
 // ignore_for_file: unnecessary_brace_in_string_interps
 
 /// The translations for English (`en`).
-class GalleryLocalizationsEn extends GalleryLocalizations {
-  GalleryLocalizationsEn([String locale = 'en']) : super(locale);
+class AsLocalizationsEn extends AsLocalizations {
+  AsLocalizationsEn([String locale = 'en']) : super(locale);
 
   // Common
 
@@ -116,7 +117,7 @@ class GalleryLocalizationsEn extends GalleryLocalizations {
   @override
   String get dismiss => 'DISMISS';
   @override
-  String get backToGallery => 'Back to Assassin';
+  String get backToAssassin => 'Back to Assassin';
 
   @override
   String get demoInvalidURL => 'Couldn\'t display URL:';

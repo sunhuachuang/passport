@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 
-import 'package:assassin/l10n/gallery_localizations.dart';
+import 'package:assassin/l10n/localizations.dart';
 import 'package:assassin/widgets/adaptive.dart';
 
 import './chat_screen.dart';

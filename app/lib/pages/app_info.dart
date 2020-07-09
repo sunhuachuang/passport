@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../models/gallery_options.dart';
+import '../models/options.dart';
 
 class AppInfoPage extends StatefulWidget {
   const AppInfoPage({

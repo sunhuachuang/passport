@@ -1,12 +1,13 @@
 // ignore: unused_import
 import 'package:intl/intl.dart' as intl;
-import 'gallery_localizations.dart';
+
+import 'localizations.dart';
 
 // ignore_for_file: unnecessary_brace_in_string_interps
 
 /// The translations for Chinese (`zh`).
-class GalleryLocalizationsZh extends GalleryLocalizations {
-  GalleryLocalizationsZh([String locale = 'zh']) : super(locale);
+class AsLocalizationsZh extends AsLocalizations {
+  AsLocalizationsZh([String locale = 'zh']) : super(locale);
 
   // Common
 
@@ -117,7 +118,7 @@ class GalleryLocalizationsZh extends GalleryLocalizations {
   String get dismiss => '关闭';
 
   @override
-  String get backToGallery => '返回 Flutter Gallery';
+  String get backToAssassin => '返回 Assassin';
 
   @override
   String get demoInvalidURL => '无法显示网址。';
