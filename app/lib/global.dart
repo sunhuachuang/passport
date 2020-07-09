@@ -3,8 +3,10 @@ import 'dart:io' show Platform, Directory, File;
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:google_fonts/google_fonts.dart';
 
-import 'models/option.dart';
+import 'models/options.dart';
+import 'common/native.dart';
 
 Future<String> homeDir() async {
   if (Platform.isLinux || Platform.isMacOS || Platform.isWindows) {
@@ -41,7 +43,7 @@ class CacheDB {
 }
 
 class Global {
-  static Option OPTION = Option();
+  //static Option OPTION = AsOption();
   static CacheDB CACHE_DB = CacheDB();
 
   // default primitives
@@ -50,26 +52,28 @@ class Global {
   // cache key name
   static String OPTION_CACHE = "option";
 
-  static ThemeMode get theme => OPTION.theme;
+  //static ThemeMode get theme => OPTION.theme;
   //static get lang => _option.lang;
 
   static Future init() async {
     WidgetsFlutterBinding.ensureInitialized();
+    GoogleFonts.config.allowRuntimeFetching = false;
 
     final path = await homeDir();
     print("Doc: ${path}");
     final isOk = await CACHE_DB.init(path);
+    final isDaemon = await startDaemon(path);
 
     var _option = CACHE_DB.read(OPTION_CACHE);
     if (_option != null) {
       try {
         print(_option);
-        OPTION = Option.fromString(_option);
+        //OPTION = Option.fromString(_option);
       } catch (e) {
         print(e);
       }
     }
   }
 
-  static saveOption() => CACHE_DB.write(OPTION_CACHE, OPTION.toString());
+  //static saveOption() => CACHE_DB.write(OPTION_CACHE, OPTION.toString());
 }

@@ -6,7 +6,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart' show timeDilation;
 import 'package:flutter_localized_locales/flutter_localized_locales.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import 'routes.dart';
 import 'constants.dart';
@@ -15,11 +14,14 @@ import 'models/options.dart';
 import 'pages/backdrop.dart';
 import 'pages/splash.dart';
 import 'themes/theme_data.dart';
+import 'global.dart';
 
-void main() {
-  GoogleFonts.config.allowRuntimeFetching = false;
-  runApp(const AsApp());
-}
+void main() => Global.init().then((e) => runApp(AsApp()));
+
+// void main() {
+//   GoogleFonts.config.allowRuntimeFetching = false;
+//   runApp(const AsApp());
+// }
 
 class AsApp extends StatelessWidget {
   const AsApp({

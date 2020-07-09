@@ -136,9 +136,9 @@ class _BackdropState extends State<Backdrop>
       begin: const RelativeRect.fromLTRB(0, 0, 0, 0),
       end: RelativeRect.fromLTRB(
         0,
-        constraints.biggest.height - galleryHeaderHeight,
+        constraints.biggest.height - asHeaderHeight,
         0,
-        -galleryHeaderHeight,
+        -asHeaderHeight,
       ),
     ).animate(
       CurvedAnimation(

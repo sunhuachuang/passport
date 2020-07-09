@@ -260,7 +260,7 @@ class _SettingsPageState extends State<SettingsPage> {
         padding: isDesktop
             ? EdgeInsets.zero
             : const EdgeInsets.only(
-                bottom: galleryHeaderHeight,
+                bottom: asHeaderHeight,
               ),
         // Remove ListView top padding as it is already accounted for.
         child: MediaQuery.removePadding(

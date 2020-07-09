@@ -5,7 +5,7 @@
 // Only put constants shared between files here.
 
 // height of the 'As' header
-const double galleryHeaderHeight = 64;
+const double asHeaderHeight = 64;
 
 // The font size delta for headline4 font.
 const double desktopDisplay1FontDelta = 16;
