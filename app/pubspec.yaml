@@ -17,6 +17,12 @@ dependencies:
   cupertino_icons: ^0.1.3
   provider: ^4.2.0
   hive: ^1.4.1
+  http: ^0.12.1
+  web_socket_channel:
+  qr_flutter:
+  barcode_scan:
+  image_picker:
+  # below need remove
   flare_dart: ^2.3.4
   flare_flutter: ^2.0.2
   url_launcher: ^5.1.6

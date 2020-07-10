@@ -1,7 +1,3 @@
-// Copyright 2019 The Flutter team. All rights reserved.
-// Use of this source code is governed by a BSD-style license that can be
-// found in the LICENSE file.
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart' show timeDilation;
@@ -16,8 +12,11 @@ import 'pages/splash.dart';
 import 'themes/theme_data.dart';
 import 'global.dart';
 
+// will run this
 void main() => Global.init().then((e) => runApp(AsApp()));
 
+// only debug UI.
+//import 'package:google_fonts/google_fonts.dart';
 // void main() {
 //   GoogleFonts.config.allowRuntimeFetching = false;
 //   runApp(const AsApp());

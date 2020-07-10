@@ -19,7 +19,6 @@ pub struct User {
     id: Did,
     name: String,
     avator: String,
-    bio: String,
     addr: PeerAddr,
 }
 
@@ -56,37 +55,36 @@ impl User {
         self.id.to_hex()
     }
 
-    pub fn new(id: Did, name: String, avator: String, bio: String, addr: PeerAddr) -> Self {
+    pub fn new(id: Did, name: String, avator: String, addr: PeerAddr) -> Self {
         Self {
             id,
             name,
             avator,
-            bio,
             addr,
         }
     }
 }
 
 pub fn genereate_id(seed: &[u8]) -> (Did, Secret) {
-    Default::default()
+    let mut sha = Sha3_256::new();
+    sha.input(seed);
+
+    let mut did = [0u8; 32];
+    did.copy_from_slice(&sha.result()[..]);
+
+    (Did(did), Secret([0u8; 32]))
 }
 
-pub fn generate(
-    name: String,
-    avator: String,
-    bio: String,
-    addr: PeerAddr,
-    seed: &[u8],
-) -> (User, Secret) {
+pub fn generate(name: String, avator: String, addr: PeerAddr, seed: &[u8]) -> (User, Secret) {
     let (did, sk) = genereate_id(seed);
-    (User::new(did, name, avator, bio, addr), sk)
+    (User::new(did, name, avator, addr), sk)
 }
 
-pub fn zkp_proof(peer_addr: &PeerAddr, m_id: &Did, sk: &Secret, r_id: &Did) -> Proof {
+pub fn _zkp_proof(peer_addr: &PeerAddr, m_id: &Did, sk: &Secret, r_id: &Did) -> Proof {
     Proof::default()
 }
 
-pub fn zkp_verify(proof: &Proof, peer_addr: &PeerAddr, r_id: &Did, sk: &Secret) -> bool {
+pub fn _zkp_verify(proof: &Proof, peer_addr: &PeerAddr, r_id: &Did, sk: &Secret) -> bool {
     true
 }
 
@@ -99,7 +97,7 @@ pub struct MeId {
 }
 
 impl MeId {
-    pub fn generate(name: String, addr: PeerAddr, seed: &[u8]) -> Result<MeId, ()> {
+    pub fn _generate(name: String, addr: PeerAddr, seed: &[u8]) -> Result<MeId, ()> {
         let mut secret_bytes = [0u8; 32];
         let mut sha = Sha3_256::new();
         sha.input(seed);

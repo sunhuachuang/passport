@@ -6,15 +6,15 @@ use tdn::prelude::{GroupId, PeerAddr, RpcHandler, RpcParam};
 use crate::error::new_io_error;
 
 mod did;
+mod docs;
 mod ds;
-mod sync;
 mod yu;
 
 #[derive(Hash, Eq, PartialEq)]
 pub enum AppSymbol {
     Did,
     Yu,
-    Sync,
+    Docs,
     Ds,
 }
 
@@ -23,7 +23,7 @@ impl AppSymbol {
         match s {
             "did" => Ok(AppSymbol::Did),
             "yu" => Ok(AppSymbol::Yu),
-            "sync" => Ok(AppSymbol::Sync),
+            "sync" => Ok(AppSymbol::Docs),
             "Ds" => Ok(AppSymbol::Ds),
             _ => Err(new_io_error("App not found!")),
         }
@@ -33,7 +33,7 @@ impl AppSymbol {
         match b {
             1u32 => Ok(AppSymbol::Did),
             2u32 => Ok(AppSymbol::Yu),
-            3u32 => Ok(AppSymbol::Sync),
+            3u32 => Ok(AppSymbol::Docs),
             4u32 => Ok(AppSymbol::Ds),
             _ => Err(new_io_error("App not found!")),
         }
@@ -43,7 +43,7 @@ impl AppSymbol {
         match self {
             AppSymbol::Did => AppRpc::Did(did::rpc::new_rpc_handler(addr)),
             AppSymbol::Yu => AppRpc::Yu(yu::rpc::new_rpc_handler()),
-            AppSymbol::Sync => AppRpc::Sync(sync::rpc::new_rpc_handler()),
+            AppSymbol::Docs => AppRpc::Docs(docs::rpc::new_rpc_handler()),
             AppSymbol::Ds => AppRpc::Ds(ds::rpc::new_rpc_handler()),
         }
     }
@@ -52,7 +52,7 @@ impl AppSymbol {
 pub enum AppRpc {
     Did(RpcHandler<did::rpc::State>),
     Yu(RpcHandler<yu::rpc::State>),
-    Sync(RpcHandler<sync::rpc::State>),
+    Docs(RpcHandler<docs::rpc::State>),
     Ds(RpcHandler<ds::rpc::State>),
 }
 
@@ -61,7 +61,7 @@ impl AppRpc {
         match self {
             AppRpc::Did(x) => x.handle(params).await,
             AppRpc::Yu(x) => x.handle(params).await,
-            AppRpc::Sync(x) => x.handle(params).await,
+            AppRpc::Docs(x) => x.handle(params).await,
             AppRpc::Ds(x) => x.handle(params).await,
         }
     }

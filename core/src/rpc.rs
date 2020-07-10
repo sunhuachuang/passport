@@ -34,7 +34,7 @@ impl RpcBus {
     pub fn new(ls: Arc<RwLock<LocalStorage>>, send: Sender<SendMessage>, addr: PeerAddr) -> Self {
         let handlers = Arc::new(RwLock::new(HashMap::new()));
         Self {
-            system: system_rpc_handler(SystemState((handlers.clone(), send, ls, addr))),
+            system: system_rpc_handler(SystemState(handlers.clone(), send, ls, addr)),
             rpcs: handlers,
         }
     }
@@ -66,12 +66,10 @@ impl RpcBus {
 }
 
 struct SystemState(
-    (
-        Handlers,
-        Sender<SendMessage>,
-        Arc<RwLock<LocalStorage>>,
-        PeerAddr,
-    ),
+    Handlers,
+    Sender<SendMessage>,
+    Arc<RwLock<LocalStorage>>,
+    PeerAddr,
 );
 
 fn system_rpc_handler(s: SystemState) -> RpcHandler<SystemState> {
@@ -87,7 +85,7 @@ fn system_rpc_handler(s: SystemState) -> RpcHandler<SystemState> {
                 let socket = params[0].as_str().unwrap();
                 info!("add bootstrap to: {}", socket);
                 if let Ok(addr) = socket.parse::<SocketAddr>() {
-                    (state.0)
+                    state
                         .1
                         .send(SendMessage::Group(GroupSendMessage::Connect(addr, None)))
                         .await;
@@ -99,6 +97,10 @@ fn system_rpc_handler(s: SystemState) -> RpcHandler<SystemState> {
             })
         },
     );
+
+    rpc_handler.add_method("addr", |_params: Vec<RpcParam>, state: Arc<SystemState>| {
+        Box::pin(async move { Ok(json!([state.3.to_hex()])) })
+    });
 
     rpc_handler.add_method(
         "peer_info",
@@ -124,12 +126,12 @@ fn system_rpc_handler(s: SystemState) -> RpcHandler<SystemState> {
                 }
                 let app = app_res.unwrap();
 
-                if (state.0).0.read().await.contains_key(&app) {
+                if state.0.read().await.contains_key(&app) {
                     return Ok(Default::default());
                 }
 
-                let handler = app.start((state.0).3);
-                (state.0).0.write().await.insert(app, handler);
+                let handler = app.start(state.3);
+                state.0.write().await.insert(app, handler);
 
                 return Ok(Default::default());
             }

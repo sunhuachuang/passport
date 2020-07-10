@@ -5,6 +5,8 @@ import 'main.dart';
 import 'pages/home.dart';
 import 'pages/app_info.dart';
 import 'pages/network_device.dart';
+import 'pages/account_new.dart';
+import 'pages/account_show.dart';
 
 import 'apps/starter/app.dart';
 import 'apps/yu/app.dart';
@@ -40,6 +42,14 @@ class RouteConfiguration {
     Path(
       r'^' + AppInfoPage.baseRoute + r'/([\w-]+)$',
       (context, match) => AppInfoPage(slug: match),
+    ),
+    Path(
+      r'^' + AccountNewPage.defaultRoute,
+      (context, match) => const AccountNewPage(),
+    ),
+    Path(
+      r'^' + AccountShowPage.baseRoute + r'/([\w-]+)$',
+      (context, match) => AccountShowPage(slug: match),
     ),
     Path(
       r'^' + StarterApp.defaultRoute,

@@ -7,9 +7,10 @@ import 'package:flutter/material.dart';
 import '../l10n/localizations.dart';
 import '../themes/material_demo_theme_data.dart';
 
-import 'options.dart';
+import '../pages/account_new.dart';
+import '../pages/account_show.dart';
 
-const _docsBaseUrl = 'https://api.flutter.dev/flutter';
+import 'options.dart';
 
 enum PrifleCategory {
   apps,
@@ -112,53 +113,29 @@ List<ProfileModel> profileAccounts(AsLocalizations localizations) {
     ProfileModel(
       title: 'Sun',
       category: PrifleCategory.accounts,
-      route: '/apps',
-      subtitle: '0xzzzzzzzzzzzzzzzzzzzzf',
+      route: AccountShowPage.baseRoute + '/sun',
+      subtitle: '0xsssssssssssssssssssss',
       icon: Icons.person,
     ),
     ProfileModel(
       title: 'Huc',
       category: PrifleCategory.accounts,
-      route: '/apps',
+      route: AccountShowPage.baseRoute + '/hua',
       subtitle: '0xfffffffffffffffffffff',
       icon: Icons.person,
     ),
     ProfileModel(
       title: 'Chuang',
       category: PrifleCategory.accounts,
-      route: '/apps',
+      route: AccountShowPage.baseRoute + '/sun',
       subtitle: '0xaasdaasadsasdasdasdff',
       icon: Icons.person,
     ),
+    ProfileModel(
+      title: 'New Account',
+      category: PrifleCategory.accounts,
+      route: AccountNewPage.defaultRoute,
+      icon: Icons.add,
+    ),
   ];
-}
-
-Map<String, ProfileModel> slugToDemo(BuildContext context) {
-  final localizations = AsLocalizations.of(context);
-  return LinkedHashMap<String, ProfileModel>.fromIterable(
-    allProfiles(localizations),
-    key: (dynamic item) => item.route as String,
-  );
-}
-
-class ProfileWrapper extends StatelessWidget {
-  const ProfileWrapper({Key key, this.child}) : super(key: key);
-
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    return Theme(
-      data: MaterialDemoThemeData.themeData.copyWith(
-        platform: AsOptions.of(context).platform,
-      ),
-      child: ApplyTextOptions(
-        child: CupertinoTheme(
-          data:
-              const CupertinoThemeData().copyWith(brightness: Brightness.light),
-          child: child,
-        ),
-      ),
-    );
-  }
 }

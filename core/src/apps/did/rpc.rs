@@ -10,7 +10,7 @@ pub fn new_rpc_handler(addr: PeerAddr) -> RpcHandler<State> {
 
     rpc_handler.add_method("echo", |params, _| Box::pin(async { Ok(params.into()) }));
 
-    rpc_handler.add_method("get-user", |params, _state| {
+    rpc_handler.add_method("get", |params, _state| {
         Box::pin(async move {
             debug!("Did get get-user rpc call.");
             let did = params[0].as_str().unwrap().to_string();
@@ -21,7 +21,7 @@ pub fn new_rpc_handler(addr: PeerAddr) -> RpcHandler<State> {
         })
     });
 
-    rpc_handler.add_method("list-users", |params, _state| {
+    rpc_handler.add_method("list", |params, _state| {
         Box::pin(async move {
             debug!("Did get list-users rpc call.");
             let did = params[0].as_str().unwrap().to_string();
@@ -32,26 +32,26 @@ pub fn new_rpc_handler(addr: PeerAddr) -> RpcHandler<State> {
         })
     });
 
-    rpc_handler.add_method("new-user", |params, state| {
+    rpc_handler.add_method("create", |params, state| {
         Box::pin(async move {
-            debug!("Did get new-user rpc call.");
+            debug!("Did::create rpc call.");
             let name = params[0].as_str().unwrap().to_string();
-            debug!("Did new-user name: {}", name);
-            let avator = params[1].as_str().unwrap().to_string();
-            debug!("Did new-user avator length: {}", avator.len());
-            let bio = params[2].as_str().unwrap().to_string();
-            debug!("Did new-user bio: {}", bio);
-            let seed = params[3].as_str().unwrap().as_bytes();
+            debug!("Did::create name: {}", name);
 
-            let (user, sk) = generate(name, avator, bio, state.0, seed);
+            let avator = params[1].as_str().unwrap().to_string();
+            debug!("Did::create avator length: {}", avator.len());
+
+            let seed = params[2].as_str().unwrap().as_bytes();
+
+            let (user, sk) = generate(name, avator, state.0, seed);
 
             // TODO save storage
 
-            Ok(json!({"id": user.hex_id() }))
+            Ok(json!([user.hex_id()]))
         })
     });
 
-    rpc_handler.add_method("edit-user", |params, _state| {
+    rpc_handler.add_method("update", |params, _state| {
         Box::pin(async move {
             debug!("Did get edit-user rpc call.");
             let name = params[0].as_str().unwrap().to_string();
