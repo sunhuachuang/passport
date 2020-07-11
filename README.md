@@ -7,14 +7,14 @@ Distributed data assistant.
 
 
 ## Built-in Dapps
-1. **Yu**: distributed, security and privacy IM.
-2. **Sync**: Safely transfer files between devices.
+1. **Yu**: distributed, security and privacy IM. (Doing)
+2. **Docs**: Manage and sync file and articles under all devices. (Todo)
+3. **Reminders**: A things todo list and reminder. (Todo)
+4. **Health**: Management of personal health data form devices. (Todo)
 
 
-## How ?
+## DApps How works ?
 ![Assassin Mode](assets/assassin.jpg)
-
-![Assassin With Others](assets/assassin-others.jpg)
 
 
 ## License
