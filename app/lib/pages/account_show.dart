@@ -56,14 +56,7 @@ class _AccountShowPageState extends State<AccountShowPage> {
                 width: 400,
                 child: Column(
                   children: <Widget> [
-                    user.avator != null ? CircleAvatar(
-                      backgroundImage: MemoryImage(user.avator),
-                      minRadius: 25,
-                    ) : CircleAvatar(
-                      child: Text(user.name.length > 0 ? user.name[0].toUpperCase() : "A"),
-                      minRadius: 25,
-                      backgroundColor: Colors.lightBlueAccent[200],
-                    ),
+                    user.showAvatar(),
                     Padding(
                       padding: EdgeInsetsDirectional.only(top: 200),
                       child: Center(

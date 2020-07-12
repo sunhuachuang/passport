@@ -8,6 +8,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/semantics.dart';
+import 'package:provider/provider.dart';
 
 import '../constants.dart';
 import '../l10n/localizations.dart';
@@ -17,6 +18,7 @@ import '../widgets/profile_list_item.dart';
 import '../models/profile.dart';
 import '../models/app.dart';
 import '../models/options.dart';
+import '../global.dart';
 
 import 'settings.dart';
 import 'splash.dart';
@@ -35,8 +37,7 @@ class HomePage extends StatelessWidget {
     var carouselHeight = _carouselHeight(.7, context);
     final isDesktop = isDisplayDesktop(context);
     final localizations = AsLocalizations.of(context);
-    final apps = actived_apps(localizations);
-    final carouselCards = apps.map((app) => _CarouselCard(app: app)).toList();
+    var carouselCards = context.watch<Global>().runningApps.map((app) => _CarouselCard(app: app)).toList();
 
     if (isDesktop) {
       final desktopProfileItems = <_DesktopProfileItem>[
@@ -971,10 +972,10 @@ double _carouselHeight(double scaleFactor, BuildContext context) => math.max(
 class AppWrapper extends StatefulWidget {
   const AppWrapper({
     Key key,
-    this.study,
+    this.app,
   }) : super(key: key);
 
-  final Widget study;
+  final Widget app;
 
   @override
   _AppWrapperState createState() => _AppWrapperState();
@@ -990,7 +991,7 @@ class _AppWrapperState extends State<AppWrapper> {
         children: [
           Semantics(
             sortKey: const OrdinalSortKey(1),
-            child: widget.study,
+            child: widget.app,
           ),
           Align(
             alignment: AlignmentDirectional.bottomStart,

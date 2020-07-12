@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart' show timeDilation;
 import 'package:flutter_localized_locales/flutter_localized_locales.dart';
+import 'package:provider/provider.dart';
 
 import 'routes.dart';
 import 'constants.dart';
@@ -34,43 +35,48 @@ class AsApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ModelBinding(
-      initialModel: AsOptions(
-        themeMode: ThemeMode.system,
-        textScaleFactor: systemTextScaleFactorOption,
-        customTextDirection: CustomTextDirection.localeBased,
-        locale: null,
-        timeDilation: timeDilation,
-        platform: defaultTargetPlatform,
-        isTestMode: isTestMode,
-      ),
-      child: Builder(
-        builder: (context) {
-          return MaterialApp(
-            title: 'Assassin',
-            debugShowCheckedModeBanner: false,
-            themeMode: AsOptions.of(context).themeMode,
-            theme: AsThemeData.lightThemeData.copyWith(
-              platform: AsOptions.of(context).platform,
+    return ListenableProvider<Global>(
+      create: (_) => Global(),
+      child: Builder(builder: (context) {
+          return ModelBinding(
+            initialModel: AsOptions(
+              themeMode: ThemeMode.system,
+              textScaleFactor: systemTextScaleFactorOption,
+              customTextDirection: CustomTextDirection.localeBased,
+              locale: null,
+              timeDilation: timeDilation,
+              platform: defaultTargetPlatform,
+              isTestMode: isTestMode,
             ),
-            darkTheme: AsThemeData.darkThemeData.copyWith(
-              platform: AsOptions.of(context).platform,
+            child: Builder(
+              builder: (context) {
+                return MaterialApp(
+                  title: 'Assassin',
+                  debugShowCheckedModeBanner: false,
+                  themeMode: AsOptions.of(context).themeMode,
+                  theme: AsThemeData.lightThemeData.copyWith(
+                    platform: AsOptions.of(context).platform,
+                  ),
+                  darkTheme: AsThemeData.darkThemeData.copyWith(
+                    platform: AsOptions.of(context).platform,
+                  ),
+                  localizationsDelegates: const [
+                    ...AsLocalizations.localizationsDelegates,
+                    LocaleNamesLocalizationsDelegate()
+                  ],
+                  initialRoute: initialRoute,
+                  supportedLocales: AsLocalizations.supportedLocales,
+                  locale: AsOptions.of(context).locale,
+                  localeResolutionCallback: (locale, supportedLocales) {
+                    deviceLocale = locale;
+                    return locale;
+                  },
+                  onGenerateRoute: RouteConfiguration.onGenerateRoute,
+                );
+              },
             ),
-            localizationsDelegates: const [
-              ...AsLocalizations.localizationsDelegates,
-              LocaleNamesLocalizationsDelegate()
-            ],
-            initialRoute: initialRoute,
-            supportedLocales: AsLocalizations.supportedLocales,
-            locale: AsOptions.of(context).locale,
-            localeResolutionCallback: (locale, supportedLocales) {
-              deviceLocale = locale;
-              return locale;
-            },
-            onGenerateRoute: RouteConfiguration.onGenerateRoute,
           );
-        },
-      ),
+      })
     );
   }
 }

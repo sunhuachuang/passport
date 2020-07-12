@@ -159,6 +159,7 @@ abstract class AsLocalizations {
   // ---- end profile--
 
   // ---- Yu -----
+  String get yuAppWelcome;
 
   // ---- End Yu--
 

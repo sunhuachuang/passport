@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:typed_data';
 
 import '../common/styles.dart';
 import '../widgets/online_indicator.dart';
@@ -6,15 +7,17 @@ import '../widgets/online_indicator.dart';
 class Avatar extends StatelessWidget {
   final double width;
   final double height;
-  final String url;
-  final bool isOnline;
+  final String name;
+  final Uint8List avator;
+  final bool online;
 
   const Avatar(
-      {Key key,
+    {Key key,
       this.width = 60.0,
       this.height = 60.0,
-      this.url,
-      this.isOnline = false})
+      this.name,
+      this.avator,
+      this.online = false})
       : super(key: key);
 
   @override
@@ -31,12 +34,17 @@ class Avatar extends StatelessWidget {
         children: <Widget>[
           Container(
             margin: EdgeInsets.all(4.0),
-            decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                image: DecorationImage(
-                    fit: BoxFit.cover, image: new NetworkImage(url))),
+            child: this.avator != null
+            ? CircleAvatar(
+              minRadius: 25,
+              backgroundImage: MemoryImage(this.avator))
+            : CircleAvatar(
+              minRadius: 25,
+              backgroundColor: background,
+              child: Text(this.name.length > 0 ? this.name[0].toUpperCase() : "A")),
+            decoration: BoxDecoration(shape: BoxShape.circle)
           ),
-          isOnline
+          online
               ? Positioned(
                   child: OnlineIndicator(
                     width: 0.26 * width,

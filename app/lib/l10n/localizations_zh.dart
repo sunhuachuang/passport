@@ -13,7 +13,7 @@ class AsLocalizationsZh extends AsLocalizations {
 
   // ---- Home page --------
   @override
-  String get homeHeaderApps => '应用';
+  String get homeHeaderApps => '运行中';
   @override
   String get homeHeaderProfiles => '配置';
 
@@ -109,6 +109,16 @@ class AsLocalizationsZh extends AsLocalizations {
   @override
   String get p2pNetwork => '点对点网络';
   // ---- end profile--
+
+  // ---- Yu -----
+  @override
+  String get yuAppWelcome => '欢迎使用 语!';
+
+  // ---- End Yu--
+
+  // ---- Docs -----
+
+  // ---- End Docs--
 
 
   @override

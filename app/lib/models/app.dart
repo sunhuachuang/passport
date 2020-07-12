@@ -5,6 +5,8 @@ import '../l10n/localizations.dart';
 import '../apps/starter/app.dart';
 import '../apps/yu/app.dart';
 
+import '../models/did.dart';
+
 class AppModel {
   const AppModel({
     @required this.title,
@@ -48,8 +50,8 @@ List<AppModel> apps(AsLocalizations localizations) {
   return [
     AppModel(
       title: localizations.yuTitle,
-      subtitle: localizations.yuDescription,
-      appId: 'yu',
+      subtitle: "Sun",
+      appId: 'yu-xxxxxx',
       asset: const AssetImage(
         'assets/studies/starter_card.png',
         package: 'flutter_gallery_assets',
@@ -61,75 +63,7 @@ List<AppModel> apps(AsLocalizations localizations) {
       assetColor: const Color(0xFFFEDBD0),
       assetDarkColor: const Color(0xFF543B3C),
       textColor: Colors.red[900],
-      route: YuApp.defaultRoute,
-    ),
-    AppModel(
-      title: localizations.docsTitle,
-      subtitle: localizations.docsDescription,
-      appId: 'docs',
-      asset: const AssetImage(
-        'assets/studies/starter_card.png',
-        package: 'flutter_gallery_assets',
-      ),
-      assetDark: const AssetImage(
-        'assets/studies/starter_card_dark.png',
-        package: 'flutter_gallery_assets',
-      ),
-      assetColor: const Color(0xFFFEDBD0),
-      assetDarkColor: const Color(0xFF543B3C),
-      textColor: Colors.blue[900],
-      route: StarterApp.defaultRoute,
-    ),
-    AppModel(
-      title: localizations.healthTitle,
-      subtitle: localizations.healthDescription,
-      appId: 'health',
-      asset: const AssetImage(
-        'assets/studies/starter_card.png',
-        package: 'flutter_gallery_assets',
-      ),
-      assetDark: const AssetImage(
-        'assets/studies/starter_card_dark.png',
-        package: 'flutter_gallery_assets',
-      ),
-      assetColor: const Color(0xFFFEDBD0),
-      assetDarkColor: const Color(0xFF543B3C),
-      textColor: Colors.green[900],
-      route: StarterApp.defaultRoute,
-    ),
-    AppModel(
-      title: localizations.remindersTitle,
-      subtitle: localizations.remindersDescription,
-      appId: 'reminders',
-      asset: const AssetImage(
-        'assets/studies/starter_card.png',
-        package: 'flutter_gallery_assets',
-      ),
-      assetDark: const AssetImage(
-        'assets/studies/starter_card_dark.png',
-        package: 'flutter_gallery_assets',
-      ),
-      assetColor: const Color(0xFFFEDBD0),
-      assetDarkColor: const Color(0xFF543B3C),
-      textColor: Colors.brown[900],
-      route: StarterApp.defaultRoute,
-    ),
-    AppModel(
-      title: localizations.starterAppTitle,
-      subtitle: localizations.starterAppDescription,
-      appId: 'starter',
-      asset: const AssetImage(
-        'assets/studies/starter_card.png',
-        package: 'flutter_gallery_assets',
-      ),
-      assetDark: const AssetImage(
-        'assets/studies/starter_card_dark.png',
-        package: 'flutter_gallery_assets',
-      ),
-      assetColor: const Color(0xFFFEDBD0),
-      assetDarkColor: const Color(0xFF543B3C),
-      textColor: Colors.brown[900],
-      route: StarterApp.defaultRoute,
+      route: YuApp.defaultRoute + '/' + User.list()[0].id,
     ),
   ];
 }

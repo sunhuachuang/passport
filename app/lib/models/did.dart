@@ -1,8 +1,7 @@
-import 'dart:io';
-import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:convert/convert.dart';
+import 'package:flutter/material.dart';
 
 import '../global.dart';
 
@@ -75,11 +74,22 @@ class User {
     }
   }
 
-  String printAvator() {
+  String hexAvator() {
     if (this.avator != null) {
       return hex.encode(this.avator);
     } else {
       return "";
     }
+  }
+
+  CircleAvatar showAvatar() {
+    return this.avator != null ? CircleAvatar(
+      backgroundImage: MemoryImage(this.avator),
+      minRadius: 25,
+    ) : CircleAvatar(
+      child: Text(this.name.length > 0 ? this.name[0].toUpperCase() : "A"),
+      minRadius: 25,
+      backgroundColor: Colors.lightBlueAccent[200],
+    );
   }
 }

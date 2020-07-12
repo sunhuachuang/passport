@@ -53,11 +53,11 @@ class RouteConfiguration {
     ),
     Path(
       r'^' + StarterApp.defaultRoute,
-      (context, match) => const AppWrapper(study: StarterApp()),
+      (context, match) => const AppWrapper(app: StarterApp()),
     ),
     Path(
-      r'^' + YuApp.defaultRoute,
-      (context, match) => const AppWrapper(study: YuApp()),
+      r'^' + YuApp.defaultRoute + r'/([\w-]+)$',
+      (context, match) => AppWrapper(app: YuApp(id: match)),
     ),
     Path(
       r'^/',

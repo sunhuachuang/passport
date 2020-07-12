@@ -13,7 +13,7 @@ class AsLocalizationsEn extends AsLocalizations {
 
   // ---- Home page --------
   @override
-  String get homeHeaderApps => 'Apps';
+  String get homeHeaderApps => 'Running';
   @override
   String get homeHeaderProfiles => 'Profiles';
 
@@ -110,7 +110,15 @@ class AsLocalizationsEn extends AsLocalizations {
   String get p2pNetwork => 'Peer-To-Peer';
   // ---- end profile--
 
+  // ---- Yu -----
+  @override
+  String get yuAppWelcome => 'Welcome to use Yu!';
 
+  // ---- End Yu--
+
+  // ---- Docs -----
+
+  // ---- End Docs--
 
   @override
   String get signIn => 'SIGN IN';

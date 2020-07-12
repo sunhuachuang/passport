@@ -3,10 +3,13 @@
 // found in the LICENSE file.
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../models/profile.dart';
+import '../models/options.dart';
 import '../l10n/localizations.dart';
 import '../widgets/adaptive.dart';
+import '../global.dart';
 
 class CategoryListItem extends StatefulWidget {
   const CategoryListItem({
@@ -279,6 +282,9 @@ class CategoryDemoItem extends StatelessWidget {
       child: MergeSemantics(
         child: InkWell(
           onTap: () {
+            if (item.category == PrifleCategory.apps) {
+              context.read<Global>().openApp('sun', item.toApp());
+            }
             Navigator.of(context).pushNamed(item.route);
           },
           child: Padding(
@@ -290,10 +296,7 @@ class CategoryDemoItem extends StatelessWidget {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(
-                  item.icon,
-                  color: colorScheme.primary,
-                ),
+                Icon(item.icon, color: item.color != null ? item.color : colorScheme.primary),
                 const SizedBox(width: 40),
                 Flexible(
                   child: Column(

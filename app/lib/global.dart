@@ -7,6 +7,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'models/options.dart';
+import 'models/app.dart';
 import 'common/native.dart';
 import 'common/websocket.dart';
 
@@ -61,7 +62,7 @@ initSocket() {
   sockets.send('system', 'start', ['did']);
 }
 
-class Global {
+class Global extends ChangeNotifier {
   //static Option OPTION = AsOption();
   static CacheDB CACHE_DB = CacheDB();
 
@@ -111,5 +112,20 @@ class Global {
     } else {
       return "";
     }
+  }
+
+  // providers options
+  Map<String, AppModel> _runningApps = {};
+
+  List<AppModel> get runningApps => _runningApps.values.toList();
+
+  openApp(String name, AppModel app) {
+    _runningApps[name] = app;
+    notifyListeners();
+  }
+
+  closeApp(String name) {
+    _runningApps.remove(name);
+    notifyListeners();
   }
 }

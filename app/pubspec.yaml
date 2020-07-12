@@ -22,6 +22,7 @@ dependencies:
   qr_flutter:
   barcode_scan:
   image_picker:
+  flutter_slidable:
   # below need remove
   flare_dart: ^2.3.4
   flare_flutter: ^2.0.2

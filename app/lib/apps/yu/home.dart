@@ -4,26 +4,22 @@ import 'package:provider/provider.dart';
 
 import 'package:assassin/l10n/localizations.dart';
 import 'package:assassin/widgets/adaptive.dart';
+import 'package:assassin/models/did.dart';
 
-import './chat_screen.dart';
-import './common/styles.dart';
-import './models/message.dart';
-import './models/user_model.dart';
-import './widgets/avatar.dart';
+import 'common/styles.dart';
+import 'models/friend.dart';
+import 'widgets/avatar.dart';
+import 'detail.dart';
+import 'add.dart';
 
-class ActiveUser extends ChangeNotifier {
-  User user = User(
-    id: 1,
-    name: 'Peter lastony',
-    imgUrl: 'https://i.pravatar.cc/300?img=1',
-    isOnline: true);
-
-  ActiveUser([User user]) {
-    this.user = user;
+class ActiveFriend extends ChangeNotifier {
+  Friend friend;
+  ActiveFriend([Friend friend]) {
+    this.friend = friend;
   }
 
-  update(User user) {
-    this.user = user;
+  update(Friend friend) {
+    this.friend = friend;
     notifyListeners();
   }
 }
@@ -34,13 +30,14 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDesktop = isDisplayDesktop(context);
+    final user = context.watch<ActiveUser>();
 
     if (isDesktop) {
       return Scaffold(
         body: Container(
           color: background,
-          child: ListenableProvider<ActiveUser>(
-            create: (_) => ActiveUser(),
+          child: ListenableProvider<ActiveFriend>(
+            create: (_) => ActiveFriend(),
             child: Builder(builder: (context) {
                 return Row(
                   children: [
@@ -50,7 +47,7 @@ class HomePage extends StatelessWidget {
                     ),
                     SizedBox(width: 20.0),
                     Expanded(
-                      child: ChatDetail()
+                      child: ChatDetail(me: user.owner.id)
                     ),
                 ]);
             }),
@@ -71,22 +68,19 @@ class ListFriends extends StatefulWidget {
 }
 
 class _ListFriendsState extends State<ListFriends> {
-  Widget buildUserAvatar(User user) {
+  Widget buildGroupAvator(Friend f) {
     return Padding(
       padding: const EdgeInsets.only(right: 10.0, left: 10.0, top: 6.0),
       child: Column(
         children: <Widget>[
-          Avatar(
-            url: user.imgUrl,
-            isOnline: user.isOnline,
-          ),
+          f.showAvatar(),
           SizedBox(
             height: 4.0,
           ),
           Container(
             width: 64.0,
             child: Text(
-              user.name.split(' ')[0],
+              f.name.split(' ')[0],
               maxLines: 1,
               textAlign: TextAlign.center,
               overflow: TextOverflow.ellipsis,
@@ -101,18 +95,19 @@ class _ListFriendsState extends State<ListFriends> {
     );
   }
 
-  Widget buildRecentChat(Message message, BuildContext context) {
+  Widget buildFriendChat(Friend friend, BuildContext context, String me) {
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () {
         if (isDisplayDesktop(context)) {
-          Provider.of<ActiveUser>(context, listen: false).update(message.sender);
+          Provider.of<ActiveFriend>(context, listen: false).update(friend);
         } else {
           Navigator.push(
             context,
             MaterialPageRoute(
               builder: (_) => ChatScreen(
-                sender: message.sender,
+                sender: friend,
+                me: me,
               ),
             ),
           );
@@ -122,28 +117,26 @@ class _ListFriendsState extends State<ListFriends> {
         padding: const EdgeInsets.symmetric(vertical: 6.0),
         child: Row(
           children: [
-            Avatar(
-              url: message.sender.imgUrl,
-              isOnline: message.sender.isOnline,
-            ),
+            friend.showAvatar(),
             SizedBox(width: 8.0),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    message.sender.name,
+                    friend.name,
                     style: TextStyle(
                       color: textColor,
                       fontSize: 16.0,
                       fontWeight: FontWeight.w600),
                   ),
                   SizedBox(height: 2.0),
-                  Text(message.content,
+                  if (friend.lastMessage != null)
+                  Text(friend.lastMessage.content,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                      color: message.hasRead
+                      color: friend.lastMessage.hasRead
                       ? textColor.withOpacity(.4)
                       : textColor,
                       fontSize: 14.0,
@@ -151,12 +144,10 @@ class _ListFriendsState extends State<ListFriends> {
                 ],
             )),
             SizedBox(width: 8.0),
+            if (friend.lastMessage != null)
             Text(
-              formatTime('0' + message.time.hour.toString()) +
-              ':' +
-              formatTime('0' + message.time.minute.toString()),
-              style:
-              TextStyle(color: textColor.withOpacity(.6), fontSize: 14.0),
+              friend.lastMessage.time.toString(),
+              style: TextStyle(color: textColor.withOpacity(.6), fontSize: 14.0),
             )
           ],
         ),
@@ -164,12 +155,10 @@ class _ListFriendsState extends State<ListFriends> {
     );
   }
 
-  String formatTime(String time) {
-    return time.substring(time.length - 2);
-  }
-
   @override
   Widget build(BuildContext context) {
+    final user = context.watch<ActiveUser>();
+
     return SafeArea(
       child: Column(
         children: [
@@ -179,10 +168,12 @@ class _ListFriendsState extends State<ListFriends> {
             child: Row(
               children: [
                 // avatar
-                Avatar(url: currentUser.imgUrl, width: 40.0, height: 40.0),
+                SizedBox(width: 10.0),
+                Avatar(width: 40.0, height: 40.0,
+                  avator: user.owner.avator, name: user.owner.name, online: user.online),
                 SizedBox(width: 10.0),
                 // name
-                Text(currentUser.name,
+                Text(user.owner.name,
                   style: TextStyle(
                     color: textColor,
                     fontSize: 20.0,
@@ -190,17 +181,38 @@ class _ListFriendsState extends State<ListFriends> {
                 Expanded(
                   child: Container(),
                 ),
-                Container(
-                  padding: EdgeInsets.all(8.0),
-                  decoration: BoxDecoration(
-                    boxShadow: softShadows,
-                    color: background,
-                    shape: BoxShape.circle),
-                  child: Icon(
-                    Icons.camera_alt,
-                    size: 16.0,
-                    color: Theme.of(context).primaryColor,
-                ))
+                InkWell(
+                  onTap: () {
+                    if (isDisplayDesktop(context)) {
+                      // show Model.
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => AddFriendPage(),
+                        ),
+                      );
+                    } else {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => AddFriendPage(),
+                        ),
+                      );
+                    }
+                  },
+                  child: Container(
+                    padding: EdgeInsets.all(8.0),
+                    decoration: BoxDecoration(
+                      boxShadow: softShadows,
+                      color: background,
+                      shape: BoxShape.circle),
+                    child: Icon(
+                      Icons.person_add,
+                      size: 16.0,
+                      color: Theme.of(context).primaryColor)
+                  )
+                ),
+                SizedBox(width: 10.0),
               ],
             ),
           ),
@@ -246,25 +258,25 @@ class _ListFriendsState extends State<ListFriends> {
               ),
             ),
           ),
-          // List User
+          // groups
           Container(
             height: 100.0,
             child: Center(
               child: ListView.builder(
                 scrollDirection: Axis.horizontal,
-                itemCount: favoriteUsers.length,
+                itemCount: user.friends.length,
                 itemBuilder: (BuildContext ctx, int index) =>
-                buildUserAvatar(favoriteUsers[index])),
+                buildGroupAvator(user.friends[index])),
             ),
           ),
 
-          // recents
+          // friends
           Expanded(
             child: ListView.builder(
               padding: EdgeInsets.symmetric(horizontal: 12.0),
-              itemCount: recentChats.length,
+              itemCount: user.friends.length,
               itemBuilder: (BuildContext ctx, int index) =>
-              buildRecentChat(recentChats[index], context),
+              buildFriendChat(user.friends[index], context, user.owner.id),
           ))
         ],
       ),
