@@ -130,7 +130,7 @@ fn system_rpc_handler(s: SystemState) -> RpcHandler<SystemState> {
                     return Ok(Default::default());
                 }
 
-                let handler = app.start(state.3);
+                let handler = app.start(state.3, state.1.clone(), state.2.clone());
                 state.0.write().await.insert(app, handler);
 
                 return Ok(Default::default());
@@ -171,5 +171,14 @@ fn failure_response(reason: &str) -> RpcParam {
             "code": -32600,
             "message": reason,
         }
+    })
+}
+
+pub fn rpc_response(app: &str, method: String, params: RpcParam) -> RpcParam {
+    json!({
+        "jsonrpc": "2.0",
+        "app": app,
+        "method": method,
+        "result": params
     })
 }

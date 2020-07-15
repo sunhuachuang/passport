@@ -1,6 +1,9 @@
 #[macro_use]
 extern crate log;
 
+#[macro_use]
+extern crate serde;
+
 use tdn::async_std::{io::Result, task};
 
 mod apps;

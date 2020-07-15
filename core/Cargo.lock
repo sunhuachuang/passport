@@ -25,15 +25,13 @@ name = "assassin"
 version = "0.0.1"
 dependencies = [
  "base64 0.11.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "bincode 1.3.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "blake2 0.8.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "bs58 0.3.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "ed25519-dalek 1.0.0-pre.3 (git+https://github.com/dalek-cryptography/ed25519-dalek?branch=develop)",
  "log 0.4.8 (registry+https://github.com/rust-lang/crates.io-index)",
+ "postcard 0.5.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "rand 0.7.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde 1.0.114 (registry+https://github.com/rust-lang/crates.io-index)",
- "serde_derive 1.0.114 (registry+https://github.com/rust-lang/crates.io-index)",
- "serde_json 1.0.56 (registry+https://github.com/rust-lang/crates.io-index)",
  "sha3 0.8.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "simplelog 0.7.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "tdn 0.0.1",
@@ -800,6 +798,20 @@ version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
+name = "postcard"
+version = "0.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+dependencies = [
+ "postcard-cobs 0.1.5-pre (registry+https://github.com/rust-lang/crates.io-index)",
+ "serde 1.0.114 (registry+https://github.com/rust-lang/crates.io-index)",
+]
+
+[[package]]
+name = "postcard-cobs"
+version = "0.1.5-pre"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+
+[[package]]
 name = "ppv-lite86"
 version = "0.2.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1455,6 +1467,8 @@ dependencies = [
 "checksum pin-project-internal 0.4.22 (registry+https://github.com/rust-lang/crates.io-index)" = "6a0ffd45cf79d88737d7cc85bfd5d2894bee1139b356e616fe85dc389c61aaf7"
 "checksum pin-project-lite 0.1.7 (registry+https://github.com/rust-lang/crates.io-index)" = "282adbf10f2698a7a77f8e983a74b2d18176c19a7fd32a45446139ae7b02b715"
 "checksum pin-utils 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)" = "8b870d8c151b6f2fb93e84a13146138f05d02ed11c7e7c54f8826aaaf7c9f184"
+"checksum postcard 0.5.0 (registry+https://github.com/rust-lang/crates.io-index)" = "d2ba083a6a640a9f09d294c0f504acdd7a2b000c179e80c73d4b7a036bfd8164"
+"checksum postcard-cobs 0.1.5-pre (registry+https://github.com/rust-lang/crates.io-index)" = "7c68cb38ed13fd7bc9dd5db8f165b7c8d9c1a315104083a2b10f11354c2af97f"
 "checksum ppv-lite86 0.2.8 (registry+https://github.com/rust-lang/crates.io-index)" = "237a5ed80e274dbc66f86bd59c1e25edc039660be53194b5fe0a482e0f2612ea"
 "checksum proc-macro-hack 0.5.16 (registry+https://github.com/rust-lang/crates.io-index)" = "7e0456befd48169b9f13ef0f0ad46d492cf9d2dbb918bcf38e01eed4ce3ec5e4"
 "checksum proc-macro-nested 0.1.6 (registry+https://github.com/rust-lang/crates.io-index)" = "eba180dafb9038b050a4c280019bbedf9f2467b61e5d892dcad585bb57aadc5a"

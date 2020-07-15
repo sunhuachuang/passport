@@ -7,9 +7,11 @@ import 'package:provider/provider.dart';
 
 import '../models/profile.dart';
 import '../models/options.dart';
+import '../models/app.dart';
+import '../models/did.dart';
 import '../l10n/localizations.dart';
 import '../widgets/adaptive.dart';
-import '../global.dart';
+import '../providers/running_app.dart';
 
 class CategoryListItem extends StatefulWidget {
   const CategoryListItem({
@@ -198,7 +200,6 @@ class _CategoryHeader extends StatelessWidget {
                             imageString,
                             width: 64,
                             height: 64,
-                            package: 'flutter_gallery_assets',
                           ),
                         ),
                       ),
@@ -283,9 +284,14 @@ class CategoryDemoItem extends StatelessWidget {
         child: InkWell(
           onTap: () {
             if (item.category == PrifleCategory.apps) {
-              context.read<Global>().openApp('sun', item.toApp());
+              _chooseAccountRun(context, item);
+            } else {
+              if (item.dialog != null) {
+                item.dialog(context);
+              } else {
+                Navigator.of(context).pushNamed(item.route);
+              }
             }
-            Navigator.of(context).pushNamed(item.route);
           },
           child: Padding(
             padding: EdgeInsetsDirectional.only(
@@ -328,6 +334,97 @@ class CategoryDemoItem extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+
+void _chooseAccountRun(context, ProfileModel preapp) {
+  final localizations = AsLocalizations.of(context);
+
+  var accounts = {};
+  User.list().forEach((u) {
+      accounts["${u.name} (${u.printId()})"] = u.id;
+  });
+
+  if (accounts.length > 0) {
+    String dropdownValue;
+
+    List<DropdownMenuItem<String>> items = [];
+    accounts.forEach((k, _v) =>
+      items.add(DropdownMenuItem<String>(
+          value: k,
+          child: Text(k)
+      ))
+    );
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(localizations.chooseAccountRun,
+            style: TextStyle(color: Colors.orangeAccent)),
+          content: StatefulBuilder(
+            builder: (BuildContext context, StateSetter setState) {
+              return DropdownButton<String>(
+                value: dropdownValue,
+                hint: Text(localizations.chooseAccount + '...'),
+                icon: Icon(Icons.arrow_downward),
+                iconSize: 24,
+                isExpanded: true,
+                elevation: 16,
+                style: TextStyle(
+                  color: Colors.deepPurple
+                ),
+                underline: Container(
+                  height: 2,
+                  color: Colors.deepPurpleAccent,
+                ),
+                onChanged: (String newValue) {
+                  setState(() => dropdownValue = newValue);
+                },
+                items: items,
+              );
+            }
+          ),
+          actions: <Widget>[
+            FlatButton(
+              child: new Text(localizations.cancel, style: TextStyle(color: Colors.grey[500])),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            FlatButton(
+              child: new Text(localizations.start, style: TextStyle(color: Colors.blue[500])),
+              onPressed: () {
+                final id = accounts[dropdownValue];
+                final app = preapp.toApp(dropdownValue, id);
+                context.read<RunningApp>().openApp(app);
+                Navigator.of(context).pushReplacementNamed(app.route);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  } else {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(localizations.noAccountRun,
+            style: TextStyle(color: Colors.orangeAccent)),
+          content: Text(''),
+          actions: <Widget>[
+            FlatButton(
+              child: new Text(localizations.cancel, style: TextStyle(color: Colors.grey[500])),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }

@@ -10,6 +10,12 @@ class AsLocalizationsZh extends AsLocalizations {
   AsLocalizationsZh([String locale = 'zh']) : super(locale);
 
   // Common
+  @override
+  String get cancel => '取消';
+  @override
+  String get start => '启动';
+  @override
+  String get stop => '停止';
 
   // ---- Home page --------
   @override
@@ -22,7 +28,7 @@ class AsLocalizationsZh extends AsLocalizations {
   @override
   String get homeProfileNetwork => '网络管理';
   @override
-  String get homeProfileAccount => '个人账户';
+  String get homeProfileAccount => '个人账号';
   // ---- End Home page ----
 
   // ---- Settings menu page --------
@@ -67,8 +73,6 @@ class AsLocalizationsZh extends AsLocalizations {
   @override
   String get settingsAbout => '关于 Assassin';
   @override
-  String get settingsFeedback => '发送反馈';
-  @override
   String get settingsAttribution => '由 CypherLink 团队设计实现';
   @override
   String aboutDialogDescription(Object repoLink) {
@@ -101,13 +105,21 @@ class AsLocalizationsZh extends AsLocalizations {
 
   // ---- profile -----
   @override
-  String get deviceInfo => '设备信息';
+  String get devicesInfo => '各设备信息';
   @override
-  String get devicesNetwork => '所有设备';
+  String get p2pNetwork => '节点网络状态';
   @override
-  String get distributedNetwork => '分布式网络';
+  String get addBoostrap => '添加网络种子';
   @override
-  String get p2pNetwork => '点对点网络';
+  String get changeNode => '更改本地节点';
+  @override
+  String get addAccount => '新建账号';
+  @override
+  String get chooseAccount => '选择一个账号';
+  @override
+  String get chooseAccountRun => '选择一个账号运行该应用';
+  @override
+  String get noAccountRun => '没有账号可以选择';
   // ---- end profile--
 
   // ---- Yu -----

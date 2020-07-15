@@ -1,12 +1,12 @@
 use ed25519_dalek::{Keypair, PublicKey, SecretKey};
-//use serde_derive::{Deserialize, Serialize};
 use sha3::{Digest, Sha3_256};
 //use std::fmt::{Debug, Formatter, Result as FmtResult};
 use tdn::primitive::PeerAddr;
 
+pub(crate) mod group;
 pub(crate) mod rpc;
 
-#[derive(Default, Clone, Copy)]
+#[derive(Default, Clone, Copy, Serialize, Deserialize)]
 pub struct Did([u8; 32]);
 
 #[derive(Default)]

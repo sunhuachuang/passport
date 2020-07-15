@@ -1,6 +1,9 @@
 #[macro_use]
 extern crate log;
 
+#[macro_use]
+extern crate serde;
+
 use std::ffi::CString;
 use std::os::raw::c_char;
 use tdn::async_std::task;

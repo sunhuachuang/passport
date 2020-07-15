@@ -16,8 +16,5 @@ const double desktopSettingsWidth = 520;
 // Sentinel value for the system text scale factor option.
 const double systemTextScaleFactorOption = -1;
 
-// The splash page animation duration.
-const splashPageAnimationDurationInMilliseconds = 300;
-
 // The desktop top padding for a page's first header (e.g. As, Settings)
 const firstHeaderDesktopTopPadding = 5.0;

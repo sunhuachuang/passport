@@ -4,7 +4,6 @@
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:package_info/package_info.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../l10n/localizations.dart';
@@ -21,11 +20,6 @@ void showAboutDialog({
       return _AboutDialog();
     },
   );
-}
-
-Future<String> getVersionNumber() async {
-  final packageInfo = await PackageInfo.fromPlatform();
-  return packageInfo.version;
 }
 
 class _AboutDialog extends StatelessWidget {
@@ -51,13 +45,6 @@ class _AboutDialog extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            FutureBuilder(
-              future: getVersionNumber(),
-              builder: (context, snapshot) => Text(
-                snapshot.hasData ? '$name ${snapshot.data}' : '$name',
-                style: textTheme.headline4.apply(color: colorScheme.onPrimary),
-              ),
-            ),
             const SizedBox(height: 24),
             RichText(
               text: TextSpan(
@@ -94,28 +81,6 @@ class _AboutDialog extends StatelessWidget {
         ),
       ),
       actions: [
-        FlatButton(
-          textColor: colorScheme.primary,
-          child: Text(
-            MaterialLocalizations.of(context).viewLicensesButtonLabel,
-          ),
-          onPressed: () {
-            Navigator.of(context).push(MaterialPageRoute<void>(
-              builder: (context) => Theme(
-                data: Theme.of(context).copyWith(
-                  textTheme: Typography.material2018(
-                    platform: Theme.of(context).platform,
-                  ).black,
-                  scaffoldBackgroundColor: Colors.white,
-                ),
-                child: LicensePage(
-                  applicationName: name,
-                  applicationLegalese: legalese,
-                ),
-              ),
-            ));
-          },
-        ),
         FlatButton(
           textColor: colorScheme.primary,
           child: Text(MaterialLocalizations.of(context).closeButtonLabel),

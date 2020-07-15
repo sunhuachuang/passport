@@ -23,14 +23,12 @@ dependencies:
   barcode_scan:
   image_picker:
   flutter_slidable:
+  path_provider:
   # below need remove
   flare_dart: ^2.3.4
   flare_flutter: ^2.0.2
   url_launcher: ^5.1.6
   collection: ^1.14.0
-  flutter_gallery_assets: ^0.2.1
-  package_info: ^0.4.0
-  google_fonts: ^1.0.0
 
 dev_dependencies:
   flutter_test:
@@ -47,69 +45,24 @@ dev_dependencies:
 
 flutter:
   assets:
-    - packages/flutter_gallery_assets/assets/icons/settings/settings_light.flr
-    - packages/flutter_gallery_assets/assets/icons/settings/settings_dark.flr
-    - packages/flutter_gallery_assets/assets/studies/starter_card.png
-    - packages/flutter_gallery_assets/assets/studies/starter_card_dark.png
-    - packages/flutter_gallery_assets/assets/logo/flutter_logo.png
-    - packages/flutter_gallery_assets/assets/logo/flutter_logo_color.png
-    - packages/flutter_gallery_assets/assets/icons/cupertino/cupertino.png
-    - packages/flutter_gallery_assets/assets/icons/material/material.png
-    - packages/flutter_gallery_assets/assets/icons/reference/reference.png
-    - packages/flutter_gallery_assets/assets/demos/bottom_navigation_background.png
-    - packages/flutter_gallery_assets/fonts/GalleryIcons.ttf
-    - packages/flutter_gallery_assets/fonts/google_fonts/Merriweather-Regular.ttf
-    - packages/flutter_gallery_assets/fonts/google_fonts/Eczar-Regular.ttf
-    - packages/flutter_gallery_assets/fonts/google_fonts/Montserrat-Medium.ttf
-    - packages/flutter_gallery_assets/fonts/google_fonts/Rubik-Bold.ttf
-    - packages/flutter_gallery_assets/fonts/google_fonts/Merriweather-Light.ttf
-    - packages/flutter_gallery_assets/fonts/google_fonts/RobotoCondensed-Bold.ttf
-    - packages/flutter_gallery_assets/fonts/google_fonts/Raleway-Medium.ttf
-    - packages/flutter_gallery_assets/fonts/google_fonts/Raleway-SemiBold.ttf
-    - packages/flutter_gallery_assets/fonts/google_fonts/LibreFranklin-Regular.ttf
-    - packages/flutter_gallery_assets/fonts/google_fonts/RobotoMono-Regular.ttf
-    - packages/flutter_gallery_assets/fonts/google_fonts/LibreFranklin-ExtraBold.ttf
-    - packages/flutter_gallery_assets/fonts/google_fonts/LibreFranklin-Bold.ttf
-    - packages/flutter_gallery_assets/fonts/google_fonts/Oswald-SemiBold.ttf
-    - packages/flutter_gallery_assets/fonts/google_fonts/Oswald-Medium.ttf
-    - packages/flutter_gallery_assets/fonts/google_fonts/LibreFranklin-SemiBold.ttf
-    - packages/flutter_gallery_assets/fonts/google_fonts/Raleway-Regular.ttf
-    - packages/flutter_gallery_assets/fonts/google_fonts/Montserrat-Bold.ttf
-    - packages/flutter_gallery_assets/fonts/google_fonts/Merriweather-BoldItalic.ttf
-    - packages/flutter_gallery_assets/fonts/google_fonts/Raleway-Light.ttf
-    - packages/flutter_gallery_assets/fonts/google_fonts/Rubik-Medium.ttf
-    - packages/flutter_gallery_assets/fonts/google_fonts/Montserrat-SemiBold.ttf
-    - packages/flutter_gallery_assets/fonts/google_fonts/RobotoCondensed-Regular.ttf
-    - packages/flutter_gallery_assets/fonts/google_fonts/LibreFranklin-Medium.ttf
-    - packages/flutter_gallery_assets/fonts/google_fonts/Montserrat-Regular.ttf
-    - packages/flutter_gallery_assets/fonts/google_fonts/Rubik-Regular.ttf
-    - packages/flutter_gallery_assets/fonts/google_fonts/Eczar-SemiBold.ttf
-    - packages/flutter_gallery_assets/places/india_chennai_flower_market.png
-    - packages/flutter_gallery_assets/places/india_thanjavur_market.png
-    - packages/flutter_gallery_assets/places/india_tanjore_bronze_works.png
-    - packages/flutter_gallery_assets/places/india_tanjore_market_merchant.png
-    - packages/flutter_gallery_assets/places/india_tanjore_thanjavur_temple.png
-    - packages/flutter_gallery_assets/places/india_pondicherry_salt_farm.png
-    - packages/flutter_gallery_assets/places/india_chennai_highway.png
-    - packages/flutter_gallery_assets/places/india_chettinad_silk_maker.png
-    - packages/flutter_gallery_assets/places/india_tanjore_thanjavur_temple_carvings.png
-    - packages/flutter_gallery_assets/places/india_chettinad_produce.png
-    - packages/flutter_gallery_assets/places/india_tanjore_market_technology.png
-    - packages/flutter_gallery_assets/places/india_pondicherry_beach.png
-    - packages/flutter_gallery_assets/places/india_pondicherry_fisherman.png
-    - packages/flutter_gallery_assets/splash_effects/splash_effect_1.gif
-    - packages/flutter_gallery_assets/splash_effects/splash_effect_2.gif
-    - packages/flutter_gallery_assets/splash_effects/splash_effect_3.gif
-    - packages/flutter_gallery_assets/splash_effects/splash_effect_4.gif
-    - packages/flutter_gallery_assets/splash_effects/splash_effect_5.gif
-    - packages/flutter_gallery_assets/splash_effects/splash_effect_6.gif
-    - packages/flutter_gallery_assets/splash_effects/splash_effect_7.gif
-    - packages/flutter_gallery_assets/splash_effects/splash_effect_8.gif
-    - packages/flutter_gallery_assets/splash_effects/splash_effect_9.gif
-    - packages/flutter_gallery_assets/splash_effects/splash_effect_10.gif
+    - assets/studies/starter_card.png
+    - assets/studies/starter_card_dark.png
+    - assets/studies/crane_card.png
+    - assets/studies/crane_card_dark.png
+    - assets/studies/fortnightly_card.png
+    - assets/studies/fortnightly_card_dark.png
+    - assets/studies/rally_card.png
+    - assets/studies/rally_card_dark.png
+    - assets/logo/flutter_logo.png
+    - assets/logo/flutter_logo_color.png
+    - assets/icons/cupertino/cupertino.png
+    - assets/icons/material/material.png
+    - assets/icons/reference/reference.png
+    - assets/icons/settings/settings_light.flr
+    - assets/icons/settings/settings_dark.flr
 
-  uses-material-design: true
   fonts:
-    - family: GalleryIcons
+    - family: SourceHanSansCN
       fonts:
-        - asset: packages/flutter_gallery_assets/fonts/GalleryIcons.ttf
+        - asset: assets/fonts/SourceHanSansCN-Normal.otf
+  uses-material-design: true

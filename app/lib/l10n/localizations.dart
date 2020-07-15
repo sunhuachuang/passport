@@ -102,6 +102,9 @@ abstract class AsLocalizations {
   ];
 
   // Common
+  String get cancel;
+  String get start;
+  String get stop;
 
   // ---- Home page --------
   String get homeHeaderApps;
@@ -133,7 +136,6 @@ abstract class AsLocalizations {
   String get settingsLightTheme;
   String get settingsSlowMotion;
   String get settingsAbout;
-  String get settingsFeedback;
   String get settingsAttribution;
   String aboutDialogDescription(Object repoLink);
   // ---- End Settings menu page ------
@@ -152,10 +154,14 @@ abstract class AsLocalizations {
   // ---- end bulit-in apps--
 
   // ---- profile -----
-  String get deviceInfo;
-  String get devicesNetwork;
-  String get distributedNetwork;
+  String get devicesInfo;
   String get p2pNetwork;
+  String get addBoostrap;
+  String get changeNode;
+  String get addAccount;
+  String get chooseAccount;
+  String get chooseAccountRun;
+  String get noAccountRun;
   // ---- end profile--
 
   // ---- Yu -----

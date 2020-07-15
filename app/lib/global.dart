@@ -4,10 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import 'models/options.dart';
-import 'models/app.dart';
 import 'common/native.dart';
 import 'common/websocket.dart';
 
@@ -62,7 +60,7 @@ initSocket() {
   sockets.send('system', 'start', ['did']);
 }
 
-class Global extends ChangeNotifier {
+class Global {
   //static Option OPTION = AsOption();
   static CacheDB CACHE_DB = CacheDB();
 
@@ -81,9 +79,17 @@ class Global extends ChangeNotifier {
     Global.NODE_ADDR = params[0];
   }
 
+  static changeNode(addr) {
+    Global.DEFAULT_NODE_RPC = addr;
+    initSocket();
+  }
+
+  static addBoostrap(addr) {
+    sockets.send('system', 'boostrap', [addr]);
+  }
+
   static Future init() async {
     WidgetsFlutterBinding.ensureInitialized();
-    GoogleFonts.config.allowRuntimeFetching = false;
 
     final path = await homeDir();
     print("Doc: ${path}");
@@ -112,20 +118,5 @@ class Global extends ChangeNotifier {
     } else {
       return "";
     }
-  }
-
-  // providers options
-  Map<String, AppModel> _runningApps = {};
-
-  List<AppModel> get runningApps => _runningApps.values.toList();
-
-  openApp(String name, AppModel app) {
-    _runningApps[name] = app;
-    notifyListeners();
-  }
-
-  closeApp(String name) {
-    _runningApps.remove(name);
-    notifyListeners();
   }
 }

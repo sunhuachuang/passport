@@ -290,7 +290,6 @@ class _SettingsPageState extends State<SettingsPage> {
                 Divider(thickness: 2, height: 0, color: colorScheme.background),
                 const SizedBox(height: 12),
                 SettingsAbout(),
-                SettingsFeedback(),
                 const SizedBox(height: 12),
                 Divider(thickness: 2, height: 0, color: colorScheme.background),
                 SettingsAttribution(),
@@ -311,25 +310,6 @@ class SettingsAbout extends StatelessWidget {
       icon: Icons.info_outline,
       onTap: () {
         about.showAboutDialog(context: context);
-      },
-    );
-  }
-}
-
-class SettingsFeedback extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return _SettingsLink(
-      title: AsLocalizations.of(context).settingsFeedback,
-      icon: Icons.feedback,
-      onTap: () async {
-        final url = 'https://github.com/flutter/flutter/issues/new/choose/';
-        if (await canLaunch(url)) {
-          await launch(
-            url,
-            forceSafariVC: false,
-          );
-        }
       },
     );
   }

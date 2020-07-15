@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:convert/convert.dart';
 import 'package:assassin/models/did.dart';
 import 'package:assassin/widgets/relative_time.dart';
+import 'package:assassin/common/websocket.dart';
 
 import '../widgets/avatar.dart';
 
@@ -21,18 +22,44 @@ class ActiveUser extends ChangeNotifier {
   ActiveUser({this.owner}) {
     this.online = true;
     this.friends = loadFriends(owner.id);
+
+    // register callback to ws.
+    sockets.addListener("yu", "request-friend", _requestFriend);
+    sockets.addListener("yu", "response-friend", _responseFriend);
   }
 
   static List<Friend> loadFriends(String id) {
     return [u1, u2, u3, u4, u5, u6, u7, u8];
   }
 
-  removeRequest(String key) {
-    this.requests.remove(key);
+  // callback when receive the response for make a friend.
+  _responseFriend(List<String> params) {}
+
+  /// callback when receive the request for make a friend.
+  _requestFriend(List<String> params) {}
+
+  /// request to make a friend.
+  requestFriend(String id, String addr, String remark) {
+    // save the request.
+    this.requests[id] = TmpFriend(addr, "", remark, null, true);
+
+    // send to ws.
+    sockets.send('yu', 'request-friend', [this.owner.id, id, addr, remark]);
   }
 
-  overRequest(String key, bool isOk) {
+  /// response the make friend.
+  responseFriend(String key, bool isOk) {
     this.requests[key].overIt(isOk);
+    // save the request.
+
+    // send to ws.
+    sockets.send('yu', 'response-friend', [this.owner.id, key, this.requests[key].addr]);
+  }
+
+  /// ignore the request.
+  ignoreRequest(String key) {
+    this.requests.remove(key);
+    // save the request.
   }
 }
 
@@ -107,7 +134,7 @@ Friend u7 = Friend("1", 'Peter lastony', '', 'addr', true);
 Friend u8 = Friend("1", 'Peter lastony', '', 'addr');
 
 
-final List<Message> recentChats = [
+List<Message> recentChats = [
   Message(
     sender: "u1",
     type: 0,
@@ -143,5 +170,37 @@ final List<Message> recentChats = [
     type: 0,
     content:
     'Proident fugiat exercitation nostrud magna Lorem cillum laboris pariatur.',
+    time: new RelativeTime()),Message(
+    sender: "id",
+    type: 0,
+    content:
+    'Esse laboris dolore eiusmod magna ea magna proident occaecat ullamco consectetur dolor officia.',
+    time: new RelativeTime()),
+  Message(
+    sender: "u1",
+    type: 0,
+    content: 'hi! how are you! Im fine',
+    time: new RelativeTime(),
+    hasRead: false),
+  Message(
+    sender: "id",
+    type: 0,
+    content: 'Pariatur adipisicing ullamco deserunt elit.',
+    time: new RelativeTime()),Message(
+    sender: "id",
+    type: 0,
+    content:
+    'Esse laboris dolore eiusmod magna ea magna proident occaecat ullamco consectetur dolor officia.',
+    time: new RelativeTime()),
+  Message(
+    sender: "u1",
+    type: 0,
+    content: 'hi! how are you! Im fine',
+    time: new RelativeTime(),
+    hasRead: false),
+  Message(
+    sender: "id",
+    type: 0,
+    content: 'Pariatur adipisicing ullamco deserunt elit.',
     time: new RelativeTime()),
 ];

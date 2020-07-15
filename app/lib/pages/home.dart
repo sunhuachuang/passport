@@ -1,7 +1,3 @@
-// Copyright 2019 The Flutter team. All rights reserved.
-// Use of this source code is governed by a BSD-style license that can be
-// found in the LICENSE file.
-
 import 'dart:async';
 import 'dart:math' as math;
 
@@ -18,10 +14,9 @@ import '../widgets/profile_list_item.dart';
 import '../models/profile.dart';
 import '../models/app.dart';
 import '../models/options.dart';
-import '../global.dart';
+import '../providers/running_app.dart';
 
 import 'settings.dart';
-import 'splash.dart';
 
 const _horizontalPadding = 32.0;
 const _carouselItemMargin = 8.0;
@@ -37,32 +32,23 @@ class HomePage extends StatelessWidget {
     var carouselHeight = _carouselHeight(.7, context);
     final isDesktop = isDisplayDesktop(context);
     final localizations = AsLocalizations.of(context);
-    var carouselCards = context.watch<Global>().runningApps.map((app) => _CarouselCard(app: app)).toList();
+    var carouselCards = context.watch<RunningApp>().runningApps.map((app) => _CarouselCard(app: app)).toList();
 
     if (isDesktop) {
       final desktopProfileItems = <_DesktopProfileItem>[
         _DesktopProfileItem(
           category: PrifleCategory.apps,
-          asset: const AssetImage(
-            'assets/icons/material/material.png',
-            package: 'flutter_gallery_assets',
-          ),
+          asset: const AssetImage('assets/icons/material/material.png'),
           items: profileApps(localizations),
         ),
         _DesktopProfileItem(
           category: PrifleCategory.network,
-          asset: const AssetImage(
-            'assets/icons/cupertino/cupertino.png',
-            package: 'flutter_gallery_assets',
-          ),
+          asset: const AssetImage('assets/icons/cupertino/cupertino.png'),
           items: profileNetwork(localizations),
         ),
         _DesktopProfileItem(
           category: PrifleCategory.accounts,
-          asset: const AssetImage(
-            'assets/icons/reference/reference.png',
-            package: 'flutter_gallery_assets',
-          ),
+          asset: const AssetImage('assets/icons/reference/reference.png'),
           items: profileAccounts(localizations),
         ),
       ];
@@ -114,14 +100,8 @@ class HomePage extends StatelessWidget {
                   FadeInImagePlaceholder(
                     image: Theme.of(context).colorScheme.brightness ==
                             Brightness.dark
-                        ? const AssetImage(
-                            'assets/logo/flutter_logo.png',
-                            package: 'flutter_gallery_assets',
-                          )
-                        : const AssetImage(
-                            'assets/logo/flutter_logo_color.png',
-                            package: 'flutter_gallery_assets',
-                          ),
+                        ? const AssetImage('assets/logo/flutter_logo.png')
+                        : const AssetImage('assets/logo/flutter_logo_color.png'),
                     placeholder: const SizedBox.shrink(),
                     excludeFromSemantics: true,
                   ),
@@ -131,7 +111,6 @@ class HomePage extends StatelessWidget {
                       alignment: WrapAlignment.end,
                       children: [
                         SettingsAbout(),
-                        SettingsFeedback(),
                         SettingsAttribution(),
                       ],
                     ),
@@ -145,8 +124,6 @@ class HomePage extends StatelessWidget {
     } else {
       return Scaffold(
         body: _AnimatedHomePage(
-          isSplashPageAnimationFinished:
-              SplashPageAnimation.of(context).isFinished,
           carouselCards: carouselCards,
         ),
       );
@@ -214,11 +191,9 @@ class _AnimatedHomePage extends StatefulWidget {
   const _AnimatedHomePage({
     Key key,
     @required this.carouselCards,
-    @required this.isSplashPageAnimationFinished,
   }) : super(key: key);
 
   final List<Widget> carouselCards;
-  final bool isSplashPageAnimationFinished;
 
   @override
   _AnimatedHomePageState createState() => _AnimatedHomePageState();
@@ -232,34 +207,13 @@ class _AnimatedHomePageState extends State<_AnimatedHomePage>
   @override
   void initState() {
     super.initState();
-    _animationController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 800),
-    );
-
-    if (widget.isSplashPageAnimationFinished) {
-      // To avoid the animation from running when changing the window size from
-      // desktop to mobile, we do not animate our widget if the
-      // splash page animation is finished on initState.
-      _animationController.value = 1.0;
-    } else {
-      // Start our animation halfway through the splash page animation.
-      _launchTimer = Timer(
-        const Duration(
-          milliseconds: splashPageAnimationDurationInMilliseconds ~/ 2,
-        ),
-        () {
-          _animationController.forward();
-        },
-      );
-    }
+    _animationController = AnimationController(vsync: this);
+    _animationController.value = 1.0;
   }
 
   @override
   void dispose() {
     _animationController.dispose();
-    _launchTimer?.cancel();
-    _launchTimer = null;
     super.dispose();
   }
 
@@ -895,19 +849,20 @@ class _CarouselCard extends StatelessWidget {
     this.app,
   }) : super(key: key);
 
-  final AppModel app;
+  final App app;
 
   @override
   Widget build(BuildContext context) {
+    final appModel = app.model(AsLocalizations.of(context));
     final textTheme = Theme.of(context).textTheme;
     final isDark = Theme.of(context).colorScheme.brightness == Brightness.dark;
-    final asset = isDark ? app.assetDark : app.asset;
-    final assetColor = isDark ? app.assetDarkColor : app.assetColor;
-    final textColor = isDark ? Colors.white.withOpacity(0.87) : app.textColor;
+    final asset = isDark ? appModel.assetDark : appModel.asset;
+    final assetColor = isDark ? appModel.assetDarkColor : appModel.assetColor;
+    final textColor = isDark ? Colors.white.withOpacity(0.87) : appModel.textColor;
 
     return Container(
       // Makes integration tests possible.
-      key: ValueKey(app.describe),
+      key: ValueKey(appModel.describe),
       margin:
           EdgeInsets.all(isDisplayDesktop(context) ? 0 : _carouselItemMargin),
       child: Material(
@@ -916,7 +871,7 @@ class _CarouselCard extends StatelessWidget {
         clipBehavior: Clip.antiAlias,
         child: InkWell(
           onTap: () {
-            Navigator.of(context).pushNamed(app.route);
+            Navigator.of(context).pushNamed(appModel.route);
           },
           child: Stack(
             fit: StackFit.expand,
@@ -932,6 +887,28 @@ class _CarouselCard extends StatelessWidget {
                     color: assetColor,
                   ),
                 ),
+                Padding(
+                  padding: const EdgeInsetsDirectional.fromSTEB(10, 10, 10, 10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      GestureDetector(
+                        onTap: () => context.read<RunningApp>().closeApp(app),
+                        child: Container(
+                          padding: EdgeInsets.all(6.0),
+                          decoration: BoxDecoration(
+                            color: Colors.red[200],
+                            borderRadius: BorderRadius.circular(25.0)),
+                          child: Icon(
+                            Icons.close,
+                            size: 18.0,
+                          )
+                        ),
+                      )
+                    ],
+                  ),
+                ),
               Padding(
                 padding: const EdgeInsetsDirectional.fromSTEB(16, 0, 16, 16),
                 child: Column(
@@ -939,13 +916,13 @@ class _CarouselCard extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     Text(
-                      app.title,
+                      appModel.title,
                       style: textTheme.caption.apply(color: textColor),
                       maxLines: 3,
                       overflow: TextOverflow.visible,
                     ),
                     Text(
-                      app.subtitle,
+                      appModel.subtitle,
                       style: textTheme.overline.apply(color: textColor),
                       maxLines: 5,
                       overflow: TextOverflow.visible,

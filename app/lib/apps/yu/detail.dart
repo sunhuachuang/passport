@@ -23,7 +23,7 @@ class ChatScreen extends StatelessWidget {
           return Scaffold(
             body: Container(
               color: background,
-              child: ChatDetail(me: me),
+              child: ChatDetail(sender: sender, me: me),
           ));
       })
     );
@@ -31,8 +31,9 @@ class ChatScreen extends StatelessWidget {
 }
 
 class ChatDetail extends StatefulWidget {
+  final Friend sender;
   final String me;
-  ChatDetail({Key key, this.me}) : super(key: key);
+  const ChatDetail({Key key, this.sender, this.me}) : super(key: key);
 
   @override
   _ChatDetailState createState() => _ChatDetailState();
@@ -40,7 +41,8 @@ class ChatDetail extends StatefulWidget {
 
 class _ChatDetailState extends State<ChatDetail> {
   buildChat(Message message, BuildContext context) {
-    final bool isCurrentUser = message.sender != widget.me;
+    //final bool isCurrentUser = message.sender != widget.me;
+    final bool isCurrentUser = message.sender != "id";
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6.0),
@@ -48,9 +50,9 @@ class _ChatDetailState extends State<ChatDetail> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(),
-          // isCurrentUser
-          // ? Avatar(url: message.sender.imgUrl, width: 32.0, height: 32.0)
-          // : SizedBox(),
+          isCurrentUser
+          ? widget.sender.showAvatar(32.0, 32.0)
+          : SizedBox(),
           SizedBox(width: 12.0),
           Expanded(
             child: Align(
@@ -61,7 +63,7 @@ class _ChatDetailState extends State<ChatDetail> {
                   maxWidth: MediaQuery.of(context).size.width * 0.6),
                 padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
                 decoration: BoxDecoration(
-                  color: background,
+                  color: isCurrentUser ? Colors.green[100] : background,
                   borderRadius: BorderRadius.circular(16.0),
                   boxShadow: softShadows),
                 child: Text(
@@ -77,7 +79,6 @@ class _ChatDetailState extends State<ChatDetail> {
 
   @override
   Widget build(BuildContext context) {
-    final sender = context.watch<ActiveFriend>().friend;
     final isDesktop = isDisplayDesktop(context);
 
     return Column(
@@ -96,25 +97,25 @@ class _ChatDetailState extends State<ChatDetail> {
           ]),
           child: Row(
             children:
-            sender != null ? [
+            widget.sender != null ? [
               if (!isDesktop)
               ButtonIcon(
                 icon: Icons.arrow_back,
                 action: () => Navigator.pop(context),
               ),
               SizedBox(width: 16.0),
-              sender.showAvatar(40.0, 40.0),
+              widget.sender.showAvatar(40.0, 40.0),
               SizedBox(width: 10.0),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      sender.name,
+                      widget.sender.name,
                       style: TextStyle(
                         color: textColor, fontWeight: FontWeight.bold),
                     ),
-                    Text(sender.online ? 'Online' : 'Offline',
+                    Text(widget.sender.online ? 'Online' : 'Offline',
                       style: TextStyle(
                         color: textColor.withOpacity(.54),
                         fontSize: 14.0,
@@ -133,7 +134,7 @@ class _ChatDetailState extends State<ChatDetail> {
         ),
         Expanded(
           child:
-          sender != null ? ListView.builder(
+          widget.sender != null ? ListView.builder(
             padding: EdgeInsets.symmetric(horizontal: 12.0),
             itemCount: recentChats.length,
             reverse: true,
@@ -142,7 +143,7 @@ class _ChatDetailState extends State<ChatDetail> {
           : Center(child: Text(AsLocalizations.of(context).yuAppWelcome,
               style: TextStyle(color: textColor.withOpacity(.54), fontSize: 32.0)))
         ),
-        if (sender != null)
+        if (widget.sender != null)
         Container(
           padding:
           const EdgeInsets.symmetric(horizontal: 12.0, vertical: 10.0),

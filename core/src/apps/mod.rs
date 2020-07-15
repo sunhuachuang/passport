@@ -1,7 +1,11 @@
-use serde_derive::{Deserialize, Serialize};
 use std::collections::HashMap;
 use tdn::async_std::io::Result;
-use tdn::prelude::{GroupId, PeerAddr, RpcHandler, RpcParam};
+use tdn::async_std::sync::{Arc, RwLock, Sender};
+use tdn::prelude::{
+    GroupId, GroupSendMessage, LayerSendMessage, PeerAddr, RpcHandler, RpcParam, SendMessage,
+};
+
+use crate::storage::LocalStorage;
 
 use crate::error::new_io_error;
 
@@ -10,7 +14,7 @@ mod docs;
 mod ds;
 mod yu;
 
-#[derive(Hash, Eq, PartialEq)]
+#[derive(Hash, Eq, PartialEq, Serialize, Deserialize)]
 pub enum AppSymbol {
     Did,
     Yu,
@@ -18,51 +22,70 @@ pub enum AppSymbol {
     Ds,
 }
 
+pub(super) type EventResult = (
+    Vec<(String, RpcParam)>,
+    Vec<GroupSendMessage>,
+    Vec<LayerSendMessage>,
+);
+
 impl AppSymbol {
     pub fn from_str(s: &str) -> Result<AppSymbol> {
         match s {
             "did" => Ok(AppSymbol::Did),
+            "ds" => Ok(AppSymbol::Ds),
             "yu" => Ok(AppSymbol::Yu),
-            "sync" => Ok(AppSymbol::Docs),
-            "Ds" => Ok(AppSymbol::Ds),
+            "docs" => Ok(AppSymbol::Docs),
             _ => Err(new_io_error("App not found!")),
         }
     }
 
-    pub fn from_byte(b: u32) -> Result<AppSymbol> {
-        match b {
-            1u32 => Ok(AppSymbol::Did),
-            2u32 => Ok(AppSymbol::Yu),
-            3u32 => Ok(AppSymbol::Docs),
-            4u32 => Ok(AppSymbol::Ds),
-            _ => Err(new_io_error("App not found!")),
+    pub fn to_str<'a>(&self) -> &'a str {
+        match self {
+            AppSymbol::Did => "did",
+            AppSymbol::Ds => "ds",
+            AppSymbol::Yu => "yu",
+            AppSymbol::Docs => "docs",
         }
     }
 
-    pub fn start(&self, addr: PeerAddr) -> AppRpc {
+    pub fn start(
+        &self,
+        addr: PeerAddr,
+        send: Sender<SendMessage>,
+        db: Arc<RwLock<LocalStorage>>,
+    ) -> AppRpc {
         match self {
             AppSymbol::Did => AppRpc::Did(did::rpc::new_rpc_handler(addr)),
-            AppSymbol::Yu => AppRpc::Yu(yu::rpc::new_rpc_handler()),
-            AppSymbol::Docs => AppRpc::Docs(docs::rpc::new_rpc_handler()),
             AppSymbol::Ds => AppRpc::Ds(ds::rpc::new_rpc_handler()),
+            AppSymbol::Yu => AppRpc::Yu(yu::rpc::new_rpc_handler(addr, send, db)),
+            AppSymbol::Docs => AppRpc::Docs(docs::rpc::new_rpc_handler()),
+        }
+    }
+
+    pub fn handle_event(&self, bytes: &[u8]) -> Result<EventResult> {
+        match self {
+            AppSymbol::Did => did::group::Event::handle(bytes),
+            AppSymbol::Ds => ds::group::Event::handle(bytes),
+            AppSymbol::Yu => yu::group::Event::handle(bytes),
+            AppSymbol::Docs => docs::group::Event::handle(bytes),
         }
     }
 }
 
 pub enum AppRpc {
     Did(RpcHandler<did::rpc::State>),
+    Ds(RpcHandler<ds::rpc::State>),
     Yu(RpcHandler<yu::rpc::State>),
     Docs(RpcHandler<docs::rpc::State>),
-    Ds(RpcHandler<ds::rpc::State>),
 }
 
 impl AppRpc {
     pub async fn handle(&self, params: RpcParam) -> RpcParam {
         match self {
             AppRpc::Did(x) => x.handle(params).await,
+            AppRpc::Ds(x) => x.handle(params).await,
             AppRpc::Yu(x) => x.handle(params).await,
             AppRpc::Docs(x) => x.handle(params).await,
-            AppRpc::Ds(x) => x.handle(params).await,
         }
     }
 }

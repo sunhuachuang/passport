@@ -93,23 +93,22 @@ class _AddFriendState extends State<AddFriend> {
   }
 
   send() {
-    var user_id = userIdEditingController.text;
+    var id = userIdEditingController.text;
     var addr = addrEditingController.text.substring(2); // remove 0x
     var remark = remarkEditingController.text;
 
-    // Provider.of<UserProvider>(context, listen: false)
-    // .requestUser(user_id, name, addr, remark);
+    Provider.of<ActiveUser>(context, listen: false)
+    .requestFriend(id, addr, remark);
   }
 
   @override
   Widget build(BuildContext context) {
-    final user = ActiveUser(owner: User("id", "Sun"));
-    //var userProvider = Provider.of<UserProvider>(context);
-    var requests = user.requests;
+    final requests = context.watch<ActiveUser>().requests;
     var requests_key = requests.keys.toList();
 
     return SingleChildScrollView(
       child: Container(
+        constraints: BoxConstraints(minWidth: 200, maxWidth: 700),
         padding: const EdgeInsets.all(20),
         child: Form(
           key: _formKey,
@@ -194,10 +193,11 @@ class RequestItem extends StatelessWidget {
         actions: <Widget>[
           IconSlideAction(
             caption: 'Ignore',
-            color: Colors.blue[500],
+            color: background,
+            foregroundColor: Colors.blue[500],
             icon: Icons.delete,
             onTap: () => {
-              //user.removeRequest(id),
+              context.read<ActiveUser>().ignoreRequest(id),
             }
           ),
         ],
@@ -205,19 +205,21 @@ class RequestItem extends StatelessWidget {
           if (!friend.isMe && !friend.over)
           IconSlideAction(
             caption: 'Agree',
-            color: Colors.green[500],
+            color: background,
+            foregroundColor: Colors.green[500],
             icon: Icons.person_add,
             onTap: () => {
-              //user.overRequest(id, true),
+              context.read<ActiveUser>().responseFriend(id, true),
             }
           ),
           if (!friend.isMe && !friend.over)
           IconSlideAction(
             caption: 'Reject',
-            color: Colors.red[500],
+            color: background,
+            foregroundColor: Colors.red[500],
             icon: Icons.flash_off,
             onTap: () => {
-              //user.overRequest(id, false),
+              context.read<ActiveUser>().responseFriend(id, true),
             }
           ),
         ],

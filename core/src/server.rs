@@ -16,7 +16,7 @@ use tdn::{
 use crate::group::GroupBus;
 use crate::layer::LayerBus;
 use crate::primitives::DEFAULT_LOG_FILE;
-use crate::rpc::RpcBus;
+use crate::rpc::{rpc_response, RpcBus};
 use crate::storage::LocalStorage;
 
 pub async fn start(db_path: String) -> Result<()> {
@@ -38,6 +38,7 @@ pub async fn start(db_path: String) -> Result<()> {
     let mut rpc_bus = RpcBus::new(storage.clone(), send.clone(), peer_id);
     let mut layer_bus = LayerBus::new(storage.clone());
     let mut group_bus = GroupBus::new(storage);
+    let mut tmp_uid = 0; // TODO tmp use.
 
     while let Ok(message) = out_recv.recv().await {
         match message {
@@ -60,11 +61,33 @@ pub async fn start(db_path: String) -> Result<()> {
                 }
                 GroupReceiveMessage::Event(addr, bytes) => {
                     debug!("handle Event from: {:?}!", addr);
-                    let _ = group_bus.handle(addr, bytes).await;
+                    let handle_result = group_bus.handle(addr, &bytes);
+                    match handle_result {
+                        Ok((app, rpcs, groups, layers)) => {
+                            for g in groups {
+                                send.send(SendMessage::Group(g)).await;
+                            }
+
+                            for l in layers {
+                                send.send(SendMessage::Layer(l)).await;
+                            }
+
+                            for r in rpcs {
+                                send.send(SendMessage::Rpc(
+                                    tmp_uid,
+                                    rpc_response(app.to_str(), r.0, r.1),
+                                    true,
+                                ))
+                                .await
+                            }
+                        }
+                        Err(e) => debug!("{}", e),
+                    }
                 }
             },
             ReceiveMessage::Rpc(uid, params, is_ws) => {
                 debug!("uid: {}, rpc comming.", uid);
+                tmp_uid = uid;
                 send.send(SendMessage::Rpc(uid, rpc_bus.handle(params).await?, is_ws))
                     .await;
             }

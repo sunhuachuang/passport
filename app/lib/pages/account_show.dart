@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
 import '../models/options.dart';
 import '../models/did.dart';
 import '../global.dart';
+import '../widgets/toast.dart';
 
 class AccountShowPage extends StatefulWidget {
   const AccountShowPage({
@@ -50,41 +52,40 @@ class _AccountShowPageState extends State<AccountShowPage> {
             ),
             actions: [],
           ),
-          body: Row(
-            children: <Widget>[
-              Container(
-                width: 400,
-                child: Column(
-                  children: <Widget> [
-                    user.showAvatar(),
-                    Padding(
-                      padding: EdgeInsetsDirectional.only(top: 200),
-                      child: Center(
-                        child: QrImage(
-                          data: "${user.id},0x${Global.NODE_ADDR}",
-                          version: QrVersions.auto,
-                          size: 200.0,
-                          //embeddedImage: NetworkImage(me.avator),
-                          //embeddedImageStyle: QrEmbeddedImageStyle(
-                          //  size: Size(60, 60),
-                          //),
-                        ),
-                      ),
-                    )
-                  ]
+          body: Padding(
+            padding: const EdgeInsets.all(10),
+            child: Column(
+              children: [
+                user.showAvatar(),
+                Center(
+                  child: QrImage(
+                    data: "${user.id},0x${Global.NODE_ADDR}",
+                    version: QrVersions.auto,
+                    size: 200.0,
+                    //embeddedImage: NetworkImage(me.avator),
+                    //embeddedImageStyle: QrEmbeddedImageStyle(
+                    //  size: Size(60, 60),
+                    //),
+                  ),
                 ),
-              ),
-              Container(
-                //width: 400,
-                child: Column(
-                  children: <Widget> [
-                    Text('Username: ${user.name}', style: TextStyle(fontSize: 24)),
-                    Text('DID: ${slug}', style: TextStyle(fontSize: 16)),
-                    Text('Node Addr: ${Global.NODE_ADDR}', style: TextStyle(fontSize: 16)),
-                  ]
+                ListTile(
+                  leading: Icon(Icons.person, color: Colors.blueAccent),
+                  title: Text("DID: ${user.printId()}", textAlign: TextAlign.center),
+                  onTap: () => {
+                    Clipboard.setData(ClipboardData(text: user.id)),
+                    toast(context, "Copy id ok!"),
+                  }
                 ),
-              ),
-            ]
+                ListTile(
+                  leading: Icon(Icons.location_on, color: Colors.greenAccent),
+                  title: Text('Address: ${Global.NODE_ADDR}', textAlign: TextAlign.center),
+                  onTap: () => {
+                    Clipboard.setData(ClipboardData(text: "0x${Global.NODE_ADDR}")),
+                    toast(context, "Copy addr ok!"),
+                  }
+                ),
+              ]
+            )
           ),
         ),
       ),

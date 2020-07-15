@@ -47,7 +47,9 @@ class HomePage extends StatelessWidget {
                     ),
                     SizedBox(width: 20.0),
                     Expanded(
-                      child: ChatDetail(me: user.owner.id)
+                      child: ChatDetail(
+                        sender: context.watch<ActiveFriend>().friend,
+                        me: user.owner.id)
                     ),
                 ]);
             }),

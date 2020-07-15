@@ -5,15 +5,14 @@ import 'package:flutter/foundation.dart' show describeEnum;
 import 'package:flutter/material.dart';
 
 import '../l10n/localizations.dart';
-import '../themes/material_demo_theme_data.dart';
-
 import '../pages/account_new.dart';
 import '../pages/account_show.dart';
 
 import '../apps/yu/app.dart';
+import '../global.dart';
 
-import 'options.dart';
 import 'did.dart';
+import 'options.dart';
 import 'app.dart';
 
 enum PrifleCategory {
@@ -47,16 +46,18 @@ class ProfileModel {
   const ProfileModel({
     @required this.title,
     @required this.category,
-    @required this.route,
+    this.route,
     this.subtitle,
     this.icon,
     this.asset,
     this.color,
+    this.app,
+    this.dialog,
   })  : assert(title != null),
         assert(category != null),
-        assert(route != null),
         assert(icon != null || asset != null);
 
+  final AppName app;
   final String title;
   final PrifleCategory category;
   final String subtitle;
@@ -64,27 +65,12 @@ class ProfileModel {
   final IconData icon;
   final Color color;
   final AssetImage asset;
+  final Function dialog;
 
   String get describe => '${title}@${category.name}';
 
-  AppModel toApp() {
-    return AppModel(
-      title: "Yu",
-      subtitle: "Sun",
-      appId: 'yu-xxxxxx',
-      asset: const AssetImage(
-        'assets/studies/starter_card.png',
-        package: 'flutter_gallery_assets',
-      ),
-      assetDark: const AssetImage(
-        'assets/studies/starter_card_dark.png',
-        package: 'flutter_gallery_assets',
-      ),
-      assetColor: const Color(0xFFFEDBD0),
-      assetDarkColor: const Color(0xFF543B3C),
-      textColor: Colors.red[900],
-      route: YuApp.defaultRoute + '/' + User.list()[0].id,
-    );
+  App toApp(String name, String id) {
+    return App(name: name, id: id, app: this.app);
   }
 }
 
@@ -94,33 +80,33 @@ List<ProfileModel> profileApps(AsLocalizations localizations) {
       title: localizations.yuTitle,
       subtitle: localizations.yuDescription,
       category: PrifleCategory.apps,
-      route: YuApp.defaultRoute + '/' + User.list()[0].id,
       icon: Icons.chat,
       color: Colors.purple,
+      app: AppName.yu,
     ),
     ProfileModel(
       title: localizations.docsTitle,
       subtitle: localizations.docsDescription,
       category: PrifleCategory.apps,
-      route: '/apps/1',
       icon: Icons.folder_shared,
       color: Colors.blue,
+      app: AppName.docs,
     ),
     ProfileModel(
       title: localizations.remindersTitle,
       subtitle: localizations.remindersDescription,
       category: PrifleCategory.apps,
-      route: '/apps/1',
       icon: Icons.access_alarms,
       color: Colors.orange,
+      app: AppName.reminders,
     ),
     ProfileModel(
       title: localizations.healthTitle,
       subtitle: localizations.healthDescription,
       category: PrifleCategory.apps,
-      route: '/apps/1',
       icon: Icons.local_hospital,
-      color: Colors.green
+      color: Colors.green,
+      app: AppName.health
     ),
   ];
 }
@@ -128,28 +114,30 @@ List<ProfileModel> profileApps(AsLocalizations localizations) {
 List<ProfileModel> profileNetwork(AsLocalizations localizations) {
   return [
     ProfileModel(
-      title: localizations.deviceInfo,
+      title: localizations.devicesInfo,
       category: PrifleCategory.network,
-      route: '/apps',
-      icon: Icons.phone_android,
-    ),
-    ProfileModel(
-      title: localizations.devicesNetwork,
-      category: PrifleCategory.network,
-      route: '/apps',
+      route: '/apps/1',
       icon: Icons.devices_other,
-    ),
-    ProfileModel(
-      title: localizations.distributedNetwork,
-      category: PrifleCategory.network,
-      route: '/apps',
-      icon: Icons.device_hub,
     ),
     ProfileModel(
       title: localizations.p2pNetwork,
       category: PrifleCategory.network,
-      route: '/apps',
+      route: '/apps/1',
+      icon: Icons.device_hub,
+    ),
+    ProfileModel(
+      title: localizations.addBoostrap,
+      category: PrifleCategory.network,
+      dialog: addBoostrap,
+      color: Colors.green[500],
       icon: Icons.network_check,
+    ),
+    ProfileModel(
+      title: localizations.changeNode,
+      category: PrifleCategory.network,
+      dialog: changeNode,
+      color: Colors.red[500],
+      icon: Icons.edit,
     ),
   ];
 }
@@ -168,11 +156,107 @@ List<ProfileModel> profileAccounts(AsLocalizations localizations) {
   });
 
   accounts.add(ProfileModel(
-      title: 'New Account',
+      title: localizations.addAccount,
       category: PrifleCategory.accounts,
       route: AccountNewPage.defaultRoute,
       icon: Icons.add,
   ));
 
   return accounts;
+}
+
+Widget address(c1, c2) {
+  return Row(
+    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    children: <Widget>[
+      new Flexible(
+        child: new TextField(
+          controller: c1,
+          decoration: InputDecoration(
+            hintText: 'IP',
+            contentPadding: EdgeInsets.all(10)
+          )
+        ),
+      ),
+      Text(':'),
+      new Container(
+        width: 70.0,
+        child: new TextField(
+          controller: c2,
+          decoration: InputDecoration(
+            hintText: 'PORT',
+            contentPadding: EdgeInsets.all(10)
+          )
+        ),
+      ),
+    ],
+  );
+}
+
+addBoostrap(context) {
+  final localizations = AsLocalizations.of(context);
+  TextEditingController c1 = TextEditingController();
+  TextEditingController c2 = TextEditingController();
+
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text(localizations.addBoostrap,
+          style: TextStyle(color: Colors.orangeAccent)),
+        content: address(c1, c2),
+        actions: <Widget>[
+          FlatButton(
+            child: new Text(localizations.cancel, style: TextStyle(color: Colors.grey[500])),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+          FlatButton(
+            child: new Text('OK', style: TextStyle(color: Colors.green[500])),
+            onPressed: () {
+              final addr = c1.text + ':' + c2.text;
+              // TODO add error
+              Global.addBoostrap(addr);
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      );
+    },
+  );
+}
+
+changeNode(context) {
+  final localizations = AsLocalizations.of(context);
+  TextEditingController c1 = TextEditingController();
+  TextEditingController c2 = TextEditingController();
+
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text(localizations.changeNode,
+          style: TextStyle(color: Colors.orangeAccent)),
+        content: address(c1, c2),
+        actions: <Widget>[
+          FlatButton(
+            child: new Text(localizations.cancel, style: TextStyle(color: Colors.grey[500])),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+          FlatButton(
+            child: new Text('OK', style: TextStyle(color: Colors.red[500])),
+            onPressed: () {
+              final addr = c1.text + ':' + c2.text;
+              // TODO add error
+              Global.changeNode(addr);
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      );
+    },
+  );
 }

@@ -10,6 +10,12 @@ class AsLocalizationsEn extends AsLocalizations {
   AsLocalizationsEn([String locale = 'en']) : super(locale);
 
   // Common
+  @override
+  String get cancel => 'Cancel';
+  @override
+  String get start => 'Start';
+  @override
+  String get stop => 'Stop';
 
   // ---- Home page --------
   @override
@@ -67,8 +73,6 @@ class AsLocalizationsEn extends AsLocalizations {
   @override
   String get settingsAbout => 'About Assassin';
   @override
-  String get settingsFeedback => 'Send feedback';
-  @override
   String get settingsAttribution => 'Designed & implemented by CypherLink';
   @override
   String aboutDialogDescription(Object repoLink) {
@@ -101,13 +105,21 @@ class AsLocalizationsEn extends AsLocalizations {
 
   // ---- profile -----=
   @override
-  String get deviceInfo => 'Device Info';
+  String get devicesInfo => 'Devices Status';
   @override
-  String get devicesNetwork => 'All Devices';
+  String get p2pNetwork => 'Node Status';
   @override
-  String get distributedNetwork => 'Distributed';
+  String get addBoostrap => 'Add Boostrap';
   @override
-  String get p2pNetwork => 'Peer-To-Peer';
+  String get changeNode => 'Change Node';
+  @override
+  String get addAccount => 'New Account';
+  @override
+  String get chooseAccount => 'Choose an account';
+  @override
+  String get chooseAccountRun => 'Choose an account to run';
+  @override
+  String get noAccountRun => 'No account';
   // ---- end profile--
 
   // ---- Yu -----
