@@ -4,6 +4,8 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 
+import '../global.dart';
+
 Map jsonrpc = {
   'jsonrpc': '2.0',
   'app': '',
@@ -27,7 +29,7 @@ Future<Response> post(String app, String method, List params) async {
   print(json.encode(jsonrpc));
 
   try {
-    final response = await http.post('http://127.0.0.1:8000', body: json.encode(jsonrpc));
+    final response = await http.post('http://192.168.2.148:8001', body: json.encode(jsonrpc));
     Map data = json.decode(response.body);
     print(data);
 

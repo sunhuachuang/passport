@@ -4,7 +4,7 @@
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
+//import 'package:url_launcher/url_launcher.dart';
 
 import '../l10n/localizations.dart';
 
@@ -54,16 +54,16 @@ class _AboutDialog extends StatelessWidget {
                       color: colorScheme.primary,
                     ),
                     text: name,
-                    recognizer: TapGestureRecognizer()
-                      ..onTap = () async {
-                        final url = 'https://github.com/cypherlink/assassin';
-                        if (await canLaunch(url)) {
-                          await launch(
-                            url,
-                            forceSafariVC: false,
-                          );
-                        }
-                      },
+                    // recognizer: TapGestureRecognizer()
+                    //   ..onTap = () async {
+                    //     final url = 'https://github.com/cypherlink/assassin';
+                    //     if (await canLaunch(url)) {
+                    //       await launch(
+                    //         url,
+                    //         forceSafariVC: false,
+                    //       );
+                    //     }
+                    //   },
                   ),
                   TextSpan(
                     style: bodyTextStyle,

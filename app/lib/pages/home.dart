@@ -38,17 +38,17 @@ class HomePage extends StatelessWidget {
       final desktopProfileItems = <_DesktopProfileItem>[
         _DesktopProfileItem(
           category: PrifleCategory.apps,
-          asset: const AssetImage('assets/icons/material/material.png'),
+          icon: Icon(Icons.apps, size: 45, color: Colors.blue[500]),
           items: profileApps(localizations),
         ),
         _DesktopProfileItem(
           category: PrifleCategory.network,
-          asset: const AssetImage('assets/icons/cupertino/cupertino.png'),
+          icon: Icon(Icons.settings_applications, size: 45, color: Colors.purple[500]),
           items: profileNetwork(localizations),
         ),
         _DesktopProfileItem(
           category: PrifleCategory.accounts,
-          asset: const AssetImage('assets/icons/reference/reference.png'),
+          icon: Icon(Icons.account_box, size: 45, color: Colors.red[500]),
           items: profileAccounts(localizations),
         ),
       ];
@@ -91,19 +91,20 @@ class HomePage extends StatelessWidget {
             Padding(
               padding: const EdgeInsetsDirectional.only(
                 start: _horizontalDesktopPadding,
-                bottom: 81,
+                bottom: 50,
                 end: _horizontalDesktopPadding,
-                top: 109,
+                top: 50,
               ),
               child: Row(
                 children: [
                   FadeInImagePlaceholder(
                     image: Theme.of(context).colorScheme.brightness ==
                             Brightness.dark
-                        ? const AssetImage('assets/logo/flutter_logo.png')
-                        : const AssetImage('assets/logo/flutter_logo_color.png'),
+                        ? const AssetImage('assets/logo/logo.png')
+                        : const AssetImage('assets/logo/logo_color.png'),
                     placeholder: const SizedBox.shrink(),
                     excludeFromSemantics: true,
+                    height: 50.0,
                   ),
                   Expanded(
                     child: Wrap(
@@ -250,7 +251,7 @@ class _AnimatedHomePageState extends State<_AnimatedHomePage>
                   PrifleCategory.apps,
                 ),
                 category: PrifleCategory.apps,
-                imageString: 'assets/icons/material/material.png',
+                icon: Icon(Icons.apps, size: 45, color: Colors.blue[500]),
                 items: profileApps(localizations),
                 initiallyExpanded: isTestMode,
               ),
@@ -263,7 +264,7 @@ class _AnimatedHomePageState extends State<_AnimatedHomePage>
                   PrifleCategory.network,
                 ),
                 category: PrifleCategory.network,
-                imageString: 'assets/icons/cupertino/cupertino.png',
+                icon: Icon(Icons.settings_applications, size: 45, color: Colors.purple[500]),
                 items: profileNetwork(localizations),
                 initiallyExpanded: isTestMode,
               ),
@@ -276,7 +277,7 @@ class _AnimatedHomePageState extends State<_AnimatedHomePage>
                   PrifleCategory.accounts,
                 ),
                 category: PrifleCategory.accounts,
-                imageString: 'assets/icons/reference/reference.png',
+                icon: Icon(Icons.account_box, size: 45, color: Colors.red[500]),
                 items: profileAccounts(localizations),
                 initiallyExpanded: isTestMode,
               ),
@@ -308,12 +309,12 @@ class _AnimatedHomePageState extends State<_AnimatedHomePage>
 class _DesktopProfileItem extends StatelessWidget {
   const _DesktopProfileItem({
     this.category,
-    this.asset,
+    this.icon,
     this.items,
   });
 
   final PrifleCategory category;
-  final ImageProvider asset;
+  final Icon icon;
   final List<ProfileModel> items;
 
   @override
@@ -331,7 +332,7 @@ class _DesktopProfileItem extends StatelessWidget {
             children: [
               _DesktopCategoryHeader(
                 category: category,
-                asset: asset,
+                icon: icon,
               ),
               Divider(
                 height: 2,
@@ -358,10 +359,10 @@ class _DesktopProfileItem extends StatelessWidget {
 class _DesktopCategoryHeader extends StatelessWidget {
   const _DesktopCategoryHeader({
     this.category,
-    this.asset,
+    this.icon,
   });
   final PrifleCategory category;
-  final ImageProvider asset;
+  final Icon icon;
 
   @override
   Widget build(BuildContext context) {
@@ -374,15 +375,10 @@ class _DesktopCategoryHeader extends StatelessWidget {
         children: [
           Padding(
             padding: const EdgeInsets.all(10),
-            child: FadeInImagePlaceholder(
-              image: asset,
-              placeholder: const SizedBox(
-                height: 64,
-                width: 64,
-              ),
+            child: Container(
               width: 64,
               height: 64,
-              excludeFromSemantics: true,
+              child: icon
             ),
           ),
           Flexible(

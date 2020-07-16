@@ -27,21 +27,18 @@ dependencies:
   # below need remove
   flare_dart: ^2.3.4
   flare_flutter: ^2.0.2
-  url_launcher: ^5.1.6
+  # url_launcher: ^5.1.6
   collection: ^1.14.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_driver:
-    sdk: flutter
-  test:
-  path:
-  args:
-  grinder: ^0.8.0
-  intl_translation:
-  pedantic: ^1.9.0
-  string_scanner: ^1.0.5
+  flutter_launcher_icons: "^0.7.5"
+
+flutter_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/launcher/icon.png"
 
 flutter:
   assets:
@@ -53,11 +50,8 @@ flutter:
     - assets/studies/fortnightly_card_dark.png
     - assets/studies/rally_card.png
     - assets/studies/rally_card_dark.png
-    - assets/logo/flutter_logo.png
-    - assets/logo/flutter_logo_color.png
-    - assets/icons/cupertino/cupertino.png
-    - assets/icons/material/material.png
-    - assets/icons/reference/reference.png
+    - assets/logo/logo.png
+    - assets/logo/logo_color.png
     - assets/icons/settings/settings_light.flr
     - assets/icons/settings/settings_dark.flr
 

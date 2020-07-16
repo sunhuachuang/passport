@@ -17,14 +17,14 @@ class CategoryListItem extends StatefulWidget {
   const CategoryListItem({
     Key key,
     this.category,
-    this.imageString,
+    this.icon,
     this.items = const [],
     this.initiallyExpanded = false,
   })  : assert(initiallyExpanded != null),
         super(key: key);
 
   final PrifleCategory category;
-  final String imageString;
+  final Icon icon;
   final List<ProfileModel> items;
   final bool initiallyExpanded;
 
@@ -117,7 +117,7 @@ class _CategoryListItemState extends State<CategoryListItem>
           borderRadius: _headerBorderRadius.value,
           height: _headerHeight.value,
           chevronOpacity: _headerChevronOpacity.value,
-          imageString: widget.imageString,
+          icon: widget.icon,
           category: widget.category,
           onTap: _handleTap,
         ),
@@ -158,7 +158,7 @@ class _CategoryHeader extends StatelessWidget {
     this.borderRadius,
     this.height,
     this.chevronOpacity,
-    this.imageString,
+    this.icon,
     this.category,
     this.onTap,
   }) : super(key: key);
@@ -167,7 +167,7 @@ class _CategoryHeader extends StatelessWidget {
   final EdgeInsetsGeometry imagePadding;
   final double height;
   final BorderRadiusGeometry borderRadius;
-  final String imageString;
+  final Icon icon;
   final PrifleCategory category;
   final double chevronOpacity;
   final GestureTapCallback onTap;
@@ -195,12 +195,10 @@ class _CategoryHeader extends StatelessWidget {
                     children: [
                       Padding(
                         padding: imagePadding,
-                        child: ExcludeSemantics(
-                          child: Image.asset(
-                            imageString,
-                            width: 64,
-                            height: 64,
-                          ),
+                        child: Container(
+                          width: 64,
+                          height: 64,
+                          child: icon
                         ),
                       ),
                       Padding(
