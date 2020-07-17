@@ -3,21 +3,21 @@ use tdn::prelude::{GroupSendMessage, PeerAddr, RpcError, RpcHandler, SendMessage
 
 use crate::storage::LocalStorage;
 
-use super::super::did::Did;
+use super::super::did::{Did, User};
 use super::group::Event;
 
 pub struct State {
     addr: PeerAddr,
-    send: Sender<SendMessage>,
+    sender: Sender<SendMessage>,
     db: Arc<RwLock<LocalStorage>>,
 }
 
 pub fn new_rpc_handler(
     addr: PeerAddr,
-    send: Sender<SendMessage>,
+    sender: Sender<SendMessage>,
     db: Arc<RwLock<LocalStorage>>,
 ) -> RpcHandler<State> {
-    let mut rpc_handler = RpcHandler::new(State { addr, send, db });
+    let mut rpc_handler = RpcHandler::new(State { addr, sender, db });
 
     rpc_handler.add_method("echo", |params, _| Box::pin(async { Ok(params.into()) }));
 
@@ -43,22 +43,17 @@ pub fn new_rpc_handler(
                 .map_err(|_| RpcError::Custom("peer addr invalid"))?;
 
             // TODO load from db.
+            //User::load(state.db.read().await);
             let my_name = "".to_owned();
-            let my_avator = "".to_owned();
+            let my_avatar = "".to_owned();
 
             // send to p2p
             state
-                .send
+                .sender
                 .send(SendMessage::Group(GroupSendMessage::Event(
                     remote_addr,
                     Event::RequestFriend(
-                        my_did,
-                        state.addr,
-                        my_name,
-                        my_avator,
-                        remote_did,
-                        remote_addr,
-                        remark,
+                        my_did, state.addr, my_name, my_avatar, remote_did, remark,
                     )
                     .to_event()
                     .to_bytes(),
@@ -69,7 +64,7 @@ pub fn new_rpc_handler(
         })
     });
 
-    rpc_handler.add_method("response-friend", |params, _state| {
+    rpc_handler.add_method("response-friend", |params, state| {
         Box::pin(async move {
             debug!("Yu::response-friend.");
             let my_id = params[0].as_str().unwrap().to_string();
@@ -80,8 +75,32 @@ pub fn new_rpc_handler(
 
             let remote_addr = params[2].as_str().unwrap().to_string();
             debug!("Yu::response-friend remote addr: {}", remote_addr);
+            let is_ok = params[3].as_str().unwrap().to_string();
+
+            let my_did = Did::from_hex(my_id).map_err(|_| RpcError::Custom("did invalid"))?;
+            let remote_did =
+                Did::from_hex(remote_id).map_err(|_| RpcError::Custom("did invalid"))?;
+            let remote_addr = PeerAddr::from_hex(remote_addr)
+                .map_err(|_| RpcError::Custom("peer addr invalid"))?;
+
+            let event = if is_ok != String::from("1") {
+                Event::RejectFriend(my_did, remote_did)
+            } else {
+                // TODO load from db.
+                let my_name = "".to_owned();
+                let my_avatar = "".to_owned();
+
+                Event::AgreeFriend(my_did, state.addr, my_name, my_avatar, remote_did)
+            };
 
             // send to p2p
+            state
+                .sender
+                .send(SendMessage::Group(GroupSendMessage::Event(
+                    remote_addr,
+                    event.to_event().to_bytes(),
+                )))
+                .await;
 
             Ok(Default::default())
         })

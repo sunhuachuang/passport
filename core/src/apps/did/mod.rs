@@ -3,6 +3,8 @@ use sha3::{Digest, Sha3_256};
 //use std::fmt::{Debug, Formatter, Result as FmtResult};
 use tdn::primitive::PeerAddr;
 
+use crate::storage::LocalStorage;
+
 pub(crate) mod group;
 pub(crate) mod rpc;
 
@@ -62,6 +64,14 @@ impl User {
             avator,
             addr,
         }
+    }
+
+    pub fn load(db: LocalStorage) -> Self {
+        todo!()
+    }
+
+    pub fn save(&self) {
+        todo!()
     }
 }
 

@@ -8,25 +8,25 @@ import '../global.dart';
 class User {
   String id;
   String name;
-  Uint8List avator;
+  Uint8List avatar;
 
-  User(String id, String name, [String avator = ""]) {
+  User(String id, String name, [String avatar = ""]) {
     this.id = id;
     this.name = name;
-    this.updateAvator(avator);
+    this.updateAvatar(avatar);
   }
 
   User.load(String id) {
     this.id = id;
     this.name = Global.CACHE_DB.read(id + "_name") ?? "";
-    this.avator = Global.CACHE_DB.read(id + "_avator");
+    this.avatar = Global.CACHE_DB.read(id + "_avatar");
   }
 
-  void updateAvator(String avator) {
-    if (avator.length > 1) {
-      this.avator = hex.decode(avator);
+  void updateAvatar(String avatar) {
+    if (avatar.length > 1) {
+      this.avatar = hex.decode(avatar);
     } else {
-      this.avator = null;
+      this.avatar = null;
     }
   }
 
@@ -53,7 +53,7 @@ class User {
     }
 
     await Global.CACHE_DB.write(id + "_name", name);
-    await Global.CACHE_DB.write(id + "_avator", avator);
+    await Global.CACHE_DB.write(id + "_avatar", avatar);
   }
 
   String printShortId() {
@@ -74,17 +74,17 @@ class User {
     }
   }
 
-  String hexAvator() {
-    if (this.avator != null) {
-      return hex.encode(this.avator);
+  String hexAvatar() {
+    if (this.avatar != null) {
+      return hex.encode(this.avatar);
     } else {
       return "";
     }
   }
 
   CircleAvatar showAvatar() {
-    return this.avator != null ? CircleAvatar(
-      backgroundImage: MemoryImage(this.avator),
+    return this.avatar != null ? CircleAvatar(
+      backgroundImage: MemoryImage(this.avatar),
       minRadius: 25,
     ) : CircleAvatar(
       child: Text(this.name.length > 0 ? this.name[0].toUpperCase() : "A"),

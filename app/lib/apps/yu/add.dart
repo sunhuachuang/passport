@@ -219,7 +219,7 @@ class RequestItem extends StatelessWidget {
             foregroundColor: Colors.red[500],
             icon: Icons.flash_off,
             onTap: () => {
-              context.read<ActiveUser>().responseFriend(id, true),
+              context.read<ActiveUser>().responseFriend(id, false),
             }
           ),
         ],
@@ -268,7 +268,7 @@ class RequestItem extends StatelessWidget {
                     ),
                     SizedBox(height: 3.0),
                     Text(
-                      "ID: ${key}",
+                      "ID: ${Friend.betterPrint(id)}",
                       style: TextStyle(
                         color: Colors.grey,
                         fontSize: 10,
@@ -276,7 +276,7 @@ class RequestItem extends StatelessWidget {
                     ),
                     SizedBox(height: 3.0),
                     Text(
-                      "Address: ${friend.addr}",
+                      "Address: 0x${Friend.betterPrint(friend.addr)}",
                       style: TextStyle(
                         color: Colors.grey,
                         fontSize: 10,

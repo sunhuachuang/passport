@@ -8,7 +8,7 @@ class Avatar extends StatelessWidget {
   final double width;
   final double height;
   final String name;
-  final Uint8List avator;
+  final Uint8List avatar;
   final bool online;
 
   const Avatar(
@@ -16,7 +16,7 @@ class Avatar extends StatelessWidget {
       this.width = 60.0,
       this.height = 60.0,
       this.name,
-      this.avator,
+      this.avatar,
       this.online = false})
       : super(key: key);
 
@@ -34,10 +34,10 @@ class Avatar extends StatelessWidget {
         children: <Widget>[
           Container(
             margin: EdgeInsets.all(4.0),
-            child: this.avator != null
+            child: this.avatar != null
             ? CircleAvatar(
               minRadius: 25,
-              backgroundImage: MemoryImage(this.avator))
+              backgroundImage: MemoryImage(this.avatar))
             : CircleAvatar(
               minRadius: 25,
               backgroundColor: background,

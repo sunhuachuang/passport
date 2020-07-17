@@ -14,9 +14,9 @@ pub struct Event {
     pub event: Vec<u8>,
 }
 
-pub type EventResult = (
+pub type EventResult<'a> = (
     AppSymbol,
-    Vec<(String, RpcParam)>,
+    Vec<(&'a str, RpcParam)>,
     Vec<GroupSendMessage>,
     Vec<LayerSendMessage>,
 );
@@ -38,13 +38,13 @@ impl GroupBus {
         Self(ls)
     }
 
-    pub fn handle(&mut self, addr: PeerAddr, bytes: &[u8]) -> Result<EventResult> {
+    pub fn handle(&mut self, _addr: PeerAddr, bytes: &[u8]) -> Result<EventResult> {
         let Event { app, event } = Event::from_bytes(bytes)?;
         let (rpc, group, layer) = app.handle_event(&event)?;
         Ok((app, rpc, group, layer))
     }
 
-    pub async fn leave(&mut self, addr: PeerAddr) -> Result<()> {
+    pub async fn leave(&mut self, _addr: PeerAddr) -> Result<()> {
         Ok(())
     }
 }

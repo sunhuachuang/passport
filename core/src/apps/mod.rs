@@ -23,7 +23,7 @@ pub enum AppSymbol {
 }
 
 pub(super) type EventResult = (
-    Vec<(String, RpcParam)>,
+    Vec<(&'static str, RpcParam)>,
     Vec<GroupSendMessage>,
     Vec<LayerSendMessage>,
 );

@@ -70,7 +70,7 @@ class ListFriends extends StatefulWidget {
 }
 
 class _ListFriendsState extends State<ListFriends> {
-  Widget buildGroupAvator(Friend f) {
+  Widget buildGroupAvatar(Friend f) {
     return Padding(
       padding: const EdgeInsets.only(right: 10.0, left: 10.0, top: 6.0),
       child: Column(
@@ -172,7 +172,7 @@ class _ListFriendsState extends State<ListFriends> {
                 // avatar
                 SizedBox(width: 10.0),
                 Avatar(width: 40.0, height: 40.0,
-                  avator: user.owner.avator, name: user.owner.name, online: user.online),
+                  avatar: user.owner.avatar, name: user.owner.name, online: user.online),
                 SizedBox(width: 10.0),
                 // name
                 Text(user.owner.name,
@@ -268,7 +268,7 @@ class _ListFriendsState extends State<ListFriends> {
                 scrollDirection: Axis.horizontal,
                 itemCount: user.friends.length,
                 itemBuilder: (BuildContext ctx, int index) =>
-                buildGroupAvator(user.friends[index])),
+                buildGroupAvatar(user.friends[index])),
             ),
           ),
 

@@ -17,7 +17,7 @@ class RunningApp with ChangeNotifier {
   }
 
   openApp(App app) {
-    if (_runningApps[app.app] == null) {
+    if (_runningApps[app.app] == null || _runningApps[app.app].length == 0) {
       sockets.send('system', 'start', [app.appname]);
       _runningApps[app.app] = { app.id: app };
     } else {

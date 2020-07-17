@@ -174,7 +174,7 @@ fn failure_response(reason: &str) -> RpcParam {
     })
 }
 
-pub fn rpc_response(app: &str, method: String, params: RpcParam) -> RpcParam {
+pub fn rpc_response(app: &str, method: &str, params: RpcParam) -> RpcParam {
     json!({
         "jsonrpc": "2.0",
         "app": app,

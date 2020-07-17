@@ -13,11 +13,7 @@ class ActiveUser extends ChangeNotifier {
   final User owner;
   bool online;
   List<Friend> friends;
-  Map<String, TmpFriend> requests = {
-    "1": TmpFriend("111", "Sun", "", null, true),
-    "2": TmpFriend("222", "hua", "i ame", null, false, true),
-    "3": TmpFriend("333", "chuang", "like", null, false),
-  };
+  Map<String, TmpFriend> requests = {};
 
   ActiveUser({this.owner}) {
     this.online = true;
@@ -25,23 +21,62 @@ class ActiveUser extends ChangeNotifier {
 
     // register callback to ws.
     sockets.addListener("yu", "request-friend", _requestFriend);
-    sockets.addListener("yu", "response-friend", _responseFriend);
+    sockets.addListener("yu", "reject-friend", _rejectFriend);
+    sockets.addListener("yu", "agree-friend", _agreeFriend);
   }
 
   static List<Friend> loadFriends(String id) {
     return [u1, u2, u3, u4, u5, u6, u7, u8];
   }
 
+  static List<Friend> loadRequests(String id) {
+    //return [u1, u2, u3, u4, u5, u6, u7, u8];
+  }
+
   // callback when receive the response for make a friend.
-  _responseFriend(List<String> params) {}
+  _rejectFriend(List params) {
+    final my_id = params[0];
+    final remote_id = params[1];
+
+    this.requests[remote_id].overIt(false);
+    notifyListeners();
+  }
+
+  // callback when receive the response for make a friend.
+  _agreeFriend(List params) {
+    final my_id = params[0];
+    final remote_id = params[1];
+    final remote_addr = params[2];
+    final remote_name = params[3];
+    final remote_avatar = params[4];
+
+    if (this.requests[remote_id] != null) {
+      this.requests[remote_id].overIt(true);
+      this.friends.add(Friend(remote_id, remote_name, remote_avatar, remote_addr, true));
+      notifyListeners();
+    }
+  }
 
   /// callback when receive the request for make a friend.
-  _requestFriend(List<String> params) {}
+  _requestFriend(List params) {
+    final my_id = params[0];
+    final remote_id = params[1];
+    final remote_addr = params[2];
+    final remote_name = params[3];
+    final remote_avatar = params[4];
+    final remark = params[5];
+
+    this.requests[remote_id] = TmpFriend(remote_addr, remote_name, remark,
+      remote_avatar.length > 1 ? hex.decode(remote_avatar) : null, false);
+
+    notifyListeners();
+  }
 
   /// request to make a friend.
   requestFriend(String id, String addr, String remark) {
     // save the request.
     this.requests[id] = TmpFriend(addr, "", remark, null, true);
+    notifyListeners();
 
     // send to ws.
     sockets.send('yu', 'request-friend', [this.owner.id, id, addr, remark]);
@@ -49,16 +84,26 @@ class ActiveUser extends ChangeNotifier {
 
   /// response the make friend.
   responseFriend(String key, bool isOk) {
-    this.requests[key].overIt(isOk);
+    var tmp = this.requests[key];
+    tmp.overIt(isOk);
+    if (isOk) {
+      this.friends.add(tmp.toFriend(key));
+    }
+    notifyListeners();
+
     // save the request.
 
     // send to ws.
-    sockets.send('yu', 'response-friend', [this.owner.id, key, this.requests[key].addr]);
+    sockets.send('yu', 'response-friend',
+      [this.owner.id, key, this.requests[key].addr, isOk ? "1" : "0"]
+    );
   }
 
   /// ignore the request.
   ignoreRequest(String key) {
     this.requests.remove(key);
+    notifyListeners();
+
     // save the request.
   }
 }
@@ -66,20 +111,20 @@ class ActiveUser extends ChangeNotifier {
 class Friend {
   final String id;
   String name;
-  Uint8List avator;
+  Uint8List avatar;
   String addr;
   bool online;
   String remark = "";
   Message lastMessage;
 
   // new friend from backend
-  Friend(this.id, String name, String avator, String addr, [bool online=false]) {
+  Friend(this.id, String name, String avatar, String addr, [bool online=false]) {
     //this.id = id;
     this.name = name;
-    if (avator.length > 1) {
-      this.avator = hex.decode(avator);
+    if (avatar.length > 1) {
+      this.avatar = hex.decode(avatar);
     } else {
-      this.avator = null;
+      this.avatar = null;
     }
     this.addr = addr;
     this.online = online;
@@ -87,8 +132,17 @@ class Friend {
 
   Avatar showAvatar([double width = 60.0, double height = 60.0]) {
     return Avatar(
-      width: width, height: height, name: this.name, avator: this.avator, online: this.online
+      width: width, height: height, name: this.name, avatar: this.avatar, online: this.online
     );
+  }
+
+  static String betterPrint(id) {
+    var len = id.length;
+    if (len > 8) {
+      return id.substring(0, 8) + "..." + id.substring(len - 8, len);
+    } else {
+      return id;
+    }
   }
 }
 
@@ -96,21 +150,27 @@ class TmpFriend {
   final String addr;
   final String name;
   final String remark;
-  final Uint8List avator;
+  final Uint8List avatar;
   final bool isMe;
   RelativeTime time = RelativeTime();
   bool ok = false;
   bool over = false;
 
-  TmpFriend(this.addr, this.name, this.remark, this.avator, this.isMe, [this.over=false]);
+  TmpFriend(this.addr, this.name, this.remark, this.avatar, this.isMe, [this.over=false]);
 
   overIt(bool isOk) {
     this.over = true;
-    this.ok = ok;
+    this.ok = isOk;
+  }
+
+  Friend toFriend(id) {
+    var friend = Friend(id, this.name, "", this.addr, false);
+    friend.avatar = this.avatar;
+    return friend;
   }
 
   Avatar showAvatar([double width = 60.0, double height = 60.0]) {
-    return Avatar(width: width, height: height, name: this.name, avator: this.avator);
+    return Avatar(width: width, height: height, name: this.name, avatar: this.avatar);
   }
 }
 
