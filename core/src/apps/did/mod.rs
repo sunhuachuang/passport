@@ -1,9 +1,13 @@
 use ed25519_dalek::{Keypair, PublicKey, SecretKey};
 use sha3::{Digest, Sha3_256};
 //use std::fmt::{Debug, Formatter, Result as FmtResult};
-use tdn::primitive::PeerAddr;
+use tdn::async_std::{
+    io::Result,
+    sync::{Arc, RwLock},
+};
+use tdn::prelude::PeerAddr;
 
-use crate::storage::LocalStorage;
+use crate::storage::Storage;
 
 pub(crate) mod group;
 pub(crate) mod rpc;
@@ -17,21 +21,25 @@ pub struct Secret([u8; 32]);
 #[derive(Default)]
 pub struct Proof([u8; 32]);
 
+#[derive(Serialize, Deserialize)]
 pub struct User {
     id: Did,
-    name: String,
-    avator: String,
-    addr: PeerAddr,
+    pub name: String,
+    pub avatar: String,
 }
 
 impl Did {
+    pub fn as_bytes(&self) -> &[u8] {
+        &self.0
+    }
+
     pub fn to_hex(&self) -> String {
         let mut s = String::with_capacity(self.0.len() * 2);
         s.extend(self.0.iter().map(|b| format!("{:02x}", b)));
         s
     }
 
-    pub fn from_hex(s: impl ToString) -> Result<Self, ()> {
+    pub fn from_hex(s: impl ToString) -> std::result::Result<Self, ()> {
         let s = s.to_string();
         if s.len() != 64 {
             return Err(());
@@ -57,20 +65,22 @@ impl User {
         self.id.to_hex()
     }
 
-    pub fn new(id: Did, name: String, avator: String, addr: PeerAddr) -> Self {
-        Self {
-            id,
-            name,
-            avator,
-            addr,
-        }
+    pub fn new(id: Did, name: String, avatar: String) -> Self {
+        Self { id, name, avatar }
     }
 
-    pub fn load(db: LocalStorage) -> Self {
-        todo!()
+    pub async fn load(did: &Did, db: &Arc<RwLock<Storage>>) -> Option<Self> {
+        db.read().await.ls().read::<User>(did.as_bytes())
     }
 
-    pub fn save(&self) {
+    pub async fn save(&self, db: &Arc<RwLock<Storage>>) -> Result<()> {
+        db.read()
+            .await
+            .ls()
+            .write(self.id.as_bytes().to_vec(), self)
+    }
+
+    pub async fn save_sk(&self, sk: Secret) {
         todo!()
     }
 }
@@ -85,9 +95,9 @@ pub fn genereate_id(seed: &[u8]) -> (Did, Secret) {
     (Did(did), Secret([0u8; 32]))
 }
 
-pub fn generate(name: String, avator: String, addr: PeerAddr, seed: &[u8]) -> (User, Secret) {
+pub fn generate(name: String, avatar: String, seed: &[u8]) -> (User, Secret) {
     let (did, sk) = genereate_id(seed);
-    (User::new(did, name, avator, addr), sk)
+    (User::new(did, name, avatar), sk)
 }
 
 pub fn _zkp_proof(peer_addr: &PeerAddr, m_id: &Did, sk: &Secret, r_id: &Did) -> Proof {
@@ -107,7 +117,7 @@ pub struct MeId {
 }
 
 impl MeId {
-    pub fn _generate(name: String, addr: PeerAddr, seed: &[u8]) -> Result<MeId, ()> {
+    pub fn _generate(name: String, addr: PeerAddr, seed: &[u8]) -> std::result::Result<MeId, ()> {
         let mut secret_bytes = [0u8; 32];
         let mut sha = Sha3_256::new();
         sha.input(seed);

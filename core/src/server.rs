@@ -17,7 +17,7 @@ use crate::group::GroupBus;
 use crate::layer::LayerBus;
 use crate::primitives::DEFAULT_LOG_FILE;
 use crate::rpc::{rpc_response, RpcBus};
-use crate::storage::LocalStorage;
+use crate::storage::Storage;
 
 pub async fn start(db_path: String) -> Result<()> {
     let db_path = PathBuf::from(db_path);
@@ -34,7 +34,7 @@ pub async fn start(db_path: String) -> Result<()> {
     let (peer_id, send, out_recv) = start_with_config(config).await.unwrap();
     info!("Debug: peer id: {}", peer_id.to_hex());
 
-    let storage = Arc::new(RwLock::new(LocalStorage::init(db_path)?));
+    let storage = Arc::new(RwLock::new(Storage::init(db_path)?));
     let mut rpc_bus = RpcBus::new(storage.clone(), send.clone(), peer_id);
     let mut layer_bus = LayerBus::new(storage.clone());
     let mut group_bus = GroupBus::new(storage);

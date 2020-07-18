@@ -1,7 +1,7 @@
 use tdn::async_std::sync::{Arc, RwLock, Sender};
 use tdn::prelude::{GroupSendMessage, PeerAddr, RpcError, RpcHandler, SendMessage};
 
-use crate::storage::LocalStorage;
+use crate::storage::Storage;
 
 use super::super::did::{Did, User};
 use super::group::Event;
@@ -9,13 +9,13 @@ use super::group::Event;
 pub struct State {
     addr: PeerAddr,
     sender: Sender<SendMessage>,
-    db: Arc<RwLock<LocalStorage>>,
+    db: Arc<RwLock<Storage>>,
 }
 
 pub fn new_rpc_handler(
     addr: PeerAddr,
     sender: Sender<SendMessage>,
-    db: Arc<RwLock<LocalStorage>>,
+    db: Arc<RwLock<Storage>>,
 ) -> RpcHandler<State> {
     let mut rpc_handler = RpcHandler::new(State { addr, sender, db });
 
@@ -42,10 +42,10 @@ pub fn new_rpc_handler(
             let remote_addr = PeerAddr::from_hex(remote_addr)
                 .map_err(|_| RpcError::Custom("peer addr invalid"))?;
 
-            // TODO load from db.
-            //User::load(state.db.read().await);
-            let my_name = "".to_owned();
-            let my_avatar = "".to_owned();
+            let (my_name, my_avatar) = match User::load(&my_did, &state.db).await {
+                Some(user) => (user.name, user.avatar),
+                None => ("".to_owned(), "".to_owned()),
+            };
 
             // send to p2p
             state
@@ -86,9 +86,10 @@ pub fn new_rpc_handler(
             let event = if is_ok != String::from("1") {
                 Event::RejectFriend(my_did, remote_did)
             } else {
-                // TODO load from db.
-                let my_name = "".to_owned();
-                let my_avatar = "".to_owned();
+                let (my_name, my_avatar) = match User::load(&my_did, &state.db).await {
+                    Some(user) => (user.name, user.avatar),
+                    None => ("".to_owned(), "".to_owned()),
+                };
 
                 Event::AgreeFriend(my_did, state.addr, my_name, my_avatar, remote_did)
             };

@@ -6,7 +6,7 @@ use tdn::prelude::{GroupSendMessage, LayerSendMessage, PeerAddr, RpcParam, SendM
 
 use crate::apps::AppSymbol;
 use crate::error::new_io_error;
-use crate::storage::LocalStorage;
+use crate::storage::Storage;
 
 #[derive(Serialize, Deserialize)]
 pub struct Event {
@@ -31,11 +31,11 @@ impl Event {
     }
 }
 
-pub struct GroupBus(Arc<RwLock<LocalStorage>>);
+pub struct GroupBus(Arc<RwLock<Storage>>);
 
 impl GroupBus {
-    pub fn new(ls: Arc<RwLock<LocalStorage>>) -> Self {
-        Self(ls)
+    pub fn new(s: Arc<RwLock<Storage>>) -> Self {
+        Self(s)
     }
 
     pub fn handle(&mut self, _addr: PeerAddr, bytes: &[u8]) -> Result<EventResult> {

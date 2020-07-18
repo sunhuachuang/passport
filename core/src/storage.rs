@@ -3,23 +3,33 @@ use std::path::PathBuf;
 
 use tdn::async_std::io::Result;
 //use tdn::prelude::PeerAddr;
-//use tdn::storage::{open_absolute_db, LocalDB};
+use tdn::storage::{open_absolute_db, LocalDB};
 
 //use crate::error::new_io_error;
 //use crate::user_id::{PeerList, User, UserId};
 
+const DATA_DB_NAME: &'static str = "data";
 //const USER_KEY: [u8; 1] = [0];
 //const SECRET_KEY: [u8; 1] = [1];
 //const PEERS_KEY: [u8; 1] = [2];
 
-pub struct LocalStorage(PathBuf);
+pub struct Storage(LocalDB);
 
-impl LocalStorage {
+impl Storage {
+    /// new a Storage.
     pub fn init(path: PathBuf) -> Result<Self> {
-        // TODO check path;
+        let db = open_absolute_db(path, DATA_DB_NAME)?;
 
-        Ok(LocalStorage(path))
+        Ok(Storage(db))
     }
+
+    /// Get local storage db.
+    pub fn ls(&self) -> &LocalDB {
+        &self.0
+    }
+
+    /// Get distributed storage db.
+    pub fn _ds(&self) {}
 
     // pub fn load_users(&self) -> Vec<UserId> {
     //     vec![]

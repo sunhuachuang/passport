@@ -5,7 +5,7 @@ use tdn::prelude::{
     GroupId, GroupSendMessage, LayerSendMessage, PeerAddr, RpcHandler, RpcParam, SendMessage,
 };
 
-use crate::storage::LocalStorage;
+use crate::storage::Storage;
 
 use crate::error::new_io_error;
 
@@ -52,10 +52,10 @@ impl AppSymbol {
         &self,
         addr: PeerAddr,
         send: Sender<SendMessage>,
-        db: Arc<RwLock<LocalStorage>>,
+        db: Arc<RwLock<Storage>>,
     ) -> AppRpc {
         match self {
-            AppSymbol::Did => AppRpc::Did(did::rpc::new_rpc_handler(addr)),
+            AppSymbol::Did => AppRpc::Did(did::rpc::new_rpc_handler(addr, send, db)),
             AppSymbol::Ds => AppRpc::Ds(ds::rpc::new_rpc_handler()),
             AppSymbol::Yu => AppRpc::Yu(yu::rpc::new_rpc_handler(addr, send, db)),
             AppSymbol::Docs => AppRpc::Docs(docs::rpc::new_rpc_handler()),

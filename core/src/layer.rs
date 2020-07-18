@@ -4,13 +4,13 @@ use tdn::async_std::io::Result;
 use tdn::async_std::sync::{Arc, RwLock};
 use tdn::prelude::{GroupId, LayerReceiveMessage};
 
-use crate::storage::LocalStorage;
+use crate::storage::Storage;
 
-pub struct LayerBus(Arc<RwLock<LocalStorage>>);
+pub struct LayerBus(Arc<RwLock<Storage>>);
 
 impl LayerBus {
-    pub fn new(ls: Arc<RwLock<LocalStorage>>) -> Self {
-        Self(ls)
+    pub fn new(s: Arc<RwLock<Storage>>) -> Self {
+        Self(s)
     }
 
     pub async fn handle(&mut self, _ltype: LayerReceiveMessage) -> Result<()> {

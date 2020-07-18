@@ -8,7 +8,7 @@ use tdn::prelude::{GroupSendMessage, PeerAddr, RpcError, RpcHandler, RpcParam, S
 use tdn::primitive::json;
 
 use crate::apps::{AppRpc, AppSymbol};
-use crate::storage::LocalStorage;
+use crate::storage::Storage;
 
 pub trait RpcState {}
 
@@ -31,7 +31,7 @@ pub struct RpcBus {
 }
 
 impl RpcBus {
-    pub fn new(ls: Arc<RwLock<LocalStorage>>, send: Sender<SendMessage>, addr: PeerAddr) -> Self {
+    pub fn new(ls: Arc<RwLock<Storage>>, send: Sender<SendMessage>, addr: PeerAddr) -> Self {
         let handlers = Arc::new(RwLock::new(HashMap::new()));
         Self {
             system: system_rpc_handler(SystemState(handlers.clone(), send, ls, addr)),
@@ -68,7 +68,7 @@ impl RpcBus {
 struct SystemState(
     Handlers,
     Sender<SendMessage>,
-    Arc<RwLock<LocalStorage>>,
+    Arc<RwLock<Storage>>,
     PeerAddr,
 );
 
