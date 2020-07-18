@@ -5,6 +5,7 @@ import 'package:convert/convert.dart';
 import 'package:flutter/material.dart';
 
 import '../widgets/adaptive.dart';
+import '../widgets/header.dart';
 import '../models/options.dart';
 import '../models/did.dart';
 import '../common/jsonrpc.dart' as jsonrpc;
@@ -57,102 +58,78 @@ class _AccountNewPageState extends State<AccountNewPage> {
 
   @override
   Widget build(BuildContext context) {
+    final isDesktop = isDisplayDesktop(context);
+    final colorScheme = Theme.of(context).colorScheme;
     return Container(
       child: ApplyTextOptions(
         child: Scaffold(
-          appBar: AppBar(
-            backgroundColor: Colors.transparent,
-            leading: Padding(
-              padding: EdgeInsetsDirectional.only(start: 0),
-              child: IconButton(
-                key: const ValueKey('Back'),
-                icon: const BackButtonIcon(),
-                tooltip: MaterialLocalizations.of(context).backButtonTooltip,
-                onPressed: () {
-                  Navigator.maybePop(context);
-                },
-              ),
-            ),
-            actions: [],
-          ),
           body: Column(
             children: <Widget>[
+              header(context, "Set User Info"),
               Center(
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 50),
-                  child: Container(
-                    constraints: BoxConstraints(maxWidth: 400),
-                    alignment: Alignment.center,
-                    width: 250,
-                    child: Column(
-                      children: <Widget>[
-                        Center(
-                          child: Text(
-                            'Set User Info',
-                            style: TextStyle(
-                              fontSize: 24,
-                            ),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 50),
-                          child: Container(
-                            height: 120,
-                            width: 115,
-                            child: Column(
-                              children: <Widget>[
-                                FlatButton(
-                                  onPressed: getImage,
-                                  child: Center(
-                                    child:
-                                    _image == null
-                                    ? CircleAvatar(
-                                      minRadius: 25,
-                                      backgroundColor: Colors.white,
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(20),
-                                        child: Icon(
-                                          Icons.add_a_photo,
-                                          color: Colors.lightBlueAccent,
-                                          size: 40
-                                        ),
+                child: Container(
+                  constraints: BoxConstraints(maxWidth: 400),
+                  alignment: Alignment.center,
+                  width: 250,
+                  child: Column(
+                    children: <Widget>[
+                      Padding(
+                        padding: const EdgeInsets.only(top: 10),
+                        child: Container(
+                          width: 115,
+                          child: Column(
+                            children: <Widget>[
+                              FlatButton(
+                                onPressed: getImage,
+                                child: Center(
+                                  child:
+                                  _image == null
+                                  ? CircleAvatar(
+                                    minRadius: 25,
+                                    backgroundColor: Colors.white,
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(20),
+                                      child: Icon(
+                                        Icons.add_a_photo,
+                                        color: Colors.lightBlueAccent,
+                                        size: 40
                                       ),
-                                    ) : CircleAvatar(
-                                      minRadius: 25,
-                                      backgroundImage: FileImage(_image),
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(20),
-                                        child: Icon(
-                                          Icons.add_a_photo,
-                                          color: Colors.lightBlueAccent.withAlpha(100),
-                                          size: 40
-                                        ),
-                                      ),
-                                    )
-                                  ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 10),
-                                  child: Text(
-                                    'Avator',
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      color: Colors.lightBlueAccent,
                                     ),
+                                  ) : CircleAvatar(
+                                    minRadius: 25,
+                                    backgroundImage: FileImage(_image),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(20),
+                                      child: Icon(
+                                        Icons.add_a_photo,
+                                        color: Colors.lightBlueAccent.withAlpha(100),
+                                        size: 40
+                                      ),
+                                    ),
+                                  )
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(top: 10),
+                                child: Text(
+                                  'Avator',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.lightBlueAccent,
                                   ),
                                 ),
-                              ]
-                            ),
+                              ),
+                            ]
                           ),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
               ),
               inputText(context, _nameController, 'Name'),
               inputText(context, _mnemonicController, 'Mnemonic'),
-              okEnter(context, _newUser, "OK", isDisplayDesktop(context)),
+              okEnter(context, _newUser, "OK", isDesktop),
             ],
           ),
         ),

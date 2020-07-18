@@ -36,11 +36,11 @@ pub fn new_rpc_handler(
             let remark = params[3].as_str().unwrap().to_string();
             debug!("Yu::request-friend remark: {}", remark);
 
-            let my_did = Did::from_hex(my_id).map_err(|_| RpcError::Custom("did invalid"))?;
+            let my_did = Did::from_hex(my_id).map_err(|_| RpcError::Custom("Yu: did invalid"))?;
             let remote_did =
-                Did::from_hex(remote_id).map_err(|_| RpcError::Custom("did invalid"))?;
+                Did::from_hex(remote_id).map_err(|_| RpcError::Custom("Yu: did invalid"))?;
             let remote_addr = PeerAddr::from_hex(remote_addr)
-                .map_err(|_| RpcError::Custom("peer addr invalid"))?;
+                .map_err(|_| RpcError::Custom("Yu: peer addr invalid"))?;
 
             let (my_name, my_avatar) = match User::load(&my_did, &state.db).await {
                 Some(user) => (user.name, user.avatar),
@@ -77,11 +77,11 @@ pub fn new_rpc_handler(
             debug!("Yu::response-friend remote addr: {}", remote_addr);
             let is_ok = params[3].as_str().unwrap().to_string();
 
-            let my_did = Did::from_hex(my_id).map_err(|_| RpcError::Custom("did invalid"))?;
+            let my_did = Did::from_hex(my_id).map_err(|_| RpcError::Custom("Yu: did invalid"))?;
             let remote_did =
-                Did::from_hex(remote_id).map_err(|_| RpcError::Custom("did invalid"))?;
+                Did::from_hex(remote_id).map_err(|_| RpcError::Custom("Yu: did invalid"))?;
             let remote_addr = PeerAddr::from_hex(remote_addr)
-                .map_err(|_| RpcError::Custom("peer addr invalid"))?;
+                .map_err(|_| RpcError::Custom("Yu: peer addr invalid"))?;
 
             let event = if is_ok != String::from("1") {
                 Event::RejectFriend(my_did, remote_did)
@@ -107,7 +107,7 @@ pub fn new_rpc_handler(
         })
     });
 
-    rpc_handler.add_method("message", |params, _state| {
+    rpc_handler.add_method("message", |params, state| {
         Box::pin(async move {
             debug!("Yu::message.");
             let my_id = params[0].as_str().unwrap().to_string();
@@ -122,7 +122,22 @@ pub fn new_rpc_handler(
             let message = params[3].as_str().unwrap().to_string();
             debug!("Yu::message message: {}", message);
 
+            let my_did = Did::from_hex(my_id).map_err(|_| RpcError::Custom("Yu: did invalid"))?;
+            let remote_did =
+                Did::from_hex(remote_id).map_err(|_| RpcError::Custom("Yu: did invalid"))?;
+            let remote_addr = PeerAddr::from_hex(remote_addr)
+                .map_err(|_| RpcError::Custom("Yu: did peer addr invalid"))?;
+
             // send to p2p
+            let event = Event::Message(my_did, remote_did, message);
+
+            state
+                .sender
+                .send(SendMessage::Group(GroupSendMessage::Event(
+                    remote_addr,
+                    event.to_event().to_bytes(),
+                )))
+                .await;
 
             Ok(Default::default())
         })

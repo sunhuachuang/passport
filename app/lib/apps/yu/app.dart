@@ -4,9 +4,10 @@ import 'package:provider/provider.dart';
 import 'package:assassin/models/options.dart';
 import 'package:assassin/models/did.dart';
 import 'package:assassin/l10n/localizations.dart';
+import 'package:assassin/themes/theme_data.dart';
 
 import 'home.dart';
-import 'models/friend.dart';
+import 'provider.dart';
 
 const _primaryColor = Color(0xFF6200EE);
 
@@ -33,7 +34,7 @@ class YuApp extends StatelessWidget {
             routes: {
               YuApp.defaultRoute: (context) => const _Home(),
             },
-            theme: ThemeData(
+            theme: AsThemeData.lightThemeData.copyWith(
               primaryColor: _primaryColor,
               highlightColor: Colors.transparent,
               colorScheme: const ColorScheme(

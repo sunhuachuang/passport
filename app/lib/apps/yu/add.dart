@@ -16,6 +16,8 @@ import 'models/friend.dart';
 import 'widgets/button_icon.dart';
 import 'widgets/input_text.dart';
 
+import 'provider.dart';
+
 class AddFriendPage extends StatelessWidget {
   const AddFriendPage({Key key}) : super(key: key);
 

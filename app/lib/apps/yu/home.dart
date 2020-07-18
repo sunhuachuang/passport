@@ -8,21 +8,12 @@ import 'package:assassin/models/did.dart';
 
 import 'common/styles.dart';
 import 'models/friend.dart';
+import 'models/message.dart';
 import 'widgets/avatar.dart';
-import 'detail.dart';
+
+import 'provider.dart';
+import 'friend.dart';
 import 'add.dart';
-
-class ActiveFriend extends ChangeNotifier {
-  Friend friend;
-  ActiveFriend([Friend friend]) {
-    this.friend = friend;
-  }
-
-  update(Friend friend) {
-    this.friend = friend;
-    notifyListeners();
-  }
-}
 
 class HomePage extends StatelessWidget {
   const HomePage();
@@ -36,24 +27,18 @@ class HomePage extends StatelessWidget {
       return Scaffold(
         body: Container(
           color: background,
-          child: ListenableProvider<ActiveFriend>(
-            create: (_) => ActiveFriend(),
-            child: Builder(builder: (context) {
-                return Row(
-                  children: [
-                    Container(
-                      width: 350,
-                      child: ListFriends(),
-                    ),
-                    SizedBox(width: 20.0),
-                    Expanded(
-                      child: ChatDetail(
-                        sender: context.watch<ActiveFriend>().friend,
-                        me: user.owner.id)
-                    ),
-                ]);
-            }),
-      )));
+          child: Row(
+            children: [
+              Container(
+                width: 350,
+                child: ListFriends(),
+              ),
+              SizedBox(width: 20.0),
+              Expanded(
+                child: ChatDetail()
+              ),
+          ])
+      ));
     } else {
       return Scaffold(
         body: Container(
@@ -101,16 +86,12 @@ class _ListFriendsState extends State<ListFriends> {
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () {
-        if (isDisplayDesktop(context)) {
-          Provider.of<ActiveFriend>(context, listen: false).update(friend);
-        } else {
+        context.read<ActiveUser>().updateActivedFriend(friend);
+        if (!isDisplayDesktop(context)) {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (_) => ChatScreen(
-                sender: friend,
-                me: me,
-              ),
+              builder: (_) => ChatScreen(),
             ),
           );
         }
@@ -160,6 +141,8 @@ class _ListFriendsState extends State<ListFriends> {
   @override
   Widget build(BuildContext context) {
     final user = context.watch<ActiveUser>();
+    var friends = user.friends;
+    var friend_keys = friends.keys.toList();
 
     return SafeArea(
       child: Column(
@@ -266,9 +249,10 @@ class _ListFriendsState extends State<ListFriends> {
             child: Center(
               child: ListView.builder(
                 scrollDirection: Axis.horizontal,
-                itemCount: user.friends.length,
+                itemCount: friend_keys.length,
                 itemBuilder: (BuildContext ctx, int index) =>
-                buildGroupAvatar(user.friends[index])),
+                buildGroupAvatar(friends[friend_keys[index]]),
+              )
             ),
           ),
 
@@ -276,9 +260,9 @@ class _ListFriendsState extends State<ListFriends> {
           Expanded(
             child: ListView.builder(
               padding: EdgeInsets.symmetric(horizontal: 12.0),
-              itemCount: user.friends.length,
+              itemCount: friend_keys.length,
               itemBuilder: (BuildContext ctx, int index) =>
-              buildFriendChat(user.friends[index], context, user.owner.id),
+              buildFriendChat(friends[friend_keys[index]], context, user.owner.id),
           ))
         ],
       ),

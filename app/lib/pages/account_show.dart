@@ -6,6 +6,7 @@ import '../models/options.dart';
 import '../models/did.dart';
 import '../global.dart';
 import '../widgets/toast.dart';
+import '../widgets/header.dart';
 
 class AccountShowPage extends StatefulWidget {
   const AccountShowPage({
@@ -37,25 +38,11 @@ class _AccountShowPageState extends State<AccountShowPage> {
     return Container(
       child: ApplyTextOptions(
         child: Scaffold(
-          appBar: AppBar(
-            backgroundColor: Colors.transparent,
-            leading: Padding(
-              padding: EdgeInsetsDirectional.only(start: 0),
-              child: IconButton(
-                key: const ValueKey('Back'),
-                icon: const BackButtonIcon(),
-                tooltip: MaterialLocalizations.of(context).backButtonTooltip,
-                onPressed: () {
-                  Navigator.maybePop(context);
-                },
-              ),
-            ),
-            actions: [],
-          ),
           body: Padding(
             padding: const EdgeInsets.all(10),
             child: Column(
               children: [
+                header(context, "User Info"),
                 user.showAvatar(),
                 Center(
                   child: QrImage(

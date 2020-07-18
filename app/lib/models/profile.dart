@@ -228,8 +228,12 @@ addBoostrap(context) {
 
 changeNode(context) {
   final localizations = AsLocalizations.of(context);
-  TextEditingController c1 = TextEditingController();
-  TextEditingController c2 = TextEditingController();
+  final rpcs = Global.splitRpc();
+
+  TextEditingController c1 = TextEditingController(text: rpcs[0]);
+  TextEditingController c2 = TextEditingController(text: rpcs[1]);
+  TextEditingController c3 = TextEditingController(text: rpcs[2]);
+  TextEditingController c4 = TextEditingController(text: rpcs[3]);
 
   showDialog(
     context: context,
@@ -237,7 +241,20 @@ changeNode(context) {
       return AlertDialog(
         title: Text(localizations.changeNode,
           style: TextStyle(color: Colors.orangeAccent)),
-        content: address(c1, c2),
+        content: Container(
+          height: 200,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 8),
+              Text('HTTP:', style: TextStyle(color: Colors.orangeAccent)),
+              address(c1, c2),
+              const SizedBox(height: 20),
+              Text('Websocket:', style: TextStyle(color: Colors.orangeAccent)),
+              address(c3, c4),
+            ]
+          ),
+        ),
         actions: <Widget>[
           FlatButton(
             child: new Text(localizations.cancel, style: TextStyle(color: Colors.grey[500])),
@@ -248,9 +265,10 @@ changeNode(context) {
           FlatButton(
             child: new Text('OK', style: TextStyle(color: Colors.red[500])),
             onPressed: () {
-              final addr = c1.text + ':' + c2.text;
+              final http_addr = c1.text + ':' + c2.text;
+              final ws_addr = c3.text + ':' + c4.text;
               // TODO add error
-              Global.changeNode(addr);
+              Global.changeNode(http_addr, ws_addr);
               Navigator.of(context).pop();
             },
           ),

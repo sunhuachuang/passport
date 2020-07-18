@@ -54,7 +54,7 @@ class CacheDB {
 }
 
 initSocket() {
-  sockets.init(Global.DEFAULT_NODE_RPC);
+  sockets.init(Global.WS_RPC);
   sockets.addListener('system', 'addr', Global.updateNodeAddr);
   sockets.send('system', 'addr', []);
   sockets.send('system', 'start', ['did']);
@@ -64,8 +64,11 @@ class Global {
   //static Option OPTION = AsOption();
   static CacheDB CACHE_DB = CacheDB();
 
-  // default primitives
-  static String DEFAULT_NODE_RPC = '127.0.0.1:8080';
+  /// default jsonrpc http addr.
+  static String HTTP_RPC = '127.0.0.1:8000';
+
+  /// default jsonrpc websocket addr.
+  static String WS_RPC = '127.0.0.1:8080';
 
   // cache key name
   static String OPTION_CACHE = 'option';
@@ -79,9 +82,16 @@ class Global {
     Global.NODE_ADDR = params[0];
   }
 
-  static changeNode(addr) {
-    Global.DEFAULT_NODE_RPC = addr;
+  static changeNode(http_addr, ws_addr) {
+    Global.HTTP_RPC = http_addr;
+    Global.WS_RPC = ws_addr;
     initSocket();
+  }
+
+  static List<String> splitRpc() {
+    final r1 = Global.HTTP_RPC.split(':');
+    final r2 = Global.WS_RPC.split(':');
+    return [r1[0], r1[1], r2[0], r2[1]];
   }
 
   static addBoostrap(addr) {

@@ -29,7 +29,7 @@ Future<Response> post(String app, String method, List params) async {
   print(json.encode(jsonrpc));
 
   try {
-    final response = await http.post('http://192.168.2.148:8001', body: json.encode(jsonrpc));
+    final response = await http.post('http://' + Global.HTTP_RPC, body: json.encode(jsonrpc));
     Map data = json.decode(response.body);
     print(data);
 
