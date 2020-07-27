@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:assassin/common/websocket.dart';
 import 'package:assassin/models/did.dart';
 import 'package:assassin/widgets/relative_time.dart';
+import 'package:assassin/global.dart';
 
 import 'models/friend.dart';
 import 'models/message.dart';
@@ -33,62 +34,129 @@ class ActiveUser extends ChangeNotifier {
   }
 
   static Map<String, Friend> loadFriends(String id) {
-    // TODO
-    return {
-      "local": Friend(id, "Local", "", "", true)
-    };
+    List<String> ids = Global.CACHE_DB.read("yu_friends");
+    Map<String, Friend> friends = {};
+    //friends['local'] = Friend(id, "Local", "", "", true);
+
+    if (ids != null) {
+      ids.forEach((a) {
+          final f = Friend.load("yu_friends_" + a);
+          if (f != null) {
+            friends[a] = f;
+          }
+      });
+    }
+
+    return friends;
   }
 
   static Map<String, TmpFriend> loadRequests(String id) {
-    // TODO
-    return {};
+    List<String> ids = Global.CACHE_DB.read("yu_requests");
+    Map<String, TmpFriend> tmp_friends = {};
+
+    if (ids != null) {
+      ids.forEach((a) {
+          final t = TmpFriend.load("yu_requests_" + a);
+          if (t != null) {
+            tmp_friends[a] = t;
+          }
+      });
+    }
+
+    return tmp_friends;
   }
 
   sendMessage(int type, String content) {
-
     final message = Message(
       sender: this.owner.id,
       type: type,
       content: content,
       time: new RelativeTime(),
       hasRead: true);
-    addMessage(message, true);
+
+    this.activedMessages.add(message);
+    notifyListeners();
 
     sockets.send('yu', 'message',
       [this.owner.id, this.activedFriend.id, this.activedFriend.addr, message.compress()]
     );
+
+    addMessage(message, this.activedFriend.id);
   }
 
   updateActivedFriend(Friend friend) {
     this.activedFriend = friend;
-    // TODO load active messages
+    int ms = Global.CACHE_DB.read('yu_messages_' + friend.id) ?? 0;
     this.activedMessages = [];
+
+    if (ms != 0) {
+      var list = new List<int>.generate(ms, (i) => i + 1);
+      var msgs = [];
+      list.forEach((i) {
+          final m = Message.load("yu_messages_${friend.id}_${i}");
+          if (m != null) {
+            this.activedMessages.add(m);
+          }
+      });
+    }
 
     notifyListeners();
   }
 
-  addMessage(Message msg, [isActived=false]) {
-    if (isActived || msg.sender == this.activedFriend.id) {
+  recvMessage(Message msg) {
+    if (msg.sender == this.activedFriend.id) {
       this.activedMessages.add(msg);
       notifyListeners();
     }
-
-    // TODO db
+    addMessage(msg, msg.sender);
   }
 
-  delMessage() {}
+  void addMessage(Message msg, String friend_id) async {
+    int ms = Global.CACHE_DB.read("yu_messages_" + friend_id) ?? 0;
+    msg.save("yu_messages_${friend_id}_${ms}");
+    await Global.CACHE_DB.write('yu_messages_' + friend_id, ms + 1);
+  }
 
-  addFriend() {}
-  delFriend() {}
+  delMessage() {
+    // TODO
+  }
 
-  addRequest() {}
-  delRequest() {}
+  void addFriend(String id) async {
+    final keys = this.friends.keys.toList();
+    await Global.CACHE_DB.write('yu_friends', keys);
+    print('add friends keys');
+    await this.friends[id].save('yu_friends_' + id);
+  }
+
+  void delFriend(String id) async {
+    this.friends[id].del('yu_friends_' + id);
+    this.friends.remove(id);
+
+    final keys = this.friends.keys.toList();
+    await Global.CACHE_DB.write('yu_friends', keys);
+  }
+
+  void addRequest(String id) async {
+    final keys = this.requests.keys.toList();
+    await Global.CACHE_DB.write('yu_requests', keys);
+    await this.requests[id].save('yu_requests_' + id);
+  }
+
+  void delRequest(String id) async {
+    this.requests[id].del('yu_requests_' + id);
+    this.requests.remove(id);
+
+    final keys = this.requests.keys.toList();
+    await Global.CACHE_DB.write('yu_requests', keys);
+  }
 
   /// request to make a friend.
   requestFriend(String id, String addr, String remark) {
-    // save the request.
     this.requests[id] = TmpFriend(addr, '', remark, null, true);
     notifyListeners();
+
+    // save the request.
+    addRequest(id);
 
     // send to ws.
     sockets.send('yu', 'request-friend', [this.owner.id, id, addr, remark]);
@@ -104,6 +172,10 @@ class ActiveUser extends ChangeNotifier {
     notifyListeners();
 
     // save the request.
+    this.requests[key].save('yu_requests_' + key);
+
+    // save the friends.
+    addFriend(key);
 
     // send to ws.
     sockets.send('yu', 'response-friend',
@@ -113,10 +185,8 @@ class ActiveUser extends ChangeNotifier {
 
   /// ignore the request.
   ignoreRequest(String key) {
-    this.requests.remove(key);
+    delRequest(key);
     notifyListeners();
-
-    // save the request.
   }
 
   // callback when receive the response for make a friend.
@@ -126,6 +196,9 @@ class ActiveUser extends ChangeNotifier {
 
     this.requests[remote_id].overIt(false);
     notifyListeners();
+
+    // save the request.
+    this.requests[remote_id].save('yu_requests_' + remote_id);
   }
 
   // callback when receive the response for make a friend.
@@ -142,6 +215,12 @@ class ActiveUser extends ChangeNotifier {
         remote_id, remote_name, remote_avatar, remote_addr, true);
       notifyListeners();
     }
+
+    // save the request.
+    this.requests[remote_id].save('yu_requests_' + remote_id);
+
+    // save the friends.
+    addFriend(remote_id);
   }
 
   /// callback when receive the request for make a friend.
@@ -157,6 +236,9 @@ class ActiveUser extends ChangeNotifier {
       remote_avatar.length > 1 ? hex.decode(remote_avatar) : null, false);
 
     notifyListeners();
+
+    // save the request.
+    addRequest(remote_id);
   }
 
   _message(List params) {
@@ -164,6 +246,6 @@ class ActiveUser extends ChangeNotifier {
     final remote_id = params[1];
     final msg = params[2];
     final message = Message.decompress(remote_id, msg);
-    addMessage(message);
+    recvMessage(message);
   }
 }

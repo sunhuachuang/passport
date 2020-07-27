@@ -51,6 +51,10 @@ class CacheDB {
   void write(String key, value) async {
     await _box.put(key, value);
   }
+
+  void delete(String key) async {
+    await _box.delete(key);
+  }
 }
 
 initSocket() {
