@@ -20,7 +20,6 @@ void main() => Global.init().then((e) => runApp(
       providers: [
         ChangeNotifierProvider(create: (_) => RunningApp()),
         // TODO Accounts
-        // TODO Running app
         // TODO ThemeMode
         // TODO AsLocalizations
         // TODO Platform

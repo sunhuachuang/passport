@@ -55,10 +55,9 @@ impl Event {
                     remark
                 ]),
             )),
-            Event::RejectFriend(remote_id, my_id) => rpcs.push((
-                "response-friend",
-                json!([my_id.to_hex(), remote_id.to_hex()]),
-            )),
+            Event::RejectFriend(remote_id, my_id) => {
+                rpcs.push(("reject-friend", json!([my_id.to_hex(), remote_id.to_hex()])))
+            }
             Event::AgreeFriend(remote_id, remote_addr, remote_name, remote_avatar, my_id) => rpcs
                 .push((
                     "agree-friend",

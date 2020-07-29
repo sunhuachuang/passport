@@ -23,28 +23,20 @@ class WebSocketsNotifications {
 
   WebSocketsNotifications._internal();
 
-  ///
   /// The WebSocket 'open' channel
-  ///
   IOWebSocketChannel _channel;
 
-  ///
-  /// Listeners
-  /// Like { 'appname': {'method': fn, 'method2': fn2 }, ...}
-  Map<String, Map<String, Function>> _listeners = new Map();
+  /// Callback function
+  Function _callback;
+  Map<String, Function> _system = {};
 
-  /// ----------------------------------------------------------
   /// Initialization the WebSockets connection with the server
-  /// ----------------------------------------------------------
   Future<bool> init(String addr) async {
-    ///
+
     /// Just in case, close any previous communication
-    ///
     reset();
 
-    ///
     /// Open a new WebSocket communication
-    ///
     var i = 0;
 
     while (true) {
@@ -65,9 +57,7 @@ class WebSocketsNotifications {
     }
   }
 
-  /// ----------------------------------------------------------
   /// Closes the WebSocket communication
-  /// ----------------------------------------------------------
   reset() {
     if (_channel != null){
       if (_channel.sink != null){
@@ -76,14 +66,11 @@ class WebSocketsNotifications {
     }
   }
 
-  /// ---------------------------------------------------------
   /// Sends a message to the server
-  /// ---------------------------------------------------------
   send(String app, String method, List params) {
     jsonrpc['app'] = app;
     jsonrpc['method'] = method;
     jsonrpc['params'] = params;
-    //print(json.encode(jsonrpc));
 
     if (_channel != null){
       if (_channel.sink != null) {
@@ -92,27 +79,21 @@ class WebSocketsNotifications {
     }
   }
 
-  /// ---------------------------------------------------------
   /// Adds a callback to be invoked in case of incoming
-  /// notification
-  /// ---------------------------------------------------------
-  addListener(String app, String method, Function callback) {
-    if (_listeners[app] != null) {
-      _listeners[app][method] = callback;
-    } else {
-      _listeners[app] = { method: callback };
-    }
-  }
-  removeListener(String app, String method) {
-    if (_listeners[app] != null) {
-      _listeners[app].remove(method);
-    }
+  updateCallback(Function callback) {
+    _callback = callback;
   }
 
-  /// ----------------------------------------------------------
-  /// Callback which is invoked each time that we are receiving
-  /// a message from the server
-  /// ----------------------------------------------------------
+  /// Add system callback function.
+  addSystem(String method, Function callback) {
+    _system[method] = callback;
+  }
+
+  removeSystem(String method) {
+    _system.remove(method);
+  }
+
+  /// Callback which is invoked each time that we are receiving message.
   _onReceptionOfMessageFromServer(message) {
     Map response = json.decode(message);
 
@@ -121,17 +102,17 @@ class WebSocketsNotifications {
       && response['app'] != null
       && response['method'] != null
     ) {
-      print(response);
       String app = response['app'];
       String method = response['method'];
       List params = response['result'];
-      print(app);
-      print(method);
-
-      if (_listeners[app] != null && _listeners[app][method] != null) {
-        _listeners[app][method](params);
+      if (app == 'system') {
+        if (_system[method] != null) {
+          _system[method](params);
+        } else {
+          print('DEBUG: system callback has no this method: ' + method);
+        }
       } else {
-        print("Debug websocket has no this ${app}:${method}, ${params}");
+        _callback(app, method, params);
       }
     } else {
       print('Not need handler response.');

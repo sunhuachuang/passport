@@ -37,6 +37,15 @@ class _ChatDetailState extends State<ChatDetail> {
   String me;
   Friend friend;
 
+  int send_msg_type;
+  String send_msg_content;
+
+  sendMessage() {
+    send_msg_type = 0;
+    send_msg_content = textController.text;
+    textController.text = '';
+  }
+
   buildChat(Message message, BuildContext context) {
     final bool isCurrentUser = message.sender != this.me;
 
@@ -193,7 +202,8 @@ class _ChatDetailState extends State<ChatDetail> {
                 icon: Icons.send,
                 borderRadius: 18,
                 action: () => {
-                  context.read<ActiveUser>().sendMessage(0, textController.text),
+                  sendMessage(),
+                  context.read<ActiveUser>().sendMessage(send_msg_type, send_msg_content),
                 }
               ),
             ],

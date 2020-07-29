@@ -21,7 +21,11 @@ class Message {
   }
 
   static load(String cache_id) {
-    final sender = Global.CACHE_DB.read(cache_id + "_sender");
+    final String sender = Global.CACHE_DB.read(cache_id + "_sender");
+    if (sender == null) {
+      return null;
+    }
+
     final type = Global.CACHE_DB.read(cache_id + "_type");
     final content = Global.CACHE_DB.read(cache_id + "_content");
     final String time_str = Global.CACHE_DB.read(cache_id + "_time");

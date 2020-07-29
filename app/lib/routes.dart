@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import 'main.dart';
 import 'pages/home.dart';
@@ -10,6 +11,7 @@ import 'pages/account_show.dart';
 
 import 'apps/starter/app.dart';
 import 'apps/yu/app.dart';
+import 'providers/running_app.dart';
 
 typedef PathWidgetBuilder = Widget Function(BuildContext, String);
 
@@ -57,7 +59,9 @@ class RouteConfiguration {
     ),
     Path(
       r'^' + YuApp.defaultRoute + r'/([\w-]+)$',
-      (context, match) => AppWrapper(app: YuApp(id: match)),
+      (context, match) => AppWrapper(
+        app: YuApp(id: match, sender: context.watch<RunningApp>().sender)
+      ),
     ),
     Path(
       r'^/',

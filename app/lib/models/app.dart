@@ -11,6 +11,17 @@ enum AppName {
   health
 }
 
+extension AppNameExtension on AppName {
+  String to_str() {
+    switch (this) {
+      case AppName.yu: return 'yu';
+      case AppName.docs: return 'docs';
+      case AppName.reminders: return 'reminders';
+      case AppName.health: return 'health';
+    }
+  }
+}
+
 AppModel yuModel(localizations, name, id) {
   return AppModel(
     title: localizations.yuTitle,
@@ -90,13 +101,18 @@ class App {
     }
   }
 
-  String get appname {
-    switch (this.app) {
-      case AppName.yu: return 'yu';
-      case AppName.docs: return 'docs';
-      case AppName.reminders: return 'reminders';
-      case AppName.health: return 'health';
+  static AppName parseAppName(String s) {
+    switch (s) {
+      case 'yu': return AppName.yu;
+      case 'docs': return AppName.docs;
+      case 'reminders': return AppName.reminders;
+      case 'health': return AppName.health;
+      return null;
     }
+  }
+
+  String get appname {
+    return this.app.to_str();
   }
 
   String get route {

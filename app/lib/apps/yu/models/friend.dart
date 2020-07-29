@@ -67,7 +67,7 @@ class Friend {
     await Global.CACHE_DB.write(cache_id + "_addr", this.addr);
   }
 
-  void del(String cache_id) async {
+  static del(String cache_id) async {
     await Global.CACHE_DB.delete(cache_id + "_id");
     await Global.CACHE_DB.delete(cache_id + "_name");
     await Global.CACHE_DB.delete(cache_id + "_avatar");
@@ -127,7 +127,7 @@ class TmpFriend {
     await Global.CACHE_DB.write(cache_id + "_isok", this.ok);
   }
 
-  void del(String cache_id) async {
+  static del(String cache_id) async {
     await Global.CACHE_DB.delete(cache_id + "_addr");
     await Global.CACHE_DB.delete(cache_id + "_name");
     await Global.CACHE_DB.delete(cache_id + "_remark");

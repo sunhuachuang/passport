@@ -1,3 +1,5 @@
+import 'dart:isolate';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -13,7 +15,8 @@ const _primaryColor = Color(0xFF6200EE);
 
 class YuApp extends StatelessWidget {
   final String id;
-  const YuApp({@required this.id});
+  final SendPort sender;
+  const YuApp({@required this.id, @required this.sender});
 
   static const String defaultRoute = '/yu';
 
@@ -22,7 +25,7 @@ class YuApp extends StatelessWidget {
     final owner = User.load(id);
 
     return ListenableProvider<ActiveUser>(
-      create: (_) => ActiveUser(owner: owner),
+      create: (_) => ActiveUser(owner: owner, sender: this.sender),
       child: Builder(builder: (context) {
           return MaterialApp(
             title: AsLocalizations.of(context).yuTitle,

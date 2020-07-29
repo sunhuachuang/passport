@@ -59,7 +59,7 @@ class CacheDB {
 
 initSocket() {
   sockets.init(Global.WS_RPC);
-  sockets.addListener('system', 'addr', Global.updateNodeAddr);
+  sockets.addSystem('addr', Global.updateNodeAddr);
   sockets.send('system', 'addr', []);
   sockets.send('system', 'start', ['did']);
 }
