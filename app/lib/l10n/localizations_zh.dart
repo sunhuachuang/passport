@@ -125,6 +125,10 @@ class AsLocalizationsZh extends AsLocalizations {
   // ---- Yu -----
   @override
   String get yuAppWelcome => '欢迎使用 语!';
+  @override
+  String get yuAppFriendInfo => '账户详情';
+  @override
+  String get yuAppScanAddFriend => '扫描添加好友';
 
   // ---- End Yu--
 

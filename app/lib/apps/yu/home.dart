@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 
 import 'package:assassin/l10n/localizations.dart';
 import 'package:assassin/widgets/adaptive.dart';
@@ -10,6 +11,7 @@ import 'common/styles.dart';
 import 'models/friend.dart';
 import 'models/message.dart';
 import 'widgets/avatar.dart';
+import 'widgets/button_icon.dart';
 
 import 'provider.dart';
 import 'friend.dart';
@@ -143,6 +145,8 @@ class _ListFriendsState extends State<ListFriends> {
     final user = context.watch<ActiveUser>();
     var friends = user.friends;
     var friend_keys = friends.keys.toList();
+    var groups = {};
+    var groups_keys = groups.keys.toList();
 
     return SafeArea(
       child: Column(
@@ -166,38 +170,24 @@ class _ListFriendsState extends State<ListFriends> {
                 Expanded(
                   child: Container(),
                 ),
-                InkWell(
-                  onTap: () {
-                    if (isDisplayDesktop(context)) {
-                      // show Model.
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => AddFriendPage(),
-                        ),
-                      );
-                    } else {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => AddFriendPage(),
-                        ),
-                      );
-                    }
-                  },
+                GestureDetector(
+                  onTap: () => showUserInfo(
+                    context, "${user.owner.id},0x${user.owner.addr}",
+                    user.owner.printId(), user.owner.name, user.owner.printAddr()),
                   child: Container(
-                    padding: EdgeInsets.all(8.0),
+                    padding: EdgeInsets.all(6.0),
                     decoration: BoxDecoration(
                       boxShadow: softShadows,
                       color: background,
-                      shape: BoxShape.circle),
+                      borderRadius: BorderRadius.circular(8.0)),
                     child: Icon(
-                      Icons.person_add,
-                      size: 16.0,
-                      color: Theme.of(context).primaryColor)
-                  )
+                      Icons.info,
+                      size: 18.0,
+                      color: Theme.of(context).primaryColor,
+                    )
+                  ),
                 ),
-                SizedBox(width: 10.0),
+                SizedBox(width: 15.0),
               ],
             ),
           ),
@@ -243,19 +233,21 @@ class _ListFriendsState extends State<ListFriends> {
               ),
             ),
           ),
+          CustomHeading(title: 'Groups', icon: Icons.group_add),
           // groups
+          (groups_keys.length != 0) ?
           Container(
             height: 100.0,
             child: Center(
               child: ListView.builder(
                 scrollDirection: Axis.horizontal,
-                itemCount: friend_keys.length,
+                itemCount: groups_keys.length,
                 itemBuilder: (BuildContext ctx, int index) =>
-                buildGroupAvatar(friends[friend_keys[index]]),
+                buildGroupAvatar(groups[groups_keys[index]]),
               )
             ),
-          ),
-
+          ) : SizedBox(height: 20),
+          CustomHeading(title: 'Friends', icon: Icons.person_add),
           // friends
           Expanded(
             child: ListView.builder(
@@ -270,3 +262,137 @@ class _ListFriendsState extends State<ListFriends> {
   }
 }
 
+class CustomHeading extends StatelessWidget {
+  final String title;
+  final IconData icon;
+
+  const CustomHeading({Key key, @required this.title, @required this.icon}) : super(key: key);
+
+  Widget build(BuildContext context) {
+    return Container(
+      margin: EdgeInsets.only(top: 10, bottom: 10),
+      child: Stack(
+        children: <Widget>[
+          Container(
+            padding: EdgeInsets.fromLTRB(15, 0, 0, 15),
+            child: Row(
+              children: <Widget>[
+                Text(
+                  title,
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Expanded(
+                  child: Container(),
+                ),
+                InkWell(
+                  onTap: () {
+                    if (isDisplayDesktop(context)) {
+                      // TODO show Model.
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => AddFriendPage(),
+                        ),
+                      );
+                    } else {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => AddFriendPage(),
+                        ),
+                      );
+                    }
+                  },
+                  child: Container(
+                    padding: EdgeInsets.all(8.0),
+                    decoration: BoxDecoration(
+                      boxShadow: softShadows,
+                      color: background,
+                      shape: BoxShape.circle),
+                    child: Icon(
+                      icon,
+                      size: 16.0,
+                      color: Theme.of(context).primaryColor)
+                  )
+                ),
+                SizedBox(width: 15.0),
+              ],
+            ),
+          ),
+          Positioned(
+            bottom: 0,
+            left: 15,
+            width: 30,
+            height: 4,
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(30),
+                gradient: LinearGradient(
+                  begin: Alignment.topRight,
+                  end: Alignment.bottomLeft,
+                  stops: [0.1, 1],
+                  colors: [
+                    Color(0xFF8C68EC),
+                    Color(0xFF3E8DF3),
+                  ],
+                ),
+              ),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+}
+
+showUserInfo(BuildContext context, String qrcode, String id, String name, String addr) {
+  final localizations = AsLocalizations.of(context);
+
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text(localizations.yuAppFriendInfo,
+          style: TextStyle(color: Colors.orangeAccent)),
+        content: Container(
+          width: 300,
+          child: Column(
+            children: [
+              Center(
+                child: QrImage(
+                  data: qrcode,
+                  version: QrVersions.auto,
+                  size: 200.0,
+                ),
+              ),
+              SizedBox(height: 5),
+              Center(
+                child: Text(localizations.yuAppScanAddFriend)
+              ),
+              SizedBox(height: 10),
+              ListTile(
+                leading: Icon(Icons.person, color: Colors.blueAccent),
+                title: Text(id, textAlign: TextAlign.left),
+              ),
+              ListTile(
+                leading: Icon(Icons.location_on, color: Colors.greenAccent),
+                title: Text(addr, textAlign: TextAlign.left),
+              ),
+            ]
+        )),
+        actions: <Widget>[
+          FlatButton(
+            child: new Text(localizations.cancel, style: TextStyle(color: Colors.grey[500])),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      );
+    },
+  );
+}

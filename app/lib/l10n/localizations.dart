@@ -166,6 +166,8 @@ abstract class AsLocalizations {
 
   // ---- Yu -----
   String get yuAppWelcome;
+  String get yuAppFriendInfo;
+  String get yuAppScanAddFriend;
 
   // ---- End Yu--
 

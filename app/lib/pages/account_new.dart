@@ -112,7 +112,7 @@ class _AccountNewPageState extends State<AccountNewPage> {
                               Padding(
                                 padding: const EdgeInsets.only(top: 10),
                                 child: Text(
-                                  'Avator',
+                                  'Avatar',
                                   style: TextStyle(
                                     fontSize: 12,
                                     color: Colors.lightBlueAccent,

@@ -139,7 +139,26 @@ class _ChatDetailState extends State<ChatDetail> {
               SizedBox(width: 10.0),
               ButtonIcon(icon: Icons.videocam),
               SizedBox(width: 10.0),
-              ButtonIcon(icon: Icons.info),
+              GestureDetector(
+                onTap: () => showUserInfo(
+                  context, "${this.friend.id},0x${this.friend.addr}",
+                  Friend.betterPrint(this.friend.id),
+                  this.friend.name,
+                  Friend.betterPrint('0x' + this.friend.addr)
+                ),
+                child: Container(
+                  padding: EdgeInsets.all(6.0),
+                  decoration: BoxDecoration(
+                    boxShadow: softShadows,
+                    color: background,
+                    borderRadius: BorderRadius.circular(8.0)),
+                  child: Icon(
+                    Icons.info,
+                    size: 18.0,
+                    color: Theme.of(context).primaryColor,
+                  )
+                ),
+              ),
             ] : [],
           ),
         ),

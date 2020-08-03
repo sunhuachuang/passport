@@ -867,44 +867,63 @@ class _CarouselCard extends StatelessWidget {
         clipBehavior: Clip.antiAlias,
         child: InkWell(
           onTap: () {
+            app.clearNotification();
             Navigator.of(context).pushNamed(appModel.route);
           },
           child: Stack(
             fit: StackFit.expand,
             children: [
               if (asset != null)
-                FadeInImagePlaceholder(
+              FadeInImagePlaceholder(
+                image: asset,
+                child: Ink.image(
                   image: asset,
-                  child: Ink.image(
-                    image: asset,
-                    fit: BoxFit.cover,
-                  ),
-                  placeholder: Container(
-                    color: assetColor,
-                  ),
+                  fit: BoxFit.cover,
                 ),
-                Padding(
-                  padding: const EdgeInsetsDirectional.fromSTEB(10, 10, 10, 10),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      GestureDetector(
-                        onTap: () => context.read<RunningApp>().closeApp(app),
-                        child: Container(
-                          padding: EdgeInsets.all(6.0),
-                          decoration: BoxDecoration(
-                            color: Colors.red[200],
-                            borderRadius: BorderRadius.circular(25.0)),
-                          child: Icon(
-                            Icons.close,
-                            size: 18.0,
-                          )
-                        ),
-                      )
-                    ],
-                  ),
+                placeholder: Container(
+                  color: assetColor,
                 ),
+              ),
+              Padding(
+                padding: const EdgeInsetsDirectional.fromSTEB(10, 10, 10, 10),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    GestureDetector(
+                      onTap: () => context.read<RunningApp>().closeApp(app),
+                      child: Container(
+                        padding: EdgeInsets.all(6.0),
+                        decoration: BoxDecoration(
+                          color: Colors.red[200],
+                          borderRadius: BorderRadius.circular(25.0)),
+                        child: Icon(
+                          Icons.close,
+                          size: 18.0,
+                        )
+                      ),
+                    )
+                  ],
+                ),
+              ),
+              if (app.hasNew)
+              Padding(
+                padding: const EdgeInsetsDirectional.fromSTEB(10, 10, 10, 10),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    GestureDetector(
+                      onTap: () => context.read<RunningApp>().clearNotification(app),
+                      child: Icon(
+                        Icons.notifications_active,
+                        color: Colors.red[200],
+                        size: 20.0,
+                      ),
+                    )
+                  ],
+                ),
+              ),
               Padding(
                 padding: const EdgeInsetsDirectional.fromSTEB(16, 0, 16, 16),
                 child: Column(

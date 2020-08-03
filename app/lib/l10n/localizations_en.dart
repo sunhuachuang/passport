@@ -125,6 +125,10 @@ class AsLocalizationsEn extends AsLocalizations {
   // ---- Yu -----
   @override
   String get yuAppWelcome => 'Welcome to use Yu!';
+  @override
+  String get yuAppFriendInfo => 'Info';
+  @override
+  String get yuAppScanAddFriend => 'Scan add friend';
 
   // ---- End Yu--
 

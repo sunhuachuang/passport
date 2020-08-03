@@ -25,7 +25,38 @@ enum BusType {
 class Bus {
   final BusType type;
   final List params;
-  Bus({this.type, this.params});
+
+  Bus(this.type, this.params);
+
+  /// sender from bus to apps.
+  static Bus busSender(SendPort sender) {
+    return Bus(BusType.sender, [sender]);
+  }
+
+  /// sender from apps to bus.
+  static Bus sender(AppName appname, String appid, SendPort sender) {
+    return Bus(BusType.sender, [appname, appid, sender]);
+  }
+
+  /// initialize from bus to apps.
+  static Bus busInitialize() {
+    return Bus(BusType.initialize, []);
+  }
+
+  /// initialize from apps to bus.
+  static Bus initialize(AppName appname, Map<String, Function> callbacks) {
+    return Bus(BusType.initialize, [appname, callbacks]);
+  }
+
+  /// data from bus to apps.
+  static Bus busData(Map<String, List<String>> datas) {
+    return Bus(BusType.data, [datas]);
+  }
+
+  /// data apps to bus.
+  static Bus data(AppName appname, Map<String, List<String>> datas) {
+    return Bus(BusType.data, [appname, datas]);
+  }
 }
 
 class ActivedApp {
@@ -70,7 +101,7 @@ class RunningApp with ChangeNotifier {
     this._runningApps[app][id].sender = sender;
 
     if (this._runningApps[app].length == 1) {
-      sender.send(Bus(type: BusType.initialize));
+      sender.send(Bus.busInitialize());
     }
   }
 
@@ -92,12 +123,14 @@ class RunningApp with ChangeNotifier {
         final did = params[0]; // WARNNING: default did as frist params.
 
         if (this._runningApps[app] != null && this._runningApps[app][did] != null) {
-          // TODO no-actived running app add num mark.
+          if (this._runningApps[app][did].sender == null) {
+            // TODO
+            this._runningApps[app][did].app.activeNotification();
+            notifyListeners();
+          }
 
           // send msg to app.
-          this._runningApps[app][did].sender.send(
-            Bus(type: BusType.data, params: [{ method: params }]
-          ));
+          this._runningApps[app][did].sender.send(Bus.busData({ method: params }));
         }
       } else {
         print("DEBUG: ${name} callback has no this method: ${method}, or not started");
@@ -105,6 +138,11 @@ class RunningApp with ChangeNotifier {
     } else {
       print("DEBUG: no app name: ${name}");
     }
+  }
+
+  clearNotification(App app) {
+    app.clearNotification();
+    notifyListeners();
   }
 
   openApp(App app) {
@@ -131,4 +169,3 @@ class RunningApp with ChangeNotifier {
     notifyListeners();
   }
 }
-

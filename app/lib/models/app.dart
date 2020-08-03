@@ -82,8 +82,9 @@ class App {
   final AppName app;
   final String name;
   final String id;
+  bool hasNew = false;
 
-  const App({
+  App({
       @required this.app,
       @required this.name,
       @required this.id,
@@ -91,6 +92,14 @@ class App {
   assert(app != null),
   assert(name != null),
   assert(id != null);
+
+  activeNotification() {
+    this.hasNew = true;
+  }
+
+  clearNotification() {
+    this.hasNew = false;
+  }
 
   model(localizations) {
     switch (this.app) {

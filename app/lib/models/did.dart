@@ -30,6 +30,8 @@ class User {
     }
   }
 
+  get addr => Global.NODE_ADDR;
+
   static List<User> list() {
     List<String> accounts = Global.CACHE_DB.read("accounts");
     List<User> users = [];
@@ -74,6 +76,16 @@ class User {
     }
   }
 
+  String printAddr() {
+    final addr = Global.NODE_ADDR;
+    final len = addr.length;
+    if (len > 8) {
+      return "0x" + addr.substring(0, 6) + "..." + addr.substring(len - 8, len);
+    } else {
+      return "";
+    }
+  }
+
   String hexAvatar() {
     if (this.avatar != null) {
       return hex.encode(this.avatar);
@@ -89,7 +101,7 @@ class User {
     ) : CircleAvatar(
       child: Text(this.name.length > 0 ? this.name[0].toUpperCase() : "A"),
       minRadius: 25,
-      backgroundColor: Colors.lightBlueAccent[200],
+      backgroundColor: Colors.grey[300],
     );
   }
 }

@@ -32,17 +32,13 @@ class ActiveUser extends ChangeNotifier {
     this.friends = loadFriends(owner.id);
     this.requests = loadRequests(owner.id);
     this.my_receiver = ReceivePort();
-    this.sender.send(
-      Bus(type: BusType.sender, params: [AppName.yu, this.owner.id, my_receiver.sendPort])
-    );
+    this.sender.send(Bus.sender(AppName.yu, this.owner.id, my_receiver.sendPort));
 
     this.my_receiver.listen((msg) {
         switch (msg.type) {
-          case BusType.sender: return this.sender = msg.params[0]; // nothing to do.
+          case BusType.sender: return this.sender = msg.params[0];
           case BusType.initialize:
-          return this.sender.send(
-            Bus(type: BusType.initialize, params: [AppName.yu, initializeCallback()])
-          );
+          return this.sender.send(Bus.initialize(AppName.yu, initializeCallback()));
           case BusType.data: {
             msg.params[0].forEach((m, p) {
                 _recvCallback(m, p);
@@ -99,7 +95,7 @@ class ActiveUser extends ChangeNotifier {
     Map<String, List<String>> data = new Map();
     data['message'] = [this.owner.id, this.activedFriend.id, this.activedFriend.addr,
       message.compress()];
-    this.sender.send(Bus(type: BusType.data, params: [AppName.yu, data]));
+    this.sender.send(Bus.data(AppName.yu, data));
   }
 
   updateActivedFriend(Friend friend) {
@@ -121,7 +117,7 @@ class ActiveUser extends ChangeNotifier {
     // send to bus.
     Map<String, List<String>> data = new Map();
     data['request-friend'] = [ this.owner.id, id, addr, remark];
-    this.sender.send(Bus(type: BusType.data, params: [AppName.yu, data]));
+    this.sender.send(Bus.data(AppName.yu, data));
   }
 
   /// response the make friend.
@@ -144,7 +140,7 @@ class ActiveUser extends ChangeNotifier {
     // send to bus.
     Map<String, List<String>> data = new Map();
     data['response-friend'] = [this.owner.id, key, tmp.addr, isOk ? '1' : '0'];
-    this.sender.send(Bus(type: BusType.data, params: [AppName.yu, data]));
+    this.sender.send(Bus.data(AppName.yu, data));
   }
 
   /// ignore the request.
