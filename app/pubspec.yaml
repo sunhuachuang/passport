@@ -43,18 +43,19 @@ flutter_icons:
 
 flutter:
   assets:
-    - assets/studies/starter_card.png
-    - assets/studies/starter_card_dark.png
-    - assets/studies/crane_card.png
-    - assets/studies/crane_card_dark.png
-    - assets/studies/fortnightly_card.png
-    - assets/studies/fortnightly_card_dark.png
-    - assets/studies/rally_card.png
-    - assets/studies/rally_card_dark.png
+    - assets/apps/yu.png
+    - assets/apps/yu_dark.png
+    - assets/apps/docs.png
+    - assets/apps/docs_dark.png
+    - assets/apps/reminder.png
+    - assets/apps/reminder_dark.png
+    - assets/apps/health.png
+    - assets/apps/health_dark.png
     - assets/logo/logo.png
     - assets/logo/logo_color.png
     - assets/icons/settings/settings_light.flr
     - assets/icons/settings/settings_dark.flr
+    - assets/apps/docs/
 
   fonts:
     - family: SourceHanSansCN

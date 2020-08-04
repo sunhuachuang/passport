@@ -92,12 +92,12 @@ List<ProfileModel> profileApps(AsLocalizations localizations) {
       app: AppName.docs,
     ),
     ProfileModel(
-      title: localizations.remindersTitle,
-      subtitle: localizations.remindersDescription,
+      title: localizations.reminderTitle,
+      subtitle: localizations.reminderDescription,
       category: PrifleCategory.apps,
       icon: Icons.access_alarms,
       color: Colors.orange,
-      app: AppName.reminders,
+      app: AppName.reminder,
     ),
     ProfileModel(
       title: localizations.healthTitle,

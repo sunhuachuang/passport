@@ -94,9 +94,9 @@ class AsLocalizationsZh extends AsLocalizations {
   @override
   String get healthDescription => '管理个人的健康数据和分析结果';
   @override
-  String get remindersTitle => '提醒';
+  String get reminderTitle => '提醒';
   @override
-  String get remindersDescription => '管理个人代办事务以及提醒';
+  String get reminderDescription => '管理个人代办事务以及提醒';
   @override
   String get starterAppTitle => '入门应用';
   @override

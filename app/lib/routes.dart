@@ -9,9 +9,10 @@ import 'pages/network_device.dart';
 import 'pages/account_new.dart';
 import 'pages/account_show.dart';
 
-import 'apps/starter/app.dart';
-import 'apps/yu/app.dart';
 import 'providers/running_app.dart';
+
+import 'apps/yu/app.dart';
+import 'apps/docs/app.dart';
 
 typedef PathWidgetBuilder = Widget Function(BuildContext, String);
 
@@ -54,13 +55,15 @@ class RouteConfiguration {
       (context, match) => AccountShowPage(slug: match),
     ),
     Path(
-      r'^' + StarterApp.defaultRoute,
-      (context, match) => const AppWrapper(app: StarterApp()),
-    ),
-    Path(
       r'^' + YuApp.defaultRoute + r'/([\w-]+)$',
       (context, match) => AppWrapper(
         app: YuApp(id: match, sender: context.watch<RunningApp>().sender)
+      ),
+    ),
+    Path(
+      r'^' + DocsApp.defaultRoute + r'/([\w-]+)$',
+      (context, match) => AppWrapper(
+        app: DocsApp(id: match, sender: context.watch<RunningApp>().sender)
       ),
     ),
     Path(

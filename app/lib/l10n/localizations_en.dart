@@ -94,9 +94,9 @@ class AsLocalizationsEn extends AsLocalizations {
   @override
   String get healthDescription => 'Management of personal health data';
   @override
-  String get remindersTitle => 'Reminders';
+  String get reminderTitle => 'Reminders';
   @override
-  String get remindersDescription => 'A things todo list and reminder';
+  String get reminderDescription => 'A things todo list and reminder';
   @override
   String get starterAppTitle => 'Starter app';
   @override

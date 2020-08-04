@@ -147,8 +147,8 @@ abstract class AsLocalizations {
   String get docsDescription;
   String get healthTitle;
   String get healthDescription;
-  String get remindersTitle;
-  String get remindersDescription;
+  String get reminderTitle;
+  String get reminderDescription;
   String get starterAppTitle;
   String get starterAppDescription;
   // ---- end bulit-in apps--

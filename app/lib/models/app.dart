@@ -3,11 +3,12 @@ import 'package:flutter/material.dart';
 import '../l10n/localizations.dart';
 
 import '../apps/yu/app.dart';
+import '../apps/docs/app.dart';
 
 enum AppName {
   yu,
   docs,
-  reminders,
+  reminder,
   health
 }
 
@@ -16,7 +17,7 @@ extension AppNameExtension on AppName {
     switch (this) {
       case AppName.yu: return 'yu';
       case AppName.docs: return 'docs';
-      case AppName.reminders: return 'reminders';
+      case AppName.reminder: return 'reminder';
       case AppName.health: return 'health';
     }
   }
@@ -27,8 +28,8 @@ AppModel yuModel(localizations, name, id) {
     title: localizations.yuTitle,
     subtitle: name,
     appId: id,
-    asset: const AssetImage('assets/studies/starter_card.png'),
-    assetDark: const AssetImage('assets/studies/starter_card_dark.png'),
+    asset: const AssetImage('assets/apps/yu.png'),
+    assetDark: const AssetImage('assets/apps/yu_dark.png'),
     assetColor: const Color(0xFFFEDBD0),
     assetDarkColor: const Color(0xFF543B3C),
     textColor: Colors.red[900],
@@ -41,22 +42,22 @@ AppModel docsModel(localizations, name, id) {
     title: localizations.docsTitle,
     subtitle: name,
     appId: id,
-    asset: const AssetImage('assets/studies/crane_card.png'),
-    assetDark: const AssetImage('assets/studies/crane_card_dark.png'),
+    asset: const AssetImage('assets/apps/docs.png'),
+    assetDark: const AssetImage('assets/apps/docs_dark.png'),
     assetColor: const Color(0xFFFEDBD0),
     assetDarkColor: const Color(0xFF543B3C),
     textColor: Colors.red[900],
-    route: YuApp.defaultRoute + '/' + id,
+    route: DocsApp.defaultRoute + '/' + id,
   );
 }
 
-AppModel remindersModel(localizations, name, id) {
+AppModel reminderModel(localizations, name, id) {
   return AppModel(
-    title: localizations.remindersTitle,
+    title: localizations.reminderTitle,
     subtitle: name,
     appId: id,
-    asset: const AssetImage('assets/studies/fortnightly_card.png'),
-    assetDark: const AssetImage('assets/studies/fortnightly_card_dark.png'),
+    asset: const AssetImage('assets/apps/reminder.png'),
+    assetDark: const AssetImage('assets/apps/reminder_dark.png'),
     assetColor: const Color(0xFFFEDBD0),
     assetDarkColor: const Color(0xFF543B3C),
     textColor: Colors.red[900],
@@ -69,8 +70,8 @@ AppModel healthModel(localizations, name, id) {
     title: localizations.healthTitle,
     subtitle: name,
     appId: id,
-    asset: const AssetImage('assets/studies/rally_card.png'),
-    assetDark: const AssetImage('assets/studies/rally_card_dark.png'),
+    asset: const AssetImage('assets/apps/health.png'),
+    assetDark: const AssetImage('assets/apps/health_dark.png'),
     assetColor: const Color(0xFFFEDBD0),
     assetDarkColor: const Color(0xFF543B3C),
     textColor: Colors.red[900],
@@ -105,7 +106,7 @@ class App {
     switch (this.app) {
       case AppName.yu: return yuModel(localizations, this.name, this.id);
       case AppName.docs: return docsModel(localizations, this.name, this.id);
-      case AppName.reminders: return remindersModel(localizations, this.name, this.id);
+      case AppName.reminder: return reminderModel(localizations, this.name, this.id);
       case AppName.health: return healthModel(localizations, this.name, this.id);
     }
   }
@@ -114,7 +115,7 @@ class App {
     switch (s) {
       case 'yu': return AppName.yu;
       case 'docs': return AppName.docs;
-      case 'reminders': return AppName.reminders;
+      case 'reminder': return AppName.reminder;
       case 'health': return AppName.health;
       return null;
     }
@@ -127,8 +128,8 @@ class App {
   String get route {
     switch (this.app) {
       case AppName.yu: return YuApp.defaultRoute + '/' + id;
-      case AppName.docs: return YuApp.defaultRoute + '/' + id;
-      case AppName.reminders: return YuApp.defaultRoute + '/' + id;
+      case AppName.docs: return DocsApp.defaultRoute + '/' + id;
+      case AppName.reminder: return YuApp.defaultRoute + '/' + id;
       case AppName.health: return YuApp.defaultRoute + '/' + id;
     }
   }
