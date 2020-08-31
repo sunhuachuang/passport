@@ -1,6 +1,5 @@
 import 'dart:isolate';
 
-import 'package:convert/convert.dart';
 import 'package:flutter/material.dart';
 
 import 'package:assassin/models/did.dart';
@@ -19,7 +18,7 @@ class ActiveUser extends ChangeNotifier {
   Map<String, TmpFriend> requests;
 
   SendPort sender; // send message to outside.
-  ReceivePort my_receiver;  // receive message from outside.
+  ReceivePort myReceiver;  // receive message from outside.
 
   Friend activedFriend;
   List<Message> activedMessages;
@@ -31,10 +30,10 @@ class ActiveUser extends ChangeNotifier {
     this.online = true;
     this.friends = loadFriends(owner.id);
     this.requests = loadRequests(owner.id);
-    this.my_receiver = ReceivePort();
-    this.sender.send(Bus.sender(AppName.yu, this.owner.id, my_receiver.sendPort));
+    this.myReceiver = ReceivePort();
+    this.sender.send(Bus.sender(AppName.yu, this.owner.id, myReceiver.sendPort));
 
-    this.my_receiver.listen((msg) {
+    this.myReceiver.listen((msg) {
         switch (msg.type) {
           case BusType.sender: return this.sender = msg.params[0];
           case BusType.initialize:
@@ -49,26 +48,26 @@ class ActiveUser extends ChangeNotifier {
   }
 
   _recvCallback(String method, List params) {
-    final remote_id = params[1];
+    final remoteId = params[1];
 
     if (method == 'request-friend') {
       final tmp = buildRequestFromParams(params);
-      this.requests[remote_id] = tmp;
+      this.requests[remoteId] = tmp;
     } else  if (method == 'reject-friend') {
-      if (this.requests[remote_id] != null) {
-        this.requests[remote_id].overIt(false);
+      if (this.requests[remoteId] != null) {
+        this.requests[remoteId].overIt(false);
       }
     } else if (method == 'agree-friend') {
-      if (this.requests[remote_id] != null) {
-        this.requests[remote_id].overIt(true);
+      if (this.requests[remoteId] != null) {
+        this.requests[remoteId].overIt(true);
         final f = buildFriendFromParams(params);
         this.friends[f.id] = f;
       }
     } else if (method == 'message') {
       final msg = params[2];
-      final message = Message.decompress(remote_id, msg);
+      final message = Message.decompress(remoteId, msg);
 
-      if (this.activedFriend != null && this.activedFriend.id == remote_id) {
+      if (this.activedFriend != null && this.activedFriend.id == remoteId) {
         this.activedMessages.add(message);
       } else {
         // TODO add has new message for friend.

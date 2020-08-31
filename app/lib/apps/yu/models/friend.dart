@@ -47,31 +47,31 @@ class Friend {
     }
   }
 
-  static load(String cache_id) {
-    final id = Global.CACHE_DB.read(cache_id + "_id");
+  static load(String cacheId) {
+    final id = Global.CACHE_DB.read(cacheId + "_id");
     if (id == null) {
       return null;
     }
 
-    final name = Global.CACHE_DB.read(cache_id + "_name");
-    final avatar = Global.CACHE_DB.read(cache_id + "_avatar");
-    final addr = Global.CACHE_DB.read(cache_id + "_addr");
+    final name = Global.CACHE_DB.read(cacheId + "_name");
+    final avatar = Global.CACHE_DB.read(cacheId + "_avatar");
+    final addr = Global.CACHE_DB.read(cacheId + "_addr");
 
     return Friend.fromLoad(id, name, avatar, addr, false);
   }
 
-  void save(String cache_id) async {
-    await Global.CACHE_DB.write(cache_id + "_id", this.id);
-    await Global.CACHE_DB.write(cache_id + "_name", this.name);
-    await Global.CACHE_DB.write(cache_id + "_avatar", this.avatar);
-    await Global.CACHE_DB.write(cache_id + "_addr", this.addr);
+  void save(String cacheId) async {
+    await Global.CACHE_DB.write(cacheId + "_id", this.id);
+    await Global.CACHE_DB.write(cacheId + "_name", this.name);
+    await Global.CACHE_DB.write(cacheId + "_avatar", this.avatar);
+    await Global.CACHE_DB.write(cacheId + "_addr", this.addr);
   }
 
-  static del(String cache_id) async {
-    await Global.CACHE_DB.delete(cache_id + "_id");
-    await Global.CACHE_DB.delete(cache_id + "_name");
-    await Global.CACHE_DB.delete(cache_id + "_avatar");
-    await Global.CACHE_DB.delete(cache_id + "_addr");
+  static del(String cacheId) async {
+    await Global.CACHE_DB.delete(cacheId + "_id");
+    await Global.CACHE_DB.delete(cacheId + "_name");
+    await Global.CACHE_DB.delete(cacheId + "_avatar");
+    await Global.CACHE_DB.delete(cacheId + "_addr");
   }
 }
 
@@ -102,14 +102,14 @@ class TmpFriend {
     return Avatar(width: width, height: height, name: this.name, avatar: this.avatar);
   }
 
-  static TmpFriend load(String cache_id) {
-    final addr = Global.CACHE_DB.read(cache_id + "_addr");
-    final name = Global.CACHE_DB.read(cache_id + "_name");
-    final remark = Global.CACHE_DB.read(cache_id + "_remark");
-    final avatar = Global.CACHE_DB.read(cache_id + "_avatar");
-    final isMe = Global.CACHE_DB.read(cache_id + "_isme");
-    final isOver = Global.CACHE_DB.read(cache_id + "_isover");
-    final isOk = Global.CACHE_DB.read(cache_id + "_isok");
+  static TmpFriend load(String cacheId) {
+    final addr = Global.CACHE_DB.read(cacheId + "_addr");
+    final name = Global.CACHE_DB.read(cacheId + "_name");
+    final remark = Global.CACHE_DB.read(cacheId + "_remark");
+    final avatar = Global.CACHE_DB.read(cacheId + "_avatar");
+    final isMe = Global.CACHE_DB.read(cacheId + "_isme");
+    final isOver = Global.CACHE_DB.read(cacheId + "_isover");
+    final isOk = Global.CACHE_DB.read(cacheId + "_isok");
     var tmp = TmpFriend(addr, name, remark, avatar, isMe);
     if (isOver) {
       tmp.overIt(isOk);
@@ -117,23 +117,23 @@ class TmpFriend {
     return tmp;
   }
 
-  void save(String cache_id) async {
-    await Global.CACHE_DB.write(cache_id + "_addr", this.addr);
-    await Global.CACHE_DB.write(cache_id + "_name", this.name);
-    await Global.CACHE_DB.write(cache_id + "_remark", this.remark);
-    await Global.CACHE_DB.write(cache_id + "_avatar", this.avatar);
-    await Global.CACHE_DB.write(cache_id + "_isme", this.isMe);
-    await Global.CACHE_DB.write(cache_id + "_isover", this.over);
-    await Global.CACHE_DB.write(cache_id + "_isok", this.ok);
+  Future<void> save(String cacheId) async {
+    await Global.CACHE_DB.write(cacheId + "_addr", this.addr);
+    await Global.CACHE_DB.write(cacheId + "_name", this.name);
+    await Global.CACHE_DB.write(cacheId + "_remark", this.remark);
+    await Global.CACHE_DB.write(cacheId + "_avatar", this.avatar);
+    await Global.CACHE_DB.write(cacheId + "_isme", this.isMe);
+    await Global.CACHE_DB.write(cacheId + "_isover", this.over);
+    await Global.CACHE_DB.write(cacheId + "_isok", this.ok);
   }
 
-  static del(String cache_id) async {
-    await Global.CACHE_DB.delete(cache_id + "_addr");
-    await Global.CACHE_DB.delete(cache_id + "_name");
-    await Global.CACHE_DB.delete(cache_id + "_remark");
-    await Global.CACHE_DB.delete(cache_id + "_avatar");
-    await Global.CACHE_DB.delete(cache_id + "_isme");
-    await Global.CACHE_DB.delete(cache_id + "_isover");
-    await Global.CACHE_DB.delete(cache_id + "_isok");
+  static Future<void> del(String cacheId) async {
+    await Global.CACHE_DB.delete(cacheId + "_addr");
+    await Global.CACHE_DB.delete(cacheId + "_name");
+    await Global.CACHE_DB.delete(cacheId + "_remark");
+    await Global.CACHE_DB.delete(cacheId + "_avatar");
+    await Global.CACHE_DB.delete(cacheId + "_isme");
+    await Global.CACHE_DB.delete(cacheId + "_isover");
+    await Global.CACHE_DB.delete(cacheId + "_isok");
   }
 }

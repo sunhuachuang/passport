@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'details.dart';
 import 'edit2.dart';
 import 'provider.dart';
+import 'models/file.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage();
@@ -107,10 +108,12 @@ class HomePage extends StatelessWidget {
                           return ListTile(
                             onTap: () {
                               if (file.isEditable()) {
-                                final content = context.read<ActiveUser>().getEditFile(file.id);
+                                final content = FileInfo.loadEditableContent(file.id);
                                 Navigator.push(
                                   context,
-                                  MaterialPageRoute(builder: (context) => Editor2Page(file, content)),
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          Editor2Page(file, content)),
                                 );
                               }
                             },

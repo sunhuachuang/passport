@@ -22,6 +22,11 @@ dependencies:
   qr_flutter:
   barcode_scan:
   image_picker:
+  # choose file on desktop
+  file_chooser:
+    git:
+      url: git://github.com/google/flutter-desktop-embedding.git
+      path: plugins/file_chooser
   flutter_slidable:
   path_provider:
   tuple: ^1.0.3

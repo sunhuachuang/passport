@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:assassin/global.dart';
+
 enum FileType {
   markdown,
   image,
@@ -30,6 +32,15 @@ class FileInfo {
       default:
         return false;
     }
+  }
+
+  static String loadEditableContent(String fileId) {
+    //return "markdown, here  ssss\n- sss\n- sss";
+    return Global.CACHE_DB.read("docs_" + fileId);
+  }
+
+  static Future<void> saveEditableContent(String fileId, String content) async {
+    await Global.CACHE_DB.write("docs_" + fileId, content);
   }
 }
 

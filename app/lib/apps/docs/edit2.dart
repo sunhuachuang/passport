@@ -31,8 +31,8 @@ class Editor2PageState extends State<Editor2Page> {
     inputFocus.requestFocus();
   }
 
-  saveContent(context) {
-    context.read<ActiveUser>().saveEditFile(widget.file.id, _controller.text);
+  saveContent() async {
+    await FileInfo.saveEditableContent(widget.file.id, _controller.text);
   }
 
   @override

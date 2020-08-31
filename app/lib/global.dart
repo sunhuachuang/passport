@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:file_chooser/file_chooser.dart';
 
 import 'models/options.dart';
 import 'common/native.dart';
@@ -11,18 +12,36 @@ import 'common/websocket.dart';
 
 Future<File> pickImage() async {
   if (Platform.isLinux || Platform.isMacOS || Platform.isWindows) {
-    return Future.delayed(Duration(seconds: 0), () => null);
+    var filterGroup = FileTypeFilterGroup(
+        label: "Images", fileExtensions: ["jpeg", "jpg", "png", "bmp"]);
+    var result = await showOpenPanel(
+        allowedFileTypes: [filterGroup],
+        allowsMultipleSelection: false,
+        canSelectDirectories: false,
+        confirmButtonText: "Confirm");
+    if (result.canceled == false) {
+      String path = result.paths.first;
+      File file = File(path);
+      return file;
+      //Image image = Image.file(file);
+      //return image;
+    }
+    //return Future.delayed(Duration(seconds: 0), () => null);
   }
 
   if (Platform.isAndroid || Platform.isIOS) {
-    return await ImagePicker.pickImage(source: ImageSource.gallery, maxWidth: 80.0, maxHeight: 80.0);
+    final pickedFile = await ImagePicker()
+        .getImage(source: ImageSource.gallery, maxWidth: 80.0, maxHeight: 80.0);
+    return File(pickedFile.path);
   }
 }
 
 Future<String> homeDir() async {
   if (Platform.isLinux || Platform.isMacOS || Platform.isWindows) {
-    final home = Platform.environment['HOME'] ?? Platform.environment['USERPROFILE'];
-    return Future.delayed(Duration(seconds: 0), () => '.tdn'); // PROD: home + '/.tdn'
+    final home =
+        Platform.environment['HOME'] ?? Platform.environment['USERPROFILE'];
+    return Future.delayed(
+        Duration(seconds: 0), () => '.tdn'); // PROD: home + '/.tdn'
   }
 
   if (Platform.isAndroid || Platform.isIOS) {
@@ -48,11 +67,11 @@ class CacheDB {
     return Hive.box('assassinCache').get(key);
   }
 
-  void write(String key, value) async {
+  Future<void> write(String key, value) async {
     await _box.put(key, value);
   }
 
-  void delete(String key) async {
+  Future<void> delete(String key) async {
     await _box.delete(key);
   }
 }
@@ -128,7 +147,10 @@ class Global {
   static String printAddr() {
     var len = NODE_ADDR.length;
     if (len > 8) {
-      return "0x" + NODE_ADDR.substring(0, 6) + "..." + NODE_ADDR.substring(len - 8, len);
+      return "0x" +
+          NODE_ADDR.substring(0, 6) +
+          "..." +
+          NODE_ADDR.substring(len - 8, len);
     } else {
       return "";
     }

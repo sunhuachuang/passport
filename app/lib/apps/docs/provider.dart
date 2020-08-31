@@ -1,12 +1,9 @@
 import 'dart:isolate';
-import 'dart:typed_data';
 
-import 'package:convert/convert.dart';
 import 'package:flutter/material.dart';
 
 import 'package:assassin/models/did.dart';
 import 'package:assassin/models/app.dart';
-import 'package:assassin/widgets/relative_time.dart';
 import 'package:assassin/providers/running_app.dart';
 
 import 'constants.dart';
@@ -57,13 +54,5 @@ class ActiveUser extends ChangeNotifier {
           date: "2020/2/20",
           type: FileType.markdown),
     ];
-  }
-
-  String getEditFile(String fileId) {
-    return "markdown, here  ssss\n- sss\n- sss";
-  }
-
-  saveEditFile(String fileId, String filecontent) {
-    //
   }
 }
