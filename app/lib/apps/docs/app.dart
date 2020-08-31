@@ -37,24 +37,25 @@ class DocsApp extends StatelessWidget {
             routes: {
               DocsApp.defaultRoute: (context) => const _Home(),
             },
-            // theme: AsThemeData.lightThemeData.copyWith(
-            //   colorScheme: const ColorScheme(
-            //     primary: _primaryColor,
-            //     primaryVariant: Color(0xFF3700B3),
-            //     secondary: Color(0xFF03DAC6),
-            //     secondaryVariant: Color(0xFF018786),
-            //     background: Colors.white,
-            //     surface: Colors.white,
-            //     onBackground: Colors.black,
-            //     error: Color(0xFFB00020),
-            //     onError: Colors.white,
-            //     onPrimary: Colors.white,
-            //     onSecondary: Colors.black,
-            //     onSurface: Colors.black,
-            //     brightness: Brightness.light,
-            //   ),
-            //   platform: AsOptions.of(context).platform,
-            // ),
+            theme: AsThemeData.lightThemeData.copyWith(
+              colorScheme: const ColorScheme(
+                primary: _primaryColor,
+                primaryVariant: Color(0xFF3700B3),
+                secondary: Color(0xFF03DAC6),
+                secondaryVariant: Color(0xFF018786),
+                background: Colors.white,
+                surface: Colors.white,
+                onBackground: Colors.black,
+                error: Color(0xFFB00020),
+                onError: Colors.white,
+                onPrimary: Colors.white,
+                onSecondary: Colors.black,
+                onSurface: Colors.black,
+                brightness: Brightness.light,
+              ),
+              platform: AsOptions.of(context).platform,
+              scaffoldBackgroundColor: Colors.white,
+            ),
           );
         }
       )

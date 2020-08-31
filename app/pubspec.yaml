@@ -25,6 +25,7 @@ dependencies:
   flutter_slidable:
   path_provider:
   tuple: ^1.0.3
+  flutter_markdown:
   # below need remove
   flare_dart: ^2.3.4
   flare_flutter: ^2.0.2

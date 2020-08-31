@@ -84,6 +84,7 @@ pub async fn start(db_path: String) -> Result<()> {
                         Err(e) => debug!("{}", e),
                     }
                 }
+                GroupReceiveMessage::Stream(_id, _stream) => todo!(),
             },
             ReceiveMessage::Rpc(uid, params, is_ws) => {
                 debug!("uid: {}, rpc comming.", uid);

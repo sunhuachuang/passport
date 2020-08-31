@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import 'details.dart';
+import 'edit2.dart';
+import 'provider.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage();
 
   @override
   Widget build(BuildContext context) {
+    final recentFiles = context.watch<ActiveUser>().recentFiles();
+
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
@@ -36,11 +41,11 @@ class HomePage extends StatelessWidget {
                       children: <Widget>[
                         Text(
                           "Good Morning",
-                          style: Theme.of(context).textTheme.body1,
+                          style: Theme.of(context).textTheme.bodyText1,
                         ),
                         Text(
                           "Sun",
-                          style: Theme.of(context).textTheme.headline,
+                          style: Theme.of(context).textTheme.headline5,
                         ),
                       ],
                     ),
@@ -59,15 +64,11 @@ class HomePage extends StatelessWidget {
                 ],
               ),
             ),
-            Wrap(
-              spacing: 10.0,
-              runSpacing: 5.0,
-              children: <Widget>[
-                demo(context, storageBoxes, 0),
-                demo(context, storageBoxes, 1),
-                demo(context, storageBoxes, 2),
-              ]
-            ),
+            Wrap(spacing: 10.0, runSpacing: 5.0, children: <Widget>[
+              demo(context, storageBoxes, 0),
+              demo(context, storageBoxes, 1),
+              //demo(context, storageBoxes, 2),
+            ]),
             Flexible(
               child: Container(
                 decoration: BoxDecoration(
@@ -84,7 +85,7 @@ class HomePage extends StatelessWidget {
                       children: <Widget>[
                         Text(
                           "Recent Files",
-                          style: Theme.of(context).textTheme.display1.apply(
+                          style: Theme.of(context).textTheme.headline4.apply(
                                 color: Color(0xff0b1666),
                                 fontWeightDelta: 2,
                               ),
@@ -100,61 +101,29 @@ class HomePage extends StatelessWidget {
                     ),
                     Expanded(
                       child: ListView.builder(
-                        itemCount: filesList.length,
+                        itemCount: recentFiles.length,
                         itemBuilder: (ctx, i) {
-                          String image;
-                          Color color;
-                          switch (filesList[i]['type']) {
-                            case fileType.sheet:
-                              {
-                                image = 'assets/apps/docs/file_sheet.png';
-                                color = Color(0xffe3f9f3);
-                              }
-                              break;
-
-                            case fileType.document:
-                              {
-                                image = 'assets/apps/docs/file_word.png';
-                                color = Color(0xffeaeaea);
-                              }
-                              break;
-                            case fileType.pdf:
-                              {
-                                image = 'assets/apps/docs/file_pdf.png';
-                                color = Color(0xfff8bdba);
-                              }
-                              break;
-                            case fileType.video:
-                              {
-                                image = 'assets/apps/docs/file_video.png';
-                                color = Color(0xfffceeeb);
-                              }
-                              break;
-                            case fileType.image:
-                              {
-                                image = 'assets/apps/docs/file_image.png';
-                                color = Color(0xfffceeeb);
-                              }
-                              break;
-                            default:
-                              {
-                                image = 'assets/apps/docs/file_word.png';
-                                color = Color(0xff939aef);
-                              }
-                          }
+                          final file = recentFiles[i];
                           return ListTile(
-                            onTap: () {},
+                            onTap: () {
+                              if (file.isEditable()) {
+                                final content = context.read<ActiveUser>().getEditFile(file.id);
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => Editor2Page(file, content)),
+                                );
+                              }
+                            },
                             leading: Container(
                               padding: EdgeInsets.all(11.0),
                               decoration: BoxDecoration(
-                                color: color,
+                                color: file.typeAsset.bg,
                                 borderRadius: BorderRadius.circular(5.0),
                               ),
-                              child: Image.asset(image),
+                              child: file.typeAsset.icon,
                             ),
-                            title: Text("${filesList[i]['name']}"),
-                            subtitle: Text(
-                                "${filesList[i]['date']} | ${filesList[i]['size']}"),
+                            title: Text(file.name),
+                            subtitle: Text("${file.date} | ${file.size}"),
                             trailing: IconButton(
                               icon: Icon(Icons.more_vert),
                               onPressed: () {},
@@ -209,36 +178,30 @@ Widget demo(context, storageBoxes, i) {
                 Text(
                   "${storageBoxes[i].name}",
                   style: Theme.of(context)
-                  .textTheme
-                  .title
-                  .copyWith(color: Colors.black),
+                      .textTheme
+                      .title
+                      .copyWith(color: Colors.black),
                 ),
                 SizedBox(height: 9),
                 Text(
                   "${storageBoxes[i].expiryDate}",
-                  style: Theme.of(context)
-                  .textTheme
-                  .overline
-                  .copyWith(
-                    color: Colors.black.withOpacity(.75),
-                  ),
+                  style: Theme.of(context).textTheme.overline.copyWith(
+                        color: Colors.black.withOpacity(.75),
+                      ),
                 ),
                 SizedBox(height: 9),
                 Text(
                   "${storageBoxes[i].usedSpace} GB of ${storageBoxes[i].availableSpace} Gb used",
-                  style: Theme.of(context)
-                  .textTheme
-                  .body1
-                  .copyWith(
-                    color: Colors.black.withOpacity(.75),
-                  ),
+                  style: Theme.of(context).textTheme.body1.copyWith(
+                        color: Colors.black.withOpacity(.75),
+                      ),
                 ),
                 SizedBox(height: 5),
                 ClipRRect(
                   borderRadius: BorderRadius.circular(5.0),
                   child: LinearProgressIndicator(
                     value: storageBoxes[i].usedSpace /
-                    storageBoxes[i].availableSpace,
+                        storageBoxes[i].availableSpace,
                     backgroundColor: Colors.white,
                   ),
                 )
@@ -250,61 +213,6 @@ Widget demo(context, storageBoxes, i) {
     ),
   );
 }
-
-enum fileType { sheet, pdf, video, document, image }
-
-Color blueColor = Color(0xff4e5af6);
-
-List<Map<String, dynamic>> filesList = [
-  {
-    'name': 'sheet.xlsx',
-    'date': '13/10/2019',
-    'size': '10 KB',
-    'type': fileType.sheet
-  },
-  {
-    'name': 'Hello world.pdf',
-    'date': '13/09/2019',
-    'size': '29 MB',
-    'type': fileType.pdf
-  },
-  {
-    'name': 'Provider Video.mp4',
-    'date': '04/10/2019',
-    'size': '293 MB',
-    'type': fileType.video
-  },
-  {
-    'name': 'invoice.docx',
-    'date': '04/10/2019',
-    'size': '293 MB',
-    'type': fileType.document
-  },
-  {
-    'name': 'sheet.xlsx',
-    'date': '13/10/2019',
-    'size': '10 KB',
-    'type': fileType.sheet
-  },
-  {
-    'name': 'me.jpg',
-    'date': '13/09/2019',
-    'size': '29 MB',
-    'type': fileType.image
-  },
-  {
-    'name': 'Provider Video.mp4',
-    'date': '04/10/2019',
-    'size': '293 MB',
-    'type': fileType.video
-  },
-  {
-    'name': 'invoice.docx',
-    'date': '04/10/2019',
-    'size': '293 MB',
-    'type': fileType.document
-  },
-];
 
 class MyColors {
   static const lightBlue = Color(0xffe1f2ff),
