@@ -28,6 +28,9 @@ class Editor2PageState extends State<Editor2Page> {
     super.initState();
     fullEdit = true;
     _controller.text = widget.fileContent;
+    if (widget.file == null) {
+      widget.file = FileInfo.newTmp();
+    }
     inputFocus.requestFocus();
   }
 

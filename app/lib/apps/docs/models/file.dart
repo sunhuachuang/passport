@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import 'package:assassin/global.dart';
 
@@ -25,6 +26,17 @@ class FileInfo {
     this.typeAsset = FileTypeAsset(this.type);
   }
 
+  FileInfo.newTmp() {
+    this.type = FileType.markdown;
+    this.typeAsset = FileTypeAsset(this.type);
+    final time = new DateTime.now();
+    var formatter = new DateFormat('yyyyMMddHmmss');
+    formatter.format(time);
+    this.date = formatter.format(time);
+    this.id = "tmp_" + this.date;
+    this.name = "tmp_" + this.date + ".md";
+  }
+
   bool isEditable() {
     switch (this.type) {
       case FileType.markdown:
@@ -33,6 +45,10 @@ class FileInfo {
         return false;
     }
   }
+
+  Future<void> save() {}
+
+  static List<FileInfo> loadFiles() {}
 
   static String loadEditableContent(String fileId) {
     //return "markdown, here  ssss\n- sss\n- sss";

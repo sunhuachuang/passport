@@ -93,11 +93,18 @@ class HomePage extends StatelessWidget {
                         ),
                         FlatButton(
                           child: Text(
-                            "View All",
+                            "New Article",
                             style: TextStyle(color: Colors.blue),
                           ),
-                          onPressed: () {},
-                        )
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                Editor2Page(null, "Markdown style")),
+                            );
+                          }
+                        ),
                       ],
                     ),
                     Expanded(
