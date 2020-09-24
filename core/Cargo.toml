@@ -1,11 +1,11 @@
 [package]
-name = "assassin"
+name = "possport"
 version = "0.0.1"
 authors = ["Contact <contact@cypherlink.io>"]
 edition = "2018"
 readme = "README.md"
 description = "Personal distributed assistant."
-repository = "https://github.com/cypherlink/assassin"
+repository = "https://github.com/cypherlink/possport"
 keywords = ["distributed", "blockchain", "infrastructure", "assistant"]
 license = "MIT/Apache-2.0"
 
@@ -15,7 +15,7 @@ opt-level = 's'
 codegen-units = 1
 
 [lib]
-name = "assassin"
+name = "possport"
 crate-type = ["dylib", "staticlib"]
 
 [dependencies]
@@ -27,7 +27,7 @@ base64 = "0.11"
 bs58 = "0.3"
 sha3 = "0.8"
 blake2 = "0.8"
-ed25519-dalek = { git = "https://github.com/dalek-cryptography/ed25519-dalek", branch = "develop", features=["serde"] }
+ed25519-dalek = "1.0"
 rand = "0.7"
 
 tdn = { path = "../../TDN" } # Dev

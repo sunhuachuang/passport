@@ -1,4 +1,4 @@
-# assassin-core
+# core
 Backend services built on TDN.
 
 Dev: `cargo run` use as backend service for Front-end app.
